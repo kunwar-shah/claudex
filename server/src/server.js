@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import { projectRoutes } from './routes/projects.js';
 import { searchRoutes } from './routes/search.js';
+import { exportRoutes } from './routes/export.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,6 +39,7 @@ if (process.env.NODE_ENV === 'production') {
 // API Routes
 await fastify.register(projectRoutes, { prefix: '/api' });
 await fastify.register(searchRoutes, { prefix: '/api' });
+await fastify.register(exportRoutes, { prefix: '/api' });
 
 // Catch-all route for SPA in production
 if (process.env.NODE_ENV === 'production') {
