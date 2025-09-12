@@ -1,0 +1,299 @@
+/* Tremor Dashboard Exact Styling - Only for tremor-preview routes */
+
+.tremor-dashboard-page {
+  /* Reset and base styles */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Fonts - match Tremor exactly */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Background and layout */
+  background-color: #f9fafb;
+  min-height: 100vh;
+
+  /* Typography scale - Tremor style */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.25;
+  }
+
+  h1 { font-size: 1.875rem; } /* 30px */
+  h2 { font-size: 1.5rem; }   /* 24px */
+  h3 { font-size: 1.25rem; }  /* 20px */
+
+  /* Text colors - match Tremor */
+  .text-primary { color: #111827; }
+  .text-secondary { color: #6b7280; }
+  .text-tertiary { color: #9ca3af; }
+
+  /* Card styling - exact Tremor look */
+  .tremor-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  /* Metrics styling */
+  .tremor-metric {
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.2;
+  }
+
+  .tremor-metric-sm {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  /* Badge styling - Tremor style */
+  .tremor-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    
+    &.emerald {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    &.red {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    &.blue {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    
+    &.gray {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+  }
+
+  /* Progress bar styling */
+  .tremor-progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #3b82f6;
+      border-radius: 4px;
+      transition: width 0.3s ease-in-out;
+      
+      &.emerald { background-color: #10b981; }
+      &.red { background-color: #ef4444; }
+      &.blue { background-color: #3b82f6; }
+    }
+  }
+
+  /* Text sizes - Tremor style */
+  .text-xs { font-size: 0.75rem; }
+  .text-sm { font-size: 0.875rem; }
+  .text-base { font-size: 1rem; }
+  .text-lg { font-size: 1.125rem; }
+  .text-xl { font-size: 1.25rem; }
+
+  /* Spacing system */
+  .space-y-1 > * + * { margin-top: 0.25rem; }
+  .space-y-2 > * + * { margin-top: 0.5rem; }
+  .space-y-3 > * + * { margin-top: 0.75rem; }
+  .space-y-4 > * + * { margin-top: 1rem; }
+  .space-y-6 > * + * { margin-top: 1.5rem; }
+  .space-y-8 > * + * { margin-top: 2rem; }
+
+  /* Grid system */
+  .tremor-grid {
+    display: grid;
+    gap: 1.5rem;
+    
+    &.cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    &.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    &.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    &.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    
+    @media (max-width: 768px) {
+      &.cols-2, &.cols-3, &.cols-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (min-width: 769px) and (max-width: 1024px) {
+      &.cols-3, &.cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  }
+
+  /* Chart container styling */
+  .tremor-chart {
+    .recharts-wrapper {
+      font-family: inherit;
+    }
+    
+    .recharts-text {
+      font-size: 0.75rem;
+      fill: #6b7280;
+    }
+    
+    .recharts-cartesian-axis-tick-value {
+      font-size: 0.75rem;
+      fill: #6b7280;
+    }
+    
+    .recharts-legend-item {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Layout containers */
+  .tremor-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    
+    @media (min-width: 640px) {
+      padding: 0 1.5rem;
+    }
+    
+    @media (min-width: 1024px) {
+      padding: 0 2rem;
+    }
+  }
+
+  /* Flex utilities */
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .flex-1 { flex: 1 1 0%; }
+  .items-center { align-items: center; }
+  .items-start { align-items: flex-start; }
+  .justify-between { justify-content: space-between; }
+  .justify-center { justify-content: center; }
+
+  /* Padding and margin utilities */
+  .p-4 { padding: 1rem; }
+  .p-6 { padding: 1.5rem; }
+  .px-4 { padding-left: 1rem; padding-right: 1rem; }
+  .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+  .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+  .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .mt-2 { margin-top: 0.5rem; }
+  .mt-4 { margin-top: 1rem; }
+  .mt-6 { margin-top: 1.5rem; }
+  .mt-8 { margin-top: 2rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mb-6 { margin-bottom: 1.5rem; }
+  .mb-8 { margin-bottom: 2rem; }
+
+  /* Scrolling fixes */
+  &.scrollable {
+    height: 100vh;
+    overflow: hidden;
+    
+    .main-content {
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+  }
+
+  /* Sidebar panel styling */
+  .sidebar-panel {
+    background: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+    height: 100vh;
+    overflow-y: auto;
+    
+    .panel-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .panel-content {
+      padding: 1rem;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+  }
+
+  /* Session cards styling */
+  .session-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    &.active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+  }
+
+  /* Override Tremor component styles for exact match */
+  .tremor-Card-root {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  .tremor-Text-root {
+    color: #6b7280 !important;
+    font-size: 0.875rem !important;
+  }
+
+  .tremor-Metric-root {
+    color: #111827 !important;
+    font-weight: 600 !important;
+    font-size: 1.875rem !important;
+  }
+
+  .tremor-Title-root {
+    color: #111827 !important;
+    font-weight: 600 !important;
+    font-size: 1.125rem !important;
+  }
+
+  .tremor-Badge-root {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    padding: 2px 8px !important;
+  }
+
+  .tremor-ProgressBar-root {
+    height: 8px !important;
+    background-color: #e5e7eb !important;
+  }
+}

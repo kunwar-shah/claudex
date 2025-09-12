@@ -1,0 +1,39 @@
+{
+  "name": "claude-viewer",
+  "version": "1.0.0",
+  "description": "Claude Code Conversations Viewer - A web UI for viewing Claude Code conversation files",
+  "main": "index.js",
+  "bin": {
+    "claude-viewer": "./bin/claude-viewer.js"
+  },
+  "scripts": {
+    "start": "node bin/claude-viewer.js",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "install-deps": "npm install --prefix server && npm install --prefix client",
+    "test": "npm test --prefix server && npm test --prefix client"
+  },
+  "keywords": [
+    "claude",
+    "code",
+    "conversation",
+    "viewer",
+    "jsonl",
+    "ai"
+  ],
+  "author": "Claude Code Viewer Team",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.0",
+    "cross-spawn": "^7.0.3",
+    "chalk": "^4.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/claude-viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/claude-viewer/issues"
+  },
+  "homepage": "https://github.com/your-org/claude-viewer#readme"
+}

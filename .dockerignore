@@ -1,0 +1,27 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Client build artifacts
+client/dist
+client/node_modules
+
+# Server
+server/node_modules
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  claude-viewer:
+    build: .
+    ports:
+      - "3400:3400"
+    environment:
+      - NODE_ENV=production
+      - PROJECT_ROOT=/app/data
+    volumes:
+      # Mount your Claude projects directory
+      # Adjust the path on the left to your actual Claude projects location
+      - ~/.claude/projects:/app/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3400/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Optional: Add a reverse proxy for production deployment
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - claude-viewer
+  #   restart: unless-stopped
