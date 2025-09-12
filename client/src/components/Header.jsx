@@ -36,16 +36,18 @@ const Header = () => {
             <span>Search</span>
           </Link>
           
+          {/* TODO: Re-enable Tremor UI preview later
           <Link 
             to="/tremor-preview"
             className="flex items-center space-x-1 px-2 py-1 text-xs text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
             title="Tremor UI Preview Dashboard"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1-1V4z" />
             </svg>
             <span>Tremor</span>
           </Link>
+          */}
           
           <ProjectComboBox
             projects={projectsData?.projects || []}
