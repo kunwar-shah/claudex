@@ -125,7 +125,11 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
           />
           
           {/* Menu */}
-          <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className={`absolute right-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 ${
+            variant === 'footer' 
+              ? 'bottom-full mb-1' // Appear above the button for footer
+              : 'top-full mt-1'    // Appear below the button for header
+          }`}>
             <div className="p-2">
               <div className="text-xs text-gray-500 px-3 py-2 font-medium">
                 Export "{sessionTitle || 'Conversation'}" as:
