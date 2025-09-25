@@ -3,9 +3,22 @@ import ReactMarkdown from 'react-markdown'
 import { Highlight, themes } from 'prism-react-renderer'
 
 const MessageRenderer = ({ content, contentKind = 'text' }) => {
-  if (!content) {
+  // Robust content validation and normalization
+  if (!content && content !== 0) {
     return <div className="text-gray-400 italic">No content</div>
   }
+
+  // Ensure content is a string for operations that require it
+  const normalizeContent = (value) => {
+    if (typeof value === 'string') return value
+    if (typeof value === 'number') return String(value)
+    if (typeof value === 'object' && value !== null) {
+      return JSON.stringify(value, null, 2)
+    }
+    return String(value || '')
+  }
+
+  const safeContent = normalizeContent(content)
 
   switch (contentKind) {
     case 'markdown':
@@ -54,7 +67,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
             }
           }}
         >
-          {content}
+          {safeContent}
         </ReactMarkdown>
       )
 
@@ -62,7 +75,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
       return (
         <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
           <pre className="text-sm">
-            {content.split('\n').map((line, index) => (
+            {safeContent.split('\n').map((line, index) => (
               <div key={index} className={`${
                 line.startsWith('+') ? 'text-green-400' :
                 line.startsWith('-') ? 'text-red-400' :
@@ -91,7 +104,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
         return (
           <div className="bg-gray-100 p-4 rounded-lg overflow-hidden">
             <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
-              {content}
+              {safeContent}
             </pre>
           </div>
         )
@@ -101,7 +114,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
       return (
         <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-hidden">
           <pre className="text-sm overflow-x-auto whitespace-pre-wrap break-words">
-            <code>{content}</code>
+            <code>{safeContent}</code>
           </pre>
         </div>
       )
@@ -113,14 +126,14 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
             Raw/Unknown Format
           </div>
           <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
-            {typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
+            {safeContent}
           </pre>
         </div>
       )
 
     default:
       // Plain text with basic formatting
-      const formattedContent = content
+      const formattedContent = safeContent
         .split('\n')
         .map((line, index) => (
           <div key={index}>
