@@ -1,6 +1,6 @@
-# 🚀 Claude Viewer - Setup Guide
+# 🚀 Claudex - Setup Guide
 
-Complete guide to set up Claude Viewer on any machine.
+Complete guide to set up Claudex on any machine.
 
 ---
 
@@ -17,8 +17,8 @@ Complete guide to set up Claude Viewer on any machine.
 ### **1. Clone or Download the Project**
 
 ```bash
-git clone <repository-url> claude-viewer
-cd claude-viewer
+git clone https://github.com/kunwar-shah/claudex.git
+cd claudex
 ```
 
 ### **2. Configure Environment Variables**

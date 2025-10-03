@@ -1,4 +1,4 @@
-# Claude Code Conversations Viewer
+# Claudex
 
 A powerful web application for viewing, searching, and analyzing Claude Code conversation histories. Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
 
@@ -24,8 +24,8 @@ A powerful web application for viewing, searching, and analyzing Claude Code con
 
 1. **Clone the repository**:
 ```bash
-git clone <your-repo-url>
-cd claude-viewer
+git clone https://github.com/kunwar-shah/claudex.git
+cd claudex
 ```
 
 2. **Install dependencies**:
@@ -50,12 +50,8 @@ cd ..
 
 4. **Start the application**:
 ```bash
-# Option 1: Using npm script (runs both frontend + backend)
-cd claude-viewer
+# Using npm script (runs both frontend + backend)
 npm run dev
-
-# Option 2: Or use the helper script from root
-./run-claude-viewer.sh
 ```
 
 5. **Open your browser**: http://localhost:3000
@@ -64,14 +60,13 @@ The backend API runs on `http://localhost:3400`
 
 ### Global CLI Installation (Optional)
 
-Install globally to use `claude-viewer` command anywhere:
+Install globally to use `claudex` command anywhere:
 
 ```bash
-cd claude-viewer
 ./install.sh
 
 # Then run from anywhere:
-claude-viewer
+claudex
 ```
 
 ## 🔧 Configuration
@@ -99,7 +94,7 @@ NODE_ENV=development
 ## 📂 Project Structure
 
 ```
-claude-viewer/
+claudex/
 ├── server/                    # Backend (Node.js + Fastify)
 │   ├── src/
 │   │   ├── parsers/          # Template detection & message parsing
@@ -294,10 +289,7 @@ parseMyTemplate(rawMessage) {
 
 ## 📝 Scripts Reference
 
-### Root Directory (`/home/boss/claude-chats/`)
-- `./run-claude-viewer.sh` - Quick start script (runs from claude-viewer/)
-
-### Claude Viewer Directory
+### Claudex Directory
 - `npm run dev` - Run frontend + backend concurrently
 - `npm start` - Run frontend + backend (production mode)
 - `./install.sh` - Install as global CLI command

@@ -21,8 +21,8 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd claude-viewer
+git clone https://github.com/kunwar-shah/claudex.git
+cd claudex
 ```
 
 ### 2. Install All Dependencies
@@ -52,7 +52,7 @@ cp .env.example .env
 ### 4. Start the Application
 
 ```bash
-# From claude-viewer directory
+# From claudex directory
 npm run dev
 ```
 
@@ -165,7 +165,7 @@ cd client && npm update && cd ..
 ### Minimal Setup
 ```bash
 # Clone and install
-git clone <repo-url> && cd claude-viewer
+git clone https://github.com/kunwar-shah/claudex.git && cd claudex
 npm install && cd server && npm install && cd ../client && npm install && cd ..
 
 # Configure
@@ -178,7 +178,7 @@ npm run dev
 ### Full Setup with Search
 ```bash
 # Clone and install
-git clone <repo-url> && cd claude-viewer
+git clone https://github.com/kunwar-shah/claudex.git && cd claudex
 npm install && cd server && npm install && cd ../client && npm install && cd ..
 
 # Configure
