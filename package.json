@@ -11,7 +11,12 @@
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "build": "npm run build --prefix client",
     "install-deps": "npm install --prefix server && npm install --prefix client",
-    "test": "npm test --prefix server && npm test --prefix client"
+    "test": "npm test --prefix server && npm test --prefix client",
+    "check": "node scripts/check-system.mjs",
+    "check:verbose": "node scripts/check-system.mjs --verbose",
+    "check:fix": "node scripts/check-system.mjs --fix",
+    "check:json": "node scripts/check-system.mjs --json",
+    "predev": "node scripts/check-system.mjs --quiet || true"
   },
   "keywords": [
     "claude",
