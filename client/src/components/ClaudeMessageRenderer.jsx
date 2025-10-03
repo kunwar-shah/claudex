@@ -5,12 +5,17 @@ const ClaudeMessageRenderer = ({ message }) => {
   const [showThinking, setShowThinking] = useState(false)
   const [showToolDetails, setShowToolDetails] = useState({})
 
+  // Handle cases where message might not have metadata (e.g., search results)
+  if (!message || !message.metadata) {
+    return <MessageRenderer content={message?.content || message?.text || ''} contentKind={message?.contentKind || 'text'} />
+  }
+
   // Only render for v2-mixed and v3 template messages
-  if (message.metadata?.template !== 'claude-code-v2-mixed' && message.metadata?.template !== 'claude-code-v3') {
+  if (message.metadata.template !== 'claude-code-v2-mixed' && message.metadata.template !== 'claude-code-v3') {
     return <MessageRenderer content={message.content} contentKind={message.contentKind} />
   }
 
-  const contentBlocks = message.metadata?.contentBlocks || {}
+  const contentBlocks = message.metadata.contentBlocks || {}
 
   const toggleToolDetails = (toolId) => {
     setShowToolDetails(prev => ({

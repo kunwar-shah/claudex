@@ -473,8 +473,7 @@ const SearchPage = () => {
                   <div className="prose prose-sm max-w-none">
                     {selectedMessage.content || selectedMessage.text ? (
                       <ClaudeMessageRenderer
-                        content={selectedMessage.content || selectedMessage.text}
-                        searchQuery={selectedMessage.searchQuery}
+                        message={selectedMessage}
                       />
                     ) : selectedMessage.snippet ? (
                       <div className="whitespace-pre-wrap text-slate-700">
