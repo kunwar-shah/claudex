@@ -115,3 +115,7 @@ Thumbs.db
 # Project specific
 search-index/
 data/
+server/data/
+
+# Environment files (keep .env.example for reference)
+server/.env

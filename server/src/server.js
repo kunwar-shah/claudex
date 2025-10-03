@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { projectRoutes } from './routes/projects.js';
 import { searchRoutes } from './routes/search.js';
 import { exportRoutes } from './routes/export.js';
+import { getProjectRoot } from './utils/pathHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -91,11 +92,12 @@ const start = async () => {
   try {
     const port = process.env.PORT || 3400;
     const host = process.env.HOST || '0.0.0.0';
-    
+    const projectRoot = getProjectRoot();
+
     await fastify.listen({ port: parseInt(port), host });
-    
+
     console.log(`🚀 Claude Viewer Server running on http://${host}:${port}`);
-    console.log(`📁 Projects root: ${process.env.PROJECT_ROOT || '~/.claude/projects'}`);
+    console.log(`📁 Projects root: ${projectRoot}`);
     console.log(`🔍 Search: SQLite FTS5 with persistent indexing`);
     
   } catch (error) {

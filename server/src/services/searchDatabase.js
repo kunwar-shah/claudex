@@ -93,8 +93,11 @@ export class SearchDatabase {
   }
 
   async search({ query, projectId, role, from, to, limit = 50, offset = 0 }) {
+    // Escape FTS5 query to handle terms like "ETL" that could be interpreted as column names
+    const escapedQuery = this.escapeFTS5Query(query);
+
     let searchSQL = `
-      SELECT 
+      SELECT
         project_id,
         project_name,
         session_id,
@@ -110,8 +113,8 @@ export class SearchDatabase {
       FROM messages_fts
       WHERE messages_fts MATCH ?
     `
-    
-    const params = [query]
+
+    const params = [escapedQuery]
     
     // Add filters
     if (projectId) {
@@ -142,7 +145,7 @@ export class SearchDatabase {
     
     // Get total count
     let countSQL = `SELECT COUNT(*) as total FROM messages_fts WHERE messages_fts MATCH ?`
-    const countParams = [query]
+    const countParams = [escapedQuery]
     
     if (projectId) {
       countSQL += ` AND project_id = ?`
@@ -217,6 +220,21 @@ export class SearchDatabase {
       INSERT OR REPLACE INTO search_metadata (key, value, updated_at)
       VALUES (?, ?, CURRENT_TIMESTAMP)
     `, [key, value])
+  }
+
+  escapeFTS5Query(query) {
+    // Handle FTS5 special characters and terms that could be interpreted as column names
+    // Escape double quotes and wrap the entire query in double quotes for literal search
+    const escaped = query.replace(/"/g, '""');
+
+    // For simple terms that could conflict with column names, wrap in quotes
+    // This handles cases like "ETL", "FROM", "SELECT" etc.
+    if (/^[A-Z_][A-Z0-9_-]*$/i.test(query.trim())) {
+      return `"${escaped}"`;
+    }
+
+    // For complex queries, just escape quotes and return as-is
+    return escaped;
   }
 
   async close() {

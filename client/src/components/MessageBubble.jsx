@@ -1,10 +1,15 @@
 import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import MessageRenderer from './MessageRenderer'
+import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 
 const MessageBubble = ({ message, isFirst, isLast }) => {
   const [showRaw, setShowRaw] = useState(false)
   const [showActions, setShowActions] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(() => {
+    // Only collapse for v2-mixed template messages that are explicitly marked as collapsed
+    return message.metadata?.collapsed !== true
+  })
 
   const copyToClipboard = async () => {
     try {
@@ -90,6 +95,11 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
           {getRoleIcon(message.role)}
           <span className="font-medium text-gray-900 capitalize">
             {message.role}
+            {message.role === 'system' && message.metadata?.displayType === 'summary' && (
+              <span className="ml-1 text-xs text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+                Summary
+              </span>
+            )}
           </span>
           <span className="text-sm text-gray-500">
             {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
@@ -102,6 +112,19 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
         </div>
         
         <div className="flex items-center space-x-1">
+          {/* Collapse/Expand button only for v2-mixed template messages */}
+          {message.metadata?.collapsed !== undefined && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1 text-gray-400 hover:text-gray-600"
+              title={isExpanded ? "Collapse" : "Expand"}
+            >
+              <svg className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
           {message.toolsUsed && message.toolsUsed.length > 0 && (
             <button
               onClick={() => setShowActions(!showActions)}
@@ -174,9 +197,24 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
       )}
 
       {/* Message Content */}
-      <div className="prose prose-sm max-w-none overflow-hidden">
-        <MessageRenderer content={message.content} contentKind={message.contentKind} />
-      </div>
+      {isExpanded ? (
+        <div className="prose prose-sm max-w-none overflow-hidden">
+          {/* Use ClaudeMessageRenderer for v2-mixed and v3 templates, otherwise use regular MessageRenderer */}
+          {(message.metadata?.template === 'claude-code-v2-mixed' || message.metadata?.template === 'claude-code-v3') ? (
+            <ClaudeMessageRenderer message={message} />
+          ) : (
+            <MessageRenderer content={message.content} contentKind={message.contentKind} />
+          )}
+        </div>
+      ) : (
+        <div className="text-sm text-gray-600 italic">
+          {message.metadata?.displayType === 'summary' ? (
+            <span>AI Summary: {message.content?.slice(0, 100)}...</span>
+          ) : (
+            <span>System message (click to expand)</span>
+          )}
+        </div>
+      )}
 
       {/* Raw JSON */}
       {showRaw && message.raw && (

@@ -38,6 +38,14 @@ export const projectsApi = {
     api.get(`/projects/${projectId}/sessions/${sessionId}/messages/${messageId}`),
 };
 
+export const exportApi = {
+  // Export session in different formats
+  exportSession: (projectId, sessionId, format = 'json') => 
+    api.get(`/export/session/${projectId}/${sessionId}?format=${format}`, {
+      responseType: 'blob'
+    }),
+};
+
 export const searchApi = {
   // Search across conversations
   search: (searchParams) => api.post('/search', searchParams),

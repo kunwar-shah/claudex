@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { projectsApi } from '../services/api'
 import MessageBubble from './MessageBubble'
+import ExportButton from './ExportButton'
 
 const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -115,11 +116,19 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
             </p>
           </div>
           
-          {stats && stats.skippedLines > 0 && (
-            <div className="text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded">
-              {stats.skippedLines} lines skipped
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            {stats && stats.skippedLines > 0 && (
+              <div className="text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded">
+                {stats.skippedLines} lines skipped
+              </div>
+            )}
+            
+            <ExportButton 
+              projectId={projectId} 
+              sessionId={sessionId} 
+              sessionTitle={session?.title}
+            />
+          </div>
         </div>
 
         {/* Pagination Info & Controls - Prominent Header */}

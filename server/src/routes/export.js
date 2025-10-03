@@ -1,9 +1,10 @@
 import { FileScanner } from '../services/fileScanner.js';
 import { SessionParser } from '../services/sessionParser.js';
 import { formatDistanceToNow } from 'date-fns';
+import { getProjectRoot } from '../utils/pathHelper.js';
 
 export async function exportRoutes(fastify, options) {
-  const fileScanner = new FileScanner(process.env.PROJECT_ROOT || '~/.claude/projects');
+  const fileScanner = new FileScanner(getProjectRoot());
   const sessionParser = new SessionParser();
 
   // GET /api/export/session/:projectId/:sessionId?format=json|html|txt

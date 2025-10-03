@@ -1,8 +1,9 @@
 import { FileScanner } from '../services/fileScanner.js';
 import { SessionParser } from '../services/sessionParser.js';
+import { getProjectRoot } from '../utils/pathHelper.js';
 
 export async function projectRoutes(fastify, options) {
-  const fileScanner = new FileScanner(process.env.PROJECT_ROOT || '~/.claude/projects');
+  const fileScanner = new FileScanner(getProjectRoot());
   const sessionParser = new SessionParser();
 
   // GET /api/projects

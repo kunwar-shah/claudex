@@ -3,7 +3,7 @@
 echo "🔍 Testing Claude Viewer FTS5 Search System"
 echo "=========================================="
 
-SERVER_URL="http://localhost:3001/api"
+SERVER_URL="http://localhost:3400/api"
 
 echo ""
 echo "1️⃣  Checking server health and search index status..."

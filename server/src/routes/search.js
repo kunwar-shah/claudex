@@ -1,7 +1,8 @@
 import { SearchIndexer } from '../services/searchIndexer.js';
+import { getProjectRoot } from '../utils/pathHelper.js';
 
 export async function searchRoutes(fastify, options) {
-  const searchIndexer = new SearchIndexer(process.env.PROJECT_ROOT || '~/.claude/projects');
+  const searchIndexer = new SearchIndexer(getProjectRoot());
   await searchIndexer.init();
 
   // POST /api/search  
@@ -109,7 +110,7 @@ export async function searchRoutes(fastify, options) {
       const indexStatus = await searchIndexer.getIndexStatus();
       return {
         status: 'healthy',
-        projectsRoot: process.env.PROJECT_ROOT || '~/.claude/projects',
+        projectsRoot: getProjectRoot(),
         searchIndex: indexStatus,
         timestamp: new Date().toISOString()
       };

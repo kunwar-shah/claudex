@@ -1,9 +1,10 @@
 import { FileScanner } from './fileScanner.js'
 import { SessionParser } from './sessionParser.js'
 import { SearchDatabase } from './searchDatabase.js'
+import { getProjectRoot } from '../utils/pathHelper.js'
 
 export class SearchIndexer {
-  constructor(projectsRoot = process.env.PROJECT_ROOT || '~/.claude/projects') {
+  constructor(projectsRoot = getProjectRoot()) {
     this.projectsRoot = projectsRoot
     this.fileScanner = new FileScanner(projectsRoot)
     this.sessionParser = new SessionParser()
