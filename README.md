@@ -38,19 +38,24 @@ git clone https://github.com/kunwar-shah/claudex.git
 cd claudex
 ```
 
-2. **Install dependencies**:
+2. **Run system check** (optional but recommended):
 ```bash
-# Install CLI dependencies (for global command)
+npm run check
+```
+This validates your environment and catches common setup issues.
+
+3. **Install dependencies** (or use auto-fix):
+```bash
+# Option 1: Manual installation
 npm install
-
-# Install server dependencies
 cd server && npm install && cd ..
-
-# Install client dependencies
 cd client && npm install && cd ..
+
+# Option 2: Auto-fix (installs deps + creates .env)
+npm run check:fix
 ```
 
-3. **Configure environment**:
+4. **Configure environment** (if not using auto-fix):
 ```bash
 cd server
 cp .env.example .env
@@ -58,15 +63,43 @@ cp .env.example .env
 cd ..
 ```
 
-4. **Start the application**:
+5. **Start the application**:
 ```bash
-# Using npm script (runs both frontend + backend)
+# Automatically runs system check, then starts servers
 npm run dev
 ```
 
-5. **Open your browser**: http://localhost:3000
+6. **Open your browser**: http://localhost:3000
 
 The backend API runs on `http://localhost:3400`
+
+### System Checker
+
+Claudex includes a comprehensive system checker that validates your environment:
+
+```bash
+# Quick check
+npm run check
+
+# Detailed output
+npm run check:verbose
+
+# Auto-fix common issues
+npm run check:fix
+
+# JSON output (for CI/CD)
+npm run check:json
+```
+
+**What it checks:**
+- ✅ Node.js & npm versions
+- ✅ PROJECT_ROOT path & permissions
+- ✅ Port availability (3000, 3400)
+- ✅ Dependencies installation
+- ✅ Claude Code data (projects, sessions)
+- ✅ JSONL file validity
+- ✅ Database permissions
+- ✅ Search index status
 
 ### Global CLI Installation (Optional)
 
@@ -300,8 +333,12 @@ parseMyTemplate(rawMessage) {
 ## 📝 Scripts Reference
 
 ### Claudex Directory
-- `npm run dev` - Run frontend + backend concurrently
+- `npm run dev` - Run frontend + backend concurrently (with pre-check)
 - `npm start` - Run frontend + backend (production mode)
+- `npm run check` - Run system health check
+- `npm run check:verbose` - Run detailed system check
+- `npm run check:fix` - Auto-fix common setup issues
+- `npm run check:json` - JSON output for CI/CD
 - `./install.sh` - Install as global CLI command
 - `./test-search.sh` - Test search API endpoints
 
@@ -316,30 +353,63 @@ parseMyTemplate(rawMessage) {
 
 ## 🐛 Troubleshooting
 
-### No Projects Found
+### Quick Diagnosis
+
+Run the system checker first to identify issues:
+```bash
+npm run check:verbose
+```
+
+This will check all common problems and provide actionable suggestions.
+
+### Common Issues
+
+#### No Projects Found
+```bash
+# Check what the system sees
+npm run check
+
+# Verify path
+cat server/.env | grep PROJECT_ROOT
+```
 - Verify `PROJECT_ROOT` in `.env` points to `~/.claude/projects`
 - Check that Claude Code has created conversation files
-- Ensure read permissions on the directory
+- Run `npm run check:fix` to auto-create missing directories
 
-### Search Not Working
-- Build the search index: `curl -X POST http://localhost:3400/api/search/index/build`
-- Check index status: `curl http://localhost:3400/api/search/index/status`
-- Look for errors in server logs
+#### Search Not Working
+```bash
+# Quick fix via UI
+# Visit http://localhost:3000/search → Click "Rebuild Index"
 
-### Port Conflicts
-- Change `PORT=3400` in `server/.env`
-- Update `client/vite.config.js` proxy target if needed
-- Update `test-search.sh` SERVER_URL if needed
+# Or via command line
+curl -X POST http://localhost:3400/api/search/index/build
+```
 
-### Template Not Detected
-- Check server logs for template detection results
-- Verify JSONL file format matches expected structure
-- Add new template support if format is unknown
+#### Port Conflicts
+```bash
+# System checker will detect port conflicts
+npm run check
 
-### Path Expansion Issues
-- `~/` is automatically expanded to your home directory
-- Use absolute paths if `~/` expansion fails
-- Check `server/src/utils/pathHelper.js` for path resolution logic
+# Auto-detected ports in use show PID
+# Kill process: kill <PID>
+# Or change PORT in server/.env
+```
+
+#### Permission Errors
+```bash
+# Check permissions
+npm run check:verbose
+
+# Fix permissions
+chmod +r ~/.claude/projects
+chmod +w claude-viewer/server/data
+```
+
+#### Dependencies Issues
+```bash
+# Auto-install all dependencies
+npm run check:fix
+```
 
 ## 🚢 Production Deployment
 

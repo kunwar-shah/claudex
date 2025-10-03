@@ -3,6 +3,7 @@
 * Getting Started
   * [Quick Start](getting-started.md)
   * [Installation](installation.md)
+  * [System Checker](system-checker.md)
   * [Configuration](configuration.md)
 
 * User Guide
