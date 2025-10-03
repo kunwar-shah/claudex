@@ -1,0 +1,16 @@
+# Claude Code Configuration for Claudex Repository
+
+# Git Commit Configuration
+# IMPORTANT: Never add co-author attribution to commits in this repository
+# All commits should be attributed to the primary author only
+
+# This prevents the following lines from being added to commit messages:
+# - "🤖 Generated with [Claude Code](...)"
+# - "Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# To ensure this setting is respected:
+# 1. Do not use git commit templates that add co-author lines
+# 2. All commits should be clean without additional attribution footers
+# 3. If co-author lines are accidentally added, use git filter-branch to remove them:
+#    git filter-branch -f --msg-filter 'sed "/🤖 Generated with/d" | sed "/Co-Authored-By: Claude/d"' -- --all
+#    git push --force origin main
