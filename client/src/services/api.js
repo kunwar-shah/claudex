@@ -52,6 +52,9 @@ export const searchApi = {
 
   // Rebuild search index
   rebuildIndex: () => api.post('/search/index/build'),
+
+  // Get index status
+  getIndexStatus: () => api.get('/search/index/status'),
 };
 
 export const healthApi = {

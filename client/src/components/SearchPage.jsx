@@ -5,6 +5,8 @@ import { projectsApi, searchApi } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 import RebuildIndexButton from './RebuildIndexButton'
+import IndexStatusCard from './IndexStatusCard'
+import IndexStatusBadge from './IndexStatusBadge'
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,6 +25,7 @@ const SearchPage = () => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [copySuccess, setCopySuccess] = useState('')
+  const [showRebuildModal, setShowRebuildModal] = useState(false)
 
   const { data: projectsData } = useQuery({
     queryKey: ['projects'],
@@ -270,9 +273,12 @@ const SearchPage = () => {
           {!isSearching && hasSearched && (
             <>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-slate-800">
-                  Search Results {searchResults.length > 0 && `(${searchResults.length} found)`}
-                </h2>
+                <div className="flex items-center space-x-3">
+                  <h2 className="text-sm font-semibold text-slate-800">
+                    Search Results {searchResults.length > 0 && `(${searchResults.length} found)`}
+                  </h2>
+                  <IndexStatusBadge />
+                </div>
                 {searchQuery && (
                   <p className="text-xs text-slate-500">
                     Searching for: "<span className="font-medium">{searchQuery}</span>"
@@ -374,16 +380,14 @@ const SearchPage = () => {
               <p className="text-slate-600 text-sm mb-4 max-w-md mx-auto">
                 Enter keywords to search across all your Claude conversations. Use filters to narrow down your results.
               </p>
-              <div className="text-xs text-slate-500 space-y-1">
+              <div className="text-xs text-slate-500 space-y-1 mb-6">
                 <p><strong>Tips:</strong></p>
                 <p>• Search by specific terms, phrases, or code snippets</p>
                 <p>• Use filters to search by role, date range, or template</p>
                 <p>• Select a specific project to limit your search scope</p>
               </div>
 
-              <div className="mt-6">
-                <RebuildIndexButton />
-              </div>
+              <IndexStatusCard onRebuildClick={() => setShowRebuildModal(true)} />
             </div>
           )}
         </div>
