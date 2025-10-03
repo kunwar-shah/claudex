@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { projectsApi, searchApi } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
-import MessageRenderer from './MessageRenderer'
+import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -215,7 +215,6 @@ const SearchPage = () => {
                       <option value="">All Roles</option>
                       <option value="user">User</option>
                       <option value="assistant">Assistant</option>
-                      <option value="system">System</option>
                     </select>
                   </div>
                   <div>
@@ -244,9 +243,10 @@ const SearchPage = () => {
                       className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white"
                     >
                       <option value="">All Templates</option>
+                      <option value="claude-code-v3">Claude Code v3 (Universal)</option>
+                      <option value="claude-code-v2-mixed">Claude Code v2 Mixed</option>
                       <option value="claude-code-v1">Claude Code v1</option>
                       <option value="general">General</option>
-                      <option value="unknown">Unknown</option>
                     </select>
                   </div>
                 </div>
@@ -333,15 +333,12 @@ const SearchPage = () => {
                           </div>
                         </div>
                         
-                        <div 
+                        <div
                           onClick={() => handleResultClick(result)}
                           className="block cursor-pointer"
                         >
-                          <div className="text-sm text-slate-700 hover:text-slate-900 transition-colors">
-                            <MessageRenderer 
-                              content={result.snippet || result.content || result.excerpt} 
-                              contentKind={result.contentKind || 'text'} 
-                            />
+                          <div className="text-sm text-slate-700 hover:text-slate-900 transition-colors line-clamp-4">
+                            {result.snippet || result.content || result.excerpt || 'No content preview'}
                           </div>
                         </div>
 
@@ -474,15 +471,17 @@ const SearchPage = () => {
                   </div>
                   
                   <div className="prose prose-sm max-w-none">
-                    {selectedMessage.content ? (
+                    {selectedMessage.content || selectedMessage.text ? (
+                      <ClaudeMessageRenderer
+                        content={selectedMessage.content || selectedMessage.text}
+                        searchQuery={selectedMessage.searchQuery}
+                      />
+                    ) : selectedMessage.snippet ? (
                       <div className="whitespace-pre-wrap text-slate-700">
-                        {highlightSearchText(selectedMessage.content, selectedMessage.searchQuery)}
+                        {highlightSearchText(selectedMessage.snippet, selectedMessage.searchQuery)}
                       </div>
                     ) : (
-                      <MessageRenderer 
-                        content={selectedMessage.text || selectedMessage.snippet}
-                        contentKind={selectedMessage.contentKind || 'text'}
-                      />
+                      <div className="text-slate-500">No content available</div>
                     )}
                   </div>
                 </div>
