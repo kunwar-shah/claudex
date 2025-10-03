@@ -6,6 +6,7 @@
   * [Configuration](configuration.md)
 
 * User Guide
+  * [UI Guide](ui-guide.md)
   * [Features](features.md)
   * [Search System](search.md)
   * [Templates](templates.md)
