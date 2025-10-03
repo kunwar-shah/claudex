@@ -1,10 +1,10 @@
 {
-  "name": "claude-viewer",
+  "name": "claudex",
   "version": "1.0.0",
-  "description": "Claude Code Conversations Viewer - A web UI for viewing Claude Code conversation files",
+  "description": "Claudex - Universal conversation viewer for Claude Code with FTS5 search",
   "main": "index.js",
   "bin": {
-    "claude-viewer": "./bin/claude-viewer.js"
+    "claudex": "./bin/claude-viewer.js"
   },
   "scripts": {
     "start": "node bin/claude-viewer.js",
@@ -30,12 +30,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/claude-viewer.git"
+    "url": "git+https://github.com/kunwar-shah/claudex.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/claude-viewer/issues"
+    "url": "https://github.com/kunwar-shah/claudex/issues"
   },
-  "homepage": "https://github.com/your-org/claude-viewer#readme",
+  "homepage": "https://kunwar-shah.github.io/claudex/",
   "devDependencies": {
     "playwright": "^1.55.1"
   }

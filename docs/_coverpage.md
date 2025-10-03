@@ -1,4 +1,4 @@
-![logo](https://via.placeholder.com/150/2563eb/ffffff?text=Claudex)
+![logo](logo.svg ':size=150')
 
 # Claudex
 
