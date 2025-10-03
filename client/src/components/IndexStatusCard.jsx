@@ -27,17 +27,17 @@ const IndexStatusCard = ({ onRebuildClick }) => {
   const isStale = lastUpdated && (Date.now() - lastUpdated.getTime()) > 7 * 24 * 60 * 60 * 1000 // 7 days
 
   return (
-    <div className={`bg-white border rounded-lg p-5 max-w-md mx-auto shadow-sm ${
+    <div className={`bg-white border rounded-lg p-4 max-w-lg mx-auto shadow-sm ${
       !isIndexed ? 'border-amber-300 bg-amber-50' :
       isStale ? 'border-amber-300 bg-amber-50' :
       'border-slate-200'
     }`}>
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-sm font-semibold text-slate-800 flex items-center">
-          <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-start justify-between mb-2">
+        <h3 className="text-xs font-semibold text-slate-800 flex items-center">
+          <svg className="w-4 h-4 mr-1.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          Search Index Status
+          Search Index
         </h3>
         {isIndexed && !isStale ? (
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -57,70 +57,45 @@ const IndexStatusCard = ({ onRebuildClick }) => {
       </div>
 
       {!isIndexed ? (
-        <div className="mb-4">
-          <p className="text-sm text-amber-800 mb-2">
-            Search index has not been built yet. Build the index to enable full-text search across your conversations.
+        <div className="mb-3">
+          <p className="text-xs text-amber-800">
+            Search index not built yet. Build to enable search.
           </p>
         </div>
       ) : isStale ? (
-        <div className="mb-4">
-          <p className="text-sm text-amber-800 mb-2">
-            Search index may be outdated. Consider rebuilding to include recent conversations.
+        <div className="mb-3">
+          <p className="text-xs text-amber-800">
+            Index may be outdated. Consider rebuilding.
           </p>
         </div>
       ) : null}
 
       {isIndexed && (
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600 flex items-center">
-              <svg className="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              Messages
-            </span>
-            <span className="font-semibold text-slate-800">
+        <div className="grid grid-cols-3 gap-3 mb-3 text-center">
+          <div>
+            <div className="text-xs text-slate-500">Messages</div>
+            <div className="text-sm font-semibold text-slate-800">
               {stats.total_messages?.toLocaleString() || 0}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600 flex items-center">
-              <svg className="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-              Projects
-            </span>
-            <span className="font-semibold text-slate-800">
-              {stats.total_projects || 0}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600 flex items-center">
-              <svg className="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-              </svg>
-              Sessions
-            </span>
-            <span className="font-semibold text-slate-800">
-              {stats.total_sessions || 0}
-            </span>
-          </div>
-
-          {lastUpdated && (
-            <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-100">
-              <span className="text-slate-600 flex items-center">
-                <svg className="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Last Updated
-              </span>
-              <span className="text-xs text-slate-500">
-                {formatDistanceToNow(lastUpdated, { addSuffix: true })}
-              </span>
             </div>
-          )}
+          </div>
+          <div>
+            <div className="text-xs text-slate-500">Projects</div>
+            <div className="text-sm font-semibold text-slate-800">
+              {stats.total_projects || 0}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500">Sessions</div>
+            <div className="text-sm font-semibold text-slate-800">
+              {stats.total_sessions || 0}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isIndexed && lastUpdated && (
+        <div className="text-center text-xs text-slate-500 mb-3">
+          Updated {formatDistanceToNow(lastUpdated, { addSuffix: true })}
         </div>
       )}
 

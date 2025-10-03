@@ -372,20 +372,14 @@ const SearchPage = () => {
           )}
 
           {!hasSearched && (
-            <div className="text-center py-12">
-              <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-6">
+              <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <h2 className="text-slate-800 font-semibold mb-2">Search Your Conversations</h2>
-              <p className="text-slate-600 text-sm mb-4 max-w-md mx-auto">
-                Enter keywords to search across all your Claude conversations. Use filters to narrow down your results.
+              <h2 className="text-slate-800 font-semibold mb-2 text-base">Search Your Conversations</h2>
+              <p className="text-slate-600 text-xs mb-4 max-w-md mx-auto">
+                Enter keywords to search across all your Claude conversations.
               </p>
-              <div className="text-xs text-slate-500 space-y-1 mb-6">
-                <p><strong>Tips:</strong></p>
-                <p>• Search by specific terms, phrases, or code snippets</p>
-                <p>• Use filters to search by role, date range, or template</p>
-                <p>• Select a specific project to limit your search scope</p>
-              </div>
 
               <IndexStatusCard onRebuildClick={() => setShowRebuildModal(true)} />
             </div>
