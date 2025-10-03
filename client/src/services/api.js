@@ -49,6 +49,9 @@ export const exportApi = {
 export const searchApi = {
   // Search across conversations
   search: (searchParams) => api.post('/search', searchParams),
+
+  // Rebuild search index
+  rebuildIndex: () => api.post('/search/index/build'),
 };
 
 export const healthApi = {

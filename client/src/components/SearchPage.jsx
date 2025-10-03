@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { projectsApi, searchApi } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
+import RebuildIndexButton from './RebuildIndexButton'
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -378,6 +379,10 @@ const SearchPage = () => {
                 <p>• Search by specific terms, phrases, or code snippets</p>
                 <p>• Use filters to search by role, date range, or template</p>
                 <p>• Select a specific project to limit your search scope</p>
+              </div>
+
+              <div className="mt-6">
+                <RebuildIndexButton />
               </div>
             </div>
           )}
