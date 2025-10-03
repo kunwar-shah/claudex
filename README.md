@@ -2,6 +2,16 @@
 
 A powerful web application for viewing, searching, and analyzing Claude Code conversation histories. Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
 
+> **📚 [View Full Documentation](https://kunwar-shah.github.io/claudex)**
+
+## 📸 Screenshots
+
+### Home & Conversation View
+![Conversation View](./screenshots/conversation-view.png)
+
+### Full-Text Search
+![Search Results](./screenshots/search-results.png)
+
 ## ✨ Features
 
 - 📁 **Auto Project Discovery**: Scans `~/.claude/projects` for all conversations
