@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/logo-large.png" alt="Claudex Logo" width="300">
+  <img src="docs/logo-sm.png" alt="Claudex Logo" width="180">
 
   # Claudex
 

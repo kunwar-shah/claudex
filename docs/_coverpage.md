@@ -1,4 +1,4 @@
-![logo](logo.svg ':size=150')
+![logo](logo-sm.png ':size=150')
 
 # Claudex
 
