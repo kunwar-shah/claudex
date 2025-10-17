@@ -10,8 +10,9 @@
   [![Version](https://img.shields.io/github/v/release/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/releases)
   [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](LICENSE)
   [![Documentation](https://img.shields.io/badge/docs-github--pages-blue)](https://kunwar-shah.github.io/claudex/)
+  [![Discussions](https://img.shields.io/github/discussions/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/discussions)
 
-  **📚 [View Full Documentation](https://kunwar-shah.github.io/claudex/)** | **🌐 [Live Site](https://kunwar-shah.github.io/claudex/)**
+  **📚 [Documentation](https://kunwar-shah.github.io/claudex/)** | **💬 [Discussions](https://github.com/kunwar-shah/claudex/discussions)** | **🐛 [Issues](https://github.com/kunwar-shah/claudex/issues)**
 
 </div>
 
