@@ -1,8 +1,19 @@
-# Claudex
+<div align="center">
+  <img src="docs/logo.png" alt="Claudex Logo" width="200">
 
-A powerful web application for viewing, searching, and analyzing Claude Code conversation histories. Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
+  # Claudex
 
-> **📚 [View Full Documentation](https://kunwar-shah.github.io/claudex/)** | **🌐 [Live Site](https://kunwar-shah.github.io/claudex/)**
+  **A powerful web application for viewing, searching, and analyzing Claude Code conversation histories.**
+
+  Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
+
+  [![Version](https://img.shields.io/github/v/release/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/releases)
+  [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](LICENSE)
+  [![Documentation](https://img.shields.io/badge/docs-github--pages-blue)](https://kunwar-shah.github.io/claudex/)
+
+  **📚 [View Full Documentation](https://kunwar-shah.github.io/claudex/)** | **🌐 [Live Site](https://kunwar-shah.github.io/claudex/)**
+
+</div>
 
 ## 📸 Screenshots
 

@@ -16,9 +16,15 @@
       --theme-color: #2563eb;
       --theme-color-dark: #1e40af;
     }
+    .app-name-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
     .app-name-link img {
-      width: 2rem;
-      height: 2rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 4px;
     }
     .sidebar-toggle {
       background: transparent;
@@ -31,6 +37,7 @@
   <script>
     window.$docsify = {
       name: 'Claudex',
+      logo: '/logo.png',
       repo: 'kunwar-shah/claudex',
       loadSidebar: true,
       auto2top: true,
