@@ -1,6 +1,6 @@
 {
   "name": "claudex",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Claudex - Universal conversation viewer for Claude Code with FTS5 search",
   "main": "index.js",
   "bin": {

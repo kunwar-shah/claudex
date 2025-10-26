@@ -1,33 +1,68 @@
 version: '3.8'
 
+# Claudex - Universal conversation viewer for Claude Code
+# Project name: claudex (container grouping per GUIDELINE 7)
+
 services:
-  claude-viewer:
-    build: .
+  web:
+    container_name: claudex-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: claudex:latest
     ports:
       - "3400:3400"
     environment:
       - NODE_ENV=production
-      - PROJECT_ROOT=/app/data
+      - PORT=3400
+      - HOST=0.0.0.0
+      # Configure Claude projects directory inside container
+      - PROJECT_ROOT=/root/.claude/projects
     volumes:
-      # Mount your Claude projects directory
-      # Adjust the path on the left to your actual Claude projects location
-      - ~/.claude/projects:/app/data:ro
+      # Mount your Claude projects directory (read-only for safety)
+      # Adjust the path on the left to match your system
+      - ~/.claude/projects:/root/.claude/projects:ro
+
+      # Optional: Persist search index and logs
+      - claudex-data:/app/data
+      - claudex-logs:/app/logs
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3400/api/health"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3400/api/health',(r)=>{process.exit(r.statusCode===200?0:1)})"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 5s
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # Optional: Add a reverse proxy for production deployment
-  # nginx:
-  #   image: nginx:alpine
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
-  #   depends_on:
-  #     - claude-viewer
-  #   restart: unless-stopped
+# Named volumes for persistent data
+volumes:
+  claudex-data:
+    driver: local
+  claudex-logs:
+    driver: local
+
+# Optional: Add nginx reverse proxy for production
+# Uncomment to enable HTTPS and domain routing
+#
+#   nginx:
+#     container_name: claudex-nginx
+#     image: nginx:alpine
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#       - ./ssl:/etc/nginx/ssl:ro
+#     depends_on:
+#       - web
+#     restart: unless-stopped
+#     logging:
+#       driver: "json-file"
+#       options:
+#         max-size: "5m"
+#         max-file: "2"

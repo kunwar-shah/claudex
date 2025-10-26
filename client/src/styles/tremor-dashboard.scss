@@ -152,19 +152,35 @@
     .recharts-wrapper {
       font-family: inherit;
     }
-    
-    .recharts-text {
-      font-size: 0.75rem;
-      fill: #6b7280;
-    }
-    
+
+    // Style ONLY axis text, not chart elements
     .recharts-cartesian-axis-tick-value {
       font-size: 0.75rem;
       fill: #6b7280;
     }
-    
+
     .recharts-legend-item {
       font-size: 0.875rem;
+    }
+
+    // White borders between donut segments
+    .recharts-pie-sector {
+      stroke: white;
+      stroke-width: 2px;
+    }
+
+    // Bar hover effects
+    .recharts-bar {
+      opacity: 0.9;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    // Legend text color
+    .recharts-legend-item-text {
+      color: #374151 !important;
     }
   }
 
@@ -207,38 +223,99 @@
   .mb-6 { margin-bottom: 1.5rem; }
   .mb-8 { margin-bottom: 2rem; }
 
-  /* Scrolling fixes */
+  /* Additional bottom padding for scrollable content */
+  .tremor-container {
+    padding-bottom: 4rem; // Extra space at bottom to ensure all content is scrollable
+  }
+
+  /* Scrolling fixes - Works within Layout wrapper */
   &.scrollable {
-    height: 100vh;
+    min-height: 100vh;
     overflow: hidden;
-    
+
     .main-content {
-      height: 100vh;
+      min-height: calc(100vh - 120px); /* Account for header/footer */
+      max-height: calc(100vh - 120px);
       overflow-y: auto;
       overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+
+      /* Ensure scrollbar is visible */
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+
+        &:hover {
+          background: #555;
+        }
+      }
     }
   }
 
-  /* Sidebar panel styling */
+  /* Sidebar panel styling - Fixed for proper scrolling */
   .sidebar-panel {
     background: #f9fafb;
     border-right: 1px solid #e5e7eb;
-    height: 100vh;
-    overflow-y: auto;
-    
+    height: calc(100vh - 120px); /* Account for app header/footer */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
     .panel-header {
-      padding: 1rem;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid #e5e7eb;
       background: white;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      min-height: 50px;
+
+      // Prevent icon wrapping
+      button {
+        flex-shrink: 0;
+      }
+
+      .font-semibold {
+        flex: 1;
+        min-width: 0; // Allow text truncation
+        white-space: nowrap;
+      }
     }
-    
+
     .panel-content {
-      padding: 1rem;
-      height: calc(100vh - 60px);
+      flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1rem;
+      min-height: 0; // Important for flex scrolling
+
+      /* Custom scrollbar for panels */
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f3f4f6;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #9ca3af;
+        border-radius: 3px;
+
+        &:hover {
+          background: #6b7280;
+        }
+      }
     }
   }
 
@@ -251,12 +328,12 @@
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    
+
     &:hover {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       transform: translateY(-1px);
     }
-    
+
     &.active {
       border-color: #3b82f6;
       box-shadow: 0 0 0 1px #3b82f6;

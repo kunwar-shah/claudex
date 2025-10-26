@@ -10,11 +10,37 @@ export async function projectRoutes(fastify, options) {
   fastify.get('/projects', async (request, reply) => {
     try {
       const projects = await fileScanner.scanProjects();
-      return { projects };
+
+      // Enhance each project with session and message counts
+      const enhancedProjects = await Promise.all(
+        projects.map(async (project) => {
+          try {
+            const sessions = await fileScanner.scanSessions(project.path);
+            const sessionCount = sessions.length;
+            const messageCount = sessions.reduce((sum, session) => sum + (session.messageCount || 0), 0);
+
+            return {
+              ...project,
+              sessionCount,
+              messageCount
+            };
+          } catch (error) {
+            // If scanning fails for a project, return it with zero counts
+            console.error(`Failed to scan project ${project.id}:`, error.message);
+            return {
+              ...project,
+              sessionCount: 0,
+              messageCount: 0
+            };
+          }
+        })
+      );
+
+      return { projects: enhancedProjects };
     } catch (error) {
-      reply.code(500).send({ 
+      reply.code(500).send({
         error: 'Failed to scan projects',
-        message: error.message 
+        message: error.message
       });
     }
   });

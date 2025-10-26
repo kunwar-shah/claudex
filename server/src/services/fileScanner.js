@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { extractTitleFromRawMessages } from '../utils/titleExtractor.js';
 
 export class FileScanner {
   constructor(projectsRoot) {
@@ -41,14 +42,18 @@ export class FileScanner {
         if (entry.isFile() && entry.name.endsWith('.jsonl')) {
           const filePath = path.join(projectPath, entry.name);
           const stats = await fs.stat(filePath);
-          
+
           const sessionId = entry.name.replace('.jsonl', '');
-          
+
           const messageCount = await this.countMessages(filePath);
-          
+
+          // Extract title from first few messages
+          const firstMessages = await this.getSessionFirstMessages(filePath, 3);
+          const title = extractTitleFromRawMessages(firstMessages, sessionId);
+
           sessions.push({
             sessionId,
-            title: sessionId, // TODO: Extract title from first messages
+            title,
             createdAt: stats.birthtime.toISOString(),
             lastUpdatedAt: stats.mtime.toISOString(),
             messageCount,
