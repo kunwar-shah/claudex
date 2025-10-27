@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { projectsApi, searchApi } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
-import RebuildIndexButton from './RebuildIndexButton'
+import RebuildIndexModal from './RebuildIndexModal'
 import IndexStatusCard from './IndexStatusCard'
 import IndexStatusBadge from './IndexStatusBadge'
 
@@ -30,6 +30,11 @@ const SearchPage = () => {
   const { data: projectsData } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getProjects().then(res => res.data)
+  })
+
+  const { data: indexStatus } = useQuery({
+    queryKey: ['indexStatus'],
+    queryFn: () => searchApi.getIndexStatus().then(res => res.data)
   })
 
   const handleSearch = async (e) => {
@@ -400,8 +405,8 @@ const SearchPage = () => {
                   <button
                     onClick={() => copyToClipboard(selectedMessage.content || selectedMessage.text || selectedMessage.snippet || '')}
                     className={`inline-flex items-center px-3 py-1.5 text-sm rounded transition-colors ${
-                      copySuccess 
-                        ? 'text-green-600 bg-green-50 border border-green-200' 
+                      copySuccess
+                        ? 'text-green-600 bg-green-50 border border-green-200'
                         : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
                     }`}
                     title="Copy message to clipboard"
@@ -433,7 +438,7 @@ const SearchPage = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Copy Success Message */}
             {copySuccess && (
               <div className="px-4 py-2 bg-green-50 border-b border-green-200">
@@ -445,7 +450,7 @@ const SearchPage = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
               {isLoadingMessage ? (
                 <div className="flex items-center justify-center py-12">
@@ -472,7 +477,7 @@ const SearchPage = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="prose prose-sm max-w-none">
                     {selectedMessage.content || selectedMessage.text ? (
                       <ClaudeMessageRenderer
@@ -492,6 +497,13 @@ const SearchPage = () => {
           </div>
         </div>
       )}
+
+      {/* Rebuild Index Modal */}
+      <RebuildIndexModal
+        isOpen={showRebuildModal}
+        onClose={() => setShowRebuildModal(false)}
+        currentStats={indexStatus?.stats}
+      />
     </div>
   )
 }
