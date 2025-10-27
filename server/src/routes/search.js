@@ -5,6 +5,18 @@ export async function searchRoutes(fastify, options) {
   const searchIndexer = new SearchIndexer(getProjectRoot());
   await searchIndexer.init();
 
+  // Global state for tracking index rebuild status
+  let rebuildStatus = {
+    isBuilding: false,
+    progress: 0,
+    totalMessages: 0,
+    currentSession: 0,
+    totalSessions: 0,
+    error: null,
+    startTime: null,
+    result: null
+  };
+
   // POST /api/search  
   fastify.post('/search', async (request, reply) => {
     try {
@@ -54,30 +66,91 @@ export async function searchRoutes(fastify, options) {
     }
   });
 
-  // POST /api/search/index/build - Build search index
+  // POST /api/search/index/build - Build search index (async)
   fastify.post('/search/index/build', async (request, reply) => {
     try {
-      console.log('🔧 Starting search index build...');
-      const result = await searchIndexer.buildFullIndex();
+      // Check if already building
+      if (rebuildStatus.isBuilding) {
+        return reply.code(409).send({
+          error: 'Index rebuild already in progress',
+          status: rebuildStatus
+        });
+      }
+
+      // Reset status
+      rebuildStatus = {
+        isBuilding: true,
+        progress: 0,
+        totalMessages: 0,
+        currentSession: 0,
+        totalSessions: 0,
+        error: null,
+        startTime: Date.now(),
+        result: null
+      };
+
+      console.log('🔧 Starting async search index build...');
+
+      // Progress callback to update status in real-time
+      const progressCallback = (progressData) => {
+        rebuildStatus.progress = progressData.progress;
+        rebuildStatus.totalMessages = progressData.totalMessages;
+        rebuildStatus.currentSession = progressData.currentSession;
+        rebuildStatus.totalSessions = progressData.totalSessions;
+      };
+
+      // Start indexing in background (don't await)
+      searchIndexer.buildFullIndex(progressCallback)
+        .then(result => {
+          rebuildStatus.isBuilding = false;
+          rebuildStatus.progress = 100;
+          rebuildStatus.result = result;
+          console.log('✅ Search index build completed successfully');
+        })
+        .catch(error => {
+          rebuildStatus.isBuilding = false;
+          rebuildStatus.error = error.message;
+          console.error('❌ Search index build failed:', error);
+        });
+
+      // Return immediately
       return {
         success: true,
-        message: 'Search index built successfully',
-        ...result
+        message: 'Index rebuild started in background',
+        status: rebuildStatus
       };
+
     } catch (error) {
-      console.error('Failed to build search index:', error);
+      console.error('Failed to start index build:', error);
       reply.code(500).send({
-        error: 'Failed to build search index',
+        error: 'Failed to start index build',
         message: error.message
       });
     }
   });
 
-  // GET /api/search/index/status - Get index status
+  // GET /api/search/index/status - Get index status (includes rebuild progress)
   fastify.get('/search/index/status', async (request, reply) => {
     try {
-      const status = await searchIndexer.getIndexStatus();
-      return status;
+      const indexStatus = await searchIndexer.getIndexStatus();
+
+      // Include rebuild status if in progress
+      return {
+        ...indexStatus,
+        rebuild: rebuildStatus.isBuilding ? {
+          isBuilding: true,
+          progress: rebuildStatus.progress,
+          totalMessages: rebuildStatus.totalMessages,
+          currentSession: rebuildStatus.currentSession,
+          totalSessions: rebuildStatus.totalSessions,
+          elapsedTime: Date.now() - rebuildStatus.startTime,
+          error: rebuildStatus.error
+        } : {
+          isBuilding: false,
+          lastResult: rebuildStatus.result,
+          lastError: rebuildStatus.error
+        }
+      };
     } catch (error) {
       console.error('Failed to get index status:', error);
       reply.code(500).send({

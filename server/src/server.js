@@ -19,7 +19,10 @@ dotenv.config();
 const fastify = Fastify({
   logger: {
     level: process.env.NODE_ENV === 'production' ? 'warn' : 'info'
-  }
+  },
+  connectionTimeout: 0,  // Disable connection timeout
+  keepAliveTimeout: 600000,  // 10 minutes
+  requestTimeout: 600000  // 10 minutes for long operations like index rebuild
 });
 
 // Register CORS

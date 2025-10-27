@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { searchApi } from '../services/api'
 
@@ -6,33 +6,104 @@ const RebuildIndexModal = ({ isOpen, onClose, currentStats }) => {
   const [state, setState] = useState('confirm') // confirm, building, success, error
   const [buildResult, setBuildResult] = useState(null)
   const [error, setError] = useState(null)
+  const [progress, setProgress] = useState(0)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [sessionProgress, setSessionProgress] = useState({ current: 0, total: 0 })
+  const [messageCount, setMessageCount] = useState(0)
   const queryClient = useQueryClient()
+  const pollIntervalRef = useRef(null)
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+    }
+  }, [])
 
   if (!isOpen) return null
+
+  const pollStatus = async () => {
+    try {
+      const response = await searchApi.getIndexStatus()
+      const rebuildInfo = response.data.rebuild
+
+      if (rebuildInfo.isBuilding) {
+        // Still building - update progress
+        setProgress(rebuildInfo.progress || 0)
+        setElapsedTime(Math.floor(rebuildInfo.elapsedTime / 1000))
+        setSessionProgress({
+          current: rebuildInfo.currentSession || 0,
+          total: rebuildInfo.totalSessions || 0
+        })
+        setMessageCount(rebuildInfo.totalMessages || 0)
+      } else {
+        // Finished
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+
+        if (rebuildInfo.lastError) {
+          setError(rebuildInfo.lastError)
+          setState('error')
+        } else if (rebuildInfo.lastResult) {
+          setBuildResult(rebuildInfo.lastResult.stats)
+          setState('success')
+          queryClient.invalidateQueries(['indexStatus'])
+        }
+      }
+    } catch (err) {
+      console.error('Failed to poll status:', err)
+      clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+      setError('Failed to check indexing status')
+      setState('error')
+    }
+  }
 
   const handleRebuild = async () => {
     setState('building')
     setError(null)
+    setProgress(0)
+    setElapsedTime(0)
+    setSessionProgress({ current: 0, total: 0 })
+    setMessageCount(0)
 
     try {
-      const response = await searchApi.rebuildIndex()
-      setBuildResult(response.data)
-      setState('success')
+      // Start rebuild (returns immediately)
+      await searchApi.rebuildIndex()
 
-      // Invalidate index status to refetch
-      queryClient.invalidateQueries(['indexStatus'])
+      // Start polling for status every 2 seconds
+      pollIntervalRef.current = setInterval(pollStatus, 2000)
+
+      // Initial status check
+      pollStatus()
     } catch (err) {
-      console.error('Failed to rebuild index:', err)
-      setError(err.response?.data?.message || err.message || 'Failed to rebuild search index')
+      console.error('Failed to start rebuild:', err)
+      setError(err.response?.data?.message || err.message || 'Failed to start rebuild')
       setState('error')
     }
   }
 
   const handleClose = () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+    }
     setState('confirm')
     setBuildResult(null)
     setError(null)
+    setProgress(0)
+    setElapsedTime(0)
+    setSessionProgress({ current: 0, total: 0 })
+    setMessageCount(0)
     onClose()
+  }
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}m ${secs}s`
   }
 
   return (
@@ -117,16 +188,49 @@ const RebuildIndexModal = ({ isOpen, onClose, currentStats }) => {
 
             <div className="p-6">
               <p className="text-sm text-slate-600 mb-4">
-                Please wait while we rebuild the search index. This may take a few minutes depending on the size of your conversation history.
+                Rebuilding search index for all conversations. This typically takes 2-5 minutes for 100+ sessions.
               </p>
 
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
+              <div className="space-y-4">
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between text-xs text-slate-600 mb-2">
+                    <span>Progress</span>
+                    <span>{progress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Spinner */}
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
+                </div>
+
+                {/* Status */}
+                <div className="text-center space-y-1">
+                  <p className="text-sm font-medium text-slate-700">
+                    Building index...
+                  </p>
+                  {sessionProgress.total > 0 && (
+                    <p className="text-xs text-slate-600">
+                      Processing: {sessionProgress.current} / {sessionProgress.total} sessions
+                    </p>
+                  )}
+                  {messageCount > 0 && (
+                    <p className="text-xs text-slate-500">
+                      {messageCount.toLocaleString()} messages indexed
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-500">
+                    Elapsed time: {formatTime(elapsedTime)}
+                  </p>
+                </div>
               </div>
-
-              <p className="text-center text-sm text-slate-500">
-                Building index...
-              </p>
             </div>
           </>
         )}
@@ -158,7 +262,7 @@ const RebuildIndexModal = ({ isOpen, onClose, currentStats }) => {
                     <div className="flex justify-between">
                       <span>Messages Indexed:</span>
                       <span className="font-semibold text-green-700">
-                        {buildResult.indexed?.toLocaleString() || 0}
+                        {buildResult.messages?.toLocaleString() || 0}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -177,7 +281,7 @@ const RebuildIndexModal = ({ isOpen, onClose, currentStats }) => {
                       <div className="flex justify-between pt-2 border-t border-green-300">
                         <span>Completed in:</span>
                         <span className="font-semibold text-green-700">
-                          {buildResult.duration}
+                          {buildResult.duration.toFixed(1)}s
                         </span>
                       </div>
                     )}

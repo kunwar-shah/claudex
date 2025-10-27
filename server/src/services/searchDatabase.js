@@ -17,11 +17,18 @@ export class SearchDatabase {
 
       // Open database connection
       this.db = new sqlite3.Database(this.dbPath)
-      
+
       // Promisify database methods
       this.db.run = promisify(this.db.run.bind(this.db))
       this.db.get = promisify(this.db.get.bind(this.db))
       this.db.all = promisify(this.db.all.bind(this.db))
+
+      // Performance optimizations for bulk operations
+      await this.db.run('PRAGMA journal_mode = WAL')  // Write-Ahead Logging (faster writes)
+      await this.db.run('PRAGMA synchronous = NORMAL')  // Faster, still safe
+      await this.db.run('PRAGMA cache_size = 10000')  // 10MB cache
+      await this.db.run('PRAGMA temp_store = MEMORY')  // Temp tables in RAM
+      await this.db.run('PRAGMA mmap_size = 30000000000')  // Memory-mapped I/O
 
       // Create FTS5 virtual table if not exists
       await this.createFTSTable()
@@ -182,6 +189,43 @@ export class SearchDatabase {
   async clearIndex() {
     await this.db.run('DELETE FROM messages_fts')
     console.log('Search index cleared')
+  }
+
+  // Transaction management for bulk operations
+  async beginTransaction() {
+    await this.db.run('BEGIN TRANSACTION')
+  }
+
+  async commitTransaction() {
+    await this.db.run('COMMIT')
+  }
+
+  async rollbackTransaction() {
+    await this.db.run('ROLLBACK')
+  }
+
+  // Batch insert for performance (500-1000 messages at once)
+  async indexMessagesBatch(messages) {
+    if (messages.length === 0) return
+
+    // Build multi-row INSERT statement
+    const placeholders = messages.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ')
+    const insertSQL = `
+      INSERT OR REPLACE INTO messages_fts (
+        project_id, project_name, session_id, session_title,
+        message_id, role, content, timestamp, file_path,
+        line_number, template
+      ) VALUES ${placeholders}
+    `
+
+    // Flatten all values into single array
+    const values = messages.flatMap(msg => [
+      msg.projectId, msg.projectName, msg.sessionId, msg.sessionTitle,
+      msg.messageId, msg.role, msg.content, msg.timestamp, msg.filePath,
+      msg.lineNumber, msg.template
+    ])
+
+    await this.db.run(insertSQL, values)
   }
 
   async getIndexStats() {

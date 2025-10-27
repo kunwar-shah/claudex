@@ -16,33 +16,56 @@ export class SearchIndexer {
     await this.searchDb.init()
   }
 
-  async buildFullIndex() {
+  async buildFullIndex(progressCallback = null) {
     console.log('🔍 Starting full search index build...')
     const startTime = Date.now()
-    
+
     try {
       // Clear existing index
       await this.searchDb.clearIndex()
-      
+
+      // Start transaction for massive performance boost
+      await this.searchDb.beginTransaction()
+
       // Get all projects
       const projects = await this.fileScanner.scanProjects()
       let totalMessages = 0
+      let processedSessions = 0
+
+      // Batch buffer for bulk inserts (500 messages per batch)
+      const BATCH_SIZE = 500
+      let messageBatch = []
+
+      // Count total sessions first for accurate progress
       let totalSessions = 0
-      
       for (const project of projects) {
-        console.log(`📂 Indexing project: ${project.name}`)
-        
         const sessions = await this.fileScanner.scanSessions(project.path)
         totalSessions += sessions.length
-        
+      }
+
+      // Report initial progress
+      if (progressCallback) {
+        progressCallback({
+          progress: 0,
+          totalMessages,
+          currentSession: 0,
+          totalSessions
+        })
+      }
+
+      for (const project of projects) {
+        console.log(`📂 Indexing project: ${project.name}`)
+
+        const sessions = await this.fileScanner.scanSessions(project.path)
+
         for (const session of sessions) {
           try {
             // Parse the entire session
             const result = await this.sessionParser.parseSession(session.filePath)
-            
-            // Index each message
+
+            // Add messages to batch buffer
             for (const message of result.messages) {
-              await this.searchDb.indexMessage({
+              messageBatch.push({
                 projectId: project.id,
                 projectName: project.name,
                 sessionId: session.sessionId,
@@ -55,31 +78,69 @@ export class SearchIndexer {
                 lineNumber: message.lineNumber,
                 template: result.template
               })
-              
+
               totalMessages++
+
+              // Flush batch when it reaches batch size
+              if (messageBatch.length >= BATCH_SIZE) {
+                await this.searchDb.indexMessagesBatch(messageBatch)
+                messageBatch = []
+              }
             }
-            
-            // Log progress every 50 sessions
-            if (totalSessions % 50 === 0) {
-              console.log(`   ✓ Indexed ${totalSessions} sessions, ${totalMessages} messages`)
+
+            processedSessions++
+
+            // Report progress after each session
+            if (progressCallback) {
+              const progress = Math.floor((processedSessions / totalSessions) * 100)
+              progressCallback({
+                progress,
+                totalMessages,
+                currentSession: processedSessions,
+                totalSessions
+              })
             }
-            
+
+            // Log progress every 10 sessions
+            if (processedSessions % 10 === 0) {
+              console.log(`   ✓ Indexed ${processedSessions}/${totalSessions} sessions, ${totalMessages} messages`)
+            }
+
           } catch (sessionError) {
             console.warn(`   ⚠️  Failed to index session ${session.sessionId}:`, sessionError.message)
+            processedSessions++
           }
         }
+      }
+
+      // Flush any remaining messages in batch
+      if (messageBatch.length > 0) {
+        await this.searchDb.indexMessagesBatch(messageBatch)
       }
       
       // Update metadata
       await this.searchDb.setMetadata('last_full_index', new Date().toISOString())
       await this.searchDb.setMetadata('total_messages', totalMessages.toString())
       await this.searchDb.setMetadata('total_projects', projects.length.toString())
-      
+
+      // Commit transaction (write to disk once)
+      await this.searchDb.commitTransaction()
+
       const duration = ((Date.now() - startTime) / 1000).toFixed(2)
       console.log(`✅ Search index built successfully!`)
       console.log(`   📊 ${projects.length} projects, ${totalSessions} sessions, ${totalMessages} messages`)
       console.log(`   ⏱️  Completed in ${duration} seconds`)
-      
+
+      // Report final progress
+      if (progressCallback) {
+        progressCallback({
+          progress: 100,
+          totalMessages,
+          currentSession: totalSessions,
+          totalSessions
+        })
+      }
+
       return {
         success: true,
         stats: {
@@ -89,9 +150,15 @@ export class SearchIndexer {
           duration: parseFloat(duration)
         }
       }
-      
+
     } catch (error) {
       console.error('❌ Failed to build search index:', error)
+      // Rollback transaction on error
+      try {
+        await this.searchDb.rollbackTransaction()
+      } catch (rollbackError) {
+        console.error('Failed to rollback transaction:', rollbackError)
+      }
       throw error
     }
   }
