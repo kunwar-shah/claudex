@@ -4,6 +4,7 @@ const API_BASE = '/api';
 
 const api = axios.create({
   baseURL: API_BASE,
+  timeout: 600000,  // 10 minutes timeout for long operations like index rebuild
 });
 
 // Request interceptor for logging

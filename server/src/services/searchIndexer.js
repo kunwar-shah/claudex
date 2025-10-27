@@ -16,30 +16,46 @@ export class SearchIndexer {
     await this.searchDb.init()
   }
 
-  async buildFullIndex() {
+  async buildFullIndex(progressCallback = null) {
     console.log('🔍 Starting full search index build...')
     const startTime = Date.now()
-    
+
     try {
       // Clear existing index
       await this.searchDb.clearIndex()
-      
+
       // Get all projects
       const projects = await this.fileScanner.scanProjects()
       let totalMessages = 0
+      let processedSessions = 0
+
+      // Count total sessions first for accurate progress
       let totalSessions = 0
-      
       for (const project of projects) {
-        console.log(`📂 Indexing project: ${project.name}`)
-        
         const sessions = await this.fileScanner.scanSessions(project.path)
         totalSessions += sessions.length
-        
+      }
+
+      // Report initial progress
+      if (progressCallback) {
+        progressCallback({
+          progress: 0,
+          totalMessages,
+          currentSession: 0,
+          totalSessions
+        })
+      }
+
+      for (const project of projects) {
+        console.log(`📂 Indexing project: ${project.name}`)
+
+        const sessions = await this.fileScanner.scanSessions(project.path)
+
         for (const session of sessions) {
           try {
             // Parse the entire session
             const result = await this.sessionParser.parseSession(session.filePath)
-            
+
             // Index each message
             for (const message of result.messages) {
               await this.searchDb.indexMessage({
@@ -55,17 +71,31 @@ export class SearchIndexer {
                 lineNumber: message.lineNumber,
                 template: result.template
               })
-              
+
               totalMessages++
             }
-            
-            // Log progress every 50 sessions
-            if (totalSessions % 50 === 0) {
-              console.log(`   ✓ Indexed ${totalSessions} sessions, ${totalMessages} messages`)
+
+            processedSessions++
+
+            // Report progress after each session
+            if (progressCallback) {
+              const progress = Math.floor((processedSessions / totalSessions) * 100)
+              progressCallback({
+                progress,
+                totalMessages,
+                currentSession: processedSessions,
+                totalSessions
+              })
             }
-            
+
+            // Log progress every 10 sessions
+            if (processedSessions % 10 === 0) {
+              console.log(`   ✓ Indexed ${processedSessions}/${totalSessions} sessions, ${totalMessages} messages`)
+            }
+
           } catch (sessionError) {
             console.warn(`   ⚠️  Failed to index session ${session.sessionId}:`, sessionError.message)
+            processedSessions++
           }
         }
       }
@@ -80,6 +110,16 @@ export class SearchIndexer {
       console.log(`   📊 ${projects.length} projects, ${totalSessions} sessions, ${totalMessages} messages`)
       console.log(`   ⏱️  Completed in ${duration} seconds`)
       
+      // Report final progress
+      if (progressCallback) {
+        progressCallback({
+          progress: 100,
+          totalMessages,
+          currentSession: totalSessions,
+          totalSessions
+        })
+      }
+
       return {
         success: true,
         stats: {

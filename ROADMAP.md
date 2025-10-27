@@ -52,6 +52,15 @@ This document outlines the planned features and improvements for Claudex.
 - [ ] Conversation length trends
 - [ ] Tag cloud of common topics
 
+### Backup & Data Retention
+- [ ] **Full conversation backup in SQLite** (store complete message JSON, not just text)
+- [ ] **Export conversations from SQLite to .jsonl** (restore deleted conversations)
+- [ ] **Batch backup all indexed conversations**
+- [ ] **Conversation restore tool** (recover from SQLite after Claude's 30-day deletion)
+- [ ] **Auto-backup scheduler** (automatically backup new conversations)
+- [ ] **Backup health dashboard** (show coverage, missing files, last backup time)
+- [ ] **Selective backup** (choose which projects/sessions to backup)
+
 ### Performance
 - [ ] Lazy loading for long conversations
 - [ ] Virtual scrolling for message lists
