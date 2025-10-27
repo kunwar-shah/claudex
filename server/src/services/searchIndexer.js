@@ -2,6 +2,7 @@ import { FileScanner } from './fileScanner.js'
 import { SessionParser } from './sessionParser.js'
 import { SearchDatabase } from './searchDatabase.js'
 import { getProjectRoot } from '../utils/pathHelper.js'
+import { extractTitleFromMessages } from '../utils/titleExtractor.js'
 
 export class SearchIndexer {
   constructor(projectsRoot = getProjectRoot()) {
@@ -114,13 +115,16 @@ export class SearchIndexer {
         [sessionId, projectId]
       )
       
+      // Extract session title from messages
+      const sessionTitle = extractTitleFromMessages(result.messages, sessionId)
+
       // Re-index all messages in the session
       for (const message of result.messages) {
         await this.searchDb.indexMessage({
           projectId,
           projectName,
           sessionId,
-          sessionTitle: sessionId, // TODO: Extract title from messages
+          sessionTitle,
           messageId: message.id,
           role: message.role,
           content: message.content,

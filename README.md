@@ -425,20 +425,104 @@ npm run check:fix
 
 ## 🚢 Production Deployment
 
-### Using Docker (Coming Soon)
+### Using Docker (Recommended)
+
+Claudex includes production-ready Docker configuration with multi-stage builds for optimal image size.
+
+#### Quick Start with Docker
 
 ```bash
+# Build and start with docker-compose
 docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+Access at: http://localhost:3400
+
+#### Docker Configuration
+
+The default `docker-compose.yml` mounts your Claude projects directory as read-only:
+
+```yaml
+volumes:
+  # Adjust path to match your system
+  - ~/.claude/projects:/root/.claude/projects:ro
+```
+
+**Common path configurations:**
+
+```bash
+# Linux/macOS
+~/.claude/projects:/root/.claude/projects:ro
+
+# Windows (WSL2)
+/mnt/c/Users/YourName/.claude/projects:/root/.claude/projects:ro
+
+# Custom path
+/path/to/your/projects:/root/.claude/projects:ro
+```
+
+#### Docker Commands
+
+```bash
+# Build image manually
+docker build -t claudex:latest .
+
+# Run container manually
+docker run -d \
+  -p 3400:3400 \
+  -v ~/.claude/projects:/root/.claude/projects:ro \
+  -v claudex-data:/app/data \
+  --name claudex-web \
+  claudex:latest
+
+# Check health
+docker ps  # Check STATUS column for "healthy"
+
+# View logs
+docker logs claudex-web -f
+
+# Stop and remove
+docker stop claudex-web && docker rm claudex-web
+```
+
+#### Docker Features
+
+- **Multi-stage build**: Optimized image size (~200MB)
+- **Non-root user**: Runs as nodejs user for security
+- **Health checks**: Automatic health monitoring
+- **Persistent volumes**: Stores search index and logs
+- **Read-only mounts**: Claude projects mounted read-only for safety
+- **Log rotation**: JSON logs with 10MB max size, 3 file rotation
+
+#### Docker Environment Variables
+
+```bash
+# Override in docker-compose.yml or docker run
+-e PORT=3400                           # Server port
+-e HOST=0.0.0.0                        # Bind address
+-e NODE_ENV=production                 # Environment
+-e PROJECT_ROOT=/root/.claude/projects # Claude projects path
 ```
 
 ### Manual Production Build
 
-```bash
-# Build client
-cd client && npm run build
+For non-Docker deployments:
 
-# Start server (serves built client)
-cd ../server && NODE_ENV=production npm start
+```bash
+# 1. Install dependencies
+npm run install-deps
+
+# 2. Build client
+npm run build
+
+# 3. Start server (serves built client)
+cd server && NODE_ENV=production npm start
 ```
 
 Access at: http://localhost:3400
@@ -450,10 +534,10 @@ Access at: http://localhost:3400
 - [x] Export to JSON/HTML/TXT
 - [x] Path portability with `~/` support
 - [x] Hot reload development mode
-- [ ] Docker deployment
+- [x] Docker deployment (v1.1.0)
+- [x] Conversation analytics dashboard (v1.1.0)
 - [ ] WebSocket live updates
 - [ ] Authentication for multi-user
-- [ ] Conversation analytics dashboard
 - [ ] Plugin system for custom parsers
 - [ ] Diff viewer for file changes
 

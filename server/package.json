@@ -1,13 +1,13 @@
 {
   "name": "claude-viewer-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backend server for Claude Code Conversations Viewer",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
   },
   "dependencies": {
     "@fastify/cors": "^8.4.0",

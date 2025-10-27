@@ -1,27 +1,88 @@
-node_modules
-npm-debug.log
-.git
-.gitignore
-README.md
+# ============================================
+# Dockerignore for Claudex
+# Optimizes build context size and speed
+# ============================================
+
+# Dependencies (will be installed in container)
+node_modules/
+*/node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build artifacts (client will be built in container)
+client/dist/
+client/build/
+*.tsbuildinfo
+
+# Package manager files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.yarn
+.pnpm
+
+# Environment files (use docker-compose env instead)
 .env
-.nyc_output
-coverage
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
-# Client build artifacts
-client/dist
-client/node_modules
+# Git files
+.git/
+.gitignore
+.gitattributes
 
-# Server
-server/node_modules
+# Documentation (not needed in production)
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
+LICENSE
+docs/
+*.md
+!package*.json
 
-# Logs
-logs
-*.log
+# Mini-CoderBrain memory (development-only)
+.claude/
 
-# OS
+# Testing
+coverage/
+.nyc_output/
+**/__tests__/
+**/*.test.js
+**/*.test.jsx
+**/*.spec.js
+**/*.spec.jsx
+jest.config.*
+vitest.config.*
+playwright.config.*
+test-results/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Docker files (don't need in build context)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.circleci/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.cache/
