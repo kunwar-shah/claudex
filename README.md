@@ -10,7 +10,7 @@
   Claudex is a full-stack web application designed for developers, QA engineers, and researchers who need to inspect, search, and analyze Claude Code conversation histories. Built with React and Fastify, it provides enterprise-grade full-text search using SQLite FTS5, universal template support for all Claude Code versions, and comprehensive analytics dashboards.
 
   [![Version](https://img.shields.io/github/v/release/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/releases)
-  [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](LICENSE)
+  [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/blob/main/LICENSE)
   [![Documentation](https://img.shields.io/badge/docs-github--pages-blue)](https://kunwar-shah.github.io/claudex/)
   [![Discussions](https://img.shields.io/github/discussions/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/discussions)
 
