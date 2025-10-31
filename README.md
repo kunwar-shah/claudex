@@ -20,22 +20,22 @@
 
 ---
 
-## What's New
+## 🆕 What's New
 
 ### Version 1.1.1 (October 31, 2025)
-- **Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
-  - Implemented line-based unique ID generation (`{sourceId}-L{lineNumber}` format)
-  - Eliminates React duplicate key warnings in console
-  - Ensures correct rendering of Claude Code's multi-part message format
-- **Added MIT LICENSE**: Improves GitHub API discoverability and clarifies usage terms ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
-- **Quick Start Script**: One-command installation script leveraging existing system validation
+- **🐛 Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
+  - Line-based unique ID generation ensures all messages render correctly
+  - Eliminates React duplicate key warnings
+  - Handles Claude Code's multi-part message format seamlessly
+- **📄 Added LICENSE**: MIT License file for improved GitHub API discoverability ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
+- **🚀 Quick Start Script**: One-command installation leveraging existing system checker
 
 ### Version 1.1.0 (October 27, 2025)
-- **Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content using heuristics
-- **Tremor Analytics Dashboard**: Re-enabled data visualization with proper Tailwind-based color system and multi-scale charts
-- **Docker Multi-Platform**: Container images for amd64 and arm64 architectures with optimized ~200MB size
-- **Performance Optimization**: 121x faster async search index rebuild (from 30s to 0.25s)
-- **System Checker**: Automated environment validation with auto-fix capabilities (`npm run check:fix`)
+- **🎯 Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content
+- **📊 Tremor Analytics Dashboard**: Re-enabled with proper Tailwind-based color system and multi-scale visualizations
+- **🐳 Docker Multi-Platform**: Support for amd64 and arm64 with optimized ~200MB images
+- **⚡ Performance**: 121x faster async search index rebuild
+- **🔧 System Checker**: Auto-fix capabilities for common setup issues (`npm run check:fix`)
 
 [View full changelog](https://kunwar-shah.github.io/claudex/#/changelog) | [Troubleshooting guide](https://kunwar-shah.github.io/claudex/#/troubleshooting)
 
