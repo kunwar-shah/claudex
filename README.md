@@ -19,10 +19,10 @@
 ## 📸 Screenshots
 
 ### Home & Conversation View
-![Conversation View](./screenshots/conversation-view.png)
+<img src="screenshots/conversation-view.png" alt="Conversation View" width="800">
 
 ### Full-Text Search
-![Search Results](./screenshots/search-results.png)
+<img src="screenshots/search-results.png" alt="Search Results" width="800">
 
 ## ✨ Features
 
