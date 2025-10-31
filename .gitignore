@@ -118,4 +118,4 @@ data/
 server/data/
 
 # Environment files (keep .env.example for reference)
-server/.env
+server/.envscreenshots/backup/
