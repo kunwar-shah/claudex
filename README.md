@@ -3,9 +3,11 @@
 
   # Claudex
 
-  **A powerful web application for viewing, searching, and analyzing Claude Code conversation histories.**
+  **Professional conversation viewer and analysis tool for Claude Code**
 
-  Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
+  > **Category**: Development Tools · Conversation Analysis · Usage Monitoring
+
+  Claudex is a full-stack web application designed for developers, QA engineers, and researchers who need to inspect, search, and analyze Claude Code conversation histories. Built with React and Fastify, it provides enterprise-grade full-text search using SQLite FTS5, universal template support for all Claude Code versions, and comprehensive analytics dashboards.
 
   [![Version](https://img.shields.io/github/v/release/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/releases)
   [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](LICENSE)
@@ -41,7 +43,7 @@
 
 ## 📸 Screenshots
 
-### Home & Conversation View
+### Conversation View
 <img src="screenshots/conversation-view.png" alt="Conversation View" width="800">
 
 ### Full-Text Search
@@ -49,14 +51,14 @@
 
 ## ✨ Features
 
-- 📁 **Auto Project Discovery**: Scans `~/.claude/projects` for all conversations
-- 🔍 **Full-Text Search**: SQLite FTS5-powered search across all messages with filters
-- 📝 **Universal Template Support**: Works with all Claude Code versions (V1.x, V2-mixed, V2.0+)
-- 🎯 **Smart Rendering**: Markdown, code blocks, diffs, JSON, tool usage visualization
-- 📊 **Session Analytics**: Message distribution, file operations, conversation stats
-- 📋 **Export Options**: JSON, HTML, and TXT formats for conversations
-- 🎨 **Modern UI**: Responsive design with fixed header/footer and smooth navigation
-- 🚀 **Hot Reload**: Development mode with auto-restart on code changes
+- **Auto Project Discovery**: Automatically scans `~/.claude/projects` directory to discover all available conversations across multiple projects
+- **Full-Text Search**: Enterprise-grade SQLite FTS5 search engine with advanced filtering by project, session, role, date range, and content highlighting
+- **Universal Template Support**: Intelligent template detection and parsing for all Claude Code versions (V1.x, V2-mixed, V2.0+) with automatic format detection
+- **Smart Content Rendering**: Syntax-highlighted code blocks, markdown rendering, diff visualization, JSON formatting, and tool usage tracking
+- **Session Analytics**: Comprehensive analytics dashboard with message distribution charts, file operation tracking, and conversation statistics using Tremor React
+- **Export Options**: Export conversations to JSON (structured data), HTML (readable format), or plain TXT for archival and sharing
+- **Modern UI**: Responsive React interface with fixed header/footer navigation, infinite scroll, and optimized for developer workflows
+- **Hot Reload**: Development mode with automatic restart on code changes for rapid iteration
 
 ## 🚀 Quick Start
 
