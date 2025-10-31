@@ -32,16 +32,16 @@ export class SessionParser {
       for await (const line of rl) {
         lineNumber++;
         const trimmedLine = line.trim();
-        
+
         if (!trimmedLine) continue;
 
         try {
           const rawMessage = JSON.parse(trimmedLine);
-          const parsedMessage = this.messageParser.parseMessage(rawMessage, template);
-          
+          const parsedMessage = this.messageParser.parseMessage(rawMessage, template, lineNumber);
+
           parsedMessage.lineNumber = lineNumber;
           messages.push(parsedMessage);
-          
+
         } catch (error) {
           console.warn(`Skipping invalid JSON on line ${lineNumber}:`, error.message);
           skippedLines++;

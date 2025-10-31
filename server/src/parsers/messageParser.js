@@ -10,23 +10,23 @@ export class MessageParser {
     };
   }
 
-  parseMessage(rawMessage, template) {
+  parseMessage(rawMessage, template, lineNumber = null) {
     const templateInfo = TemplateDetector.getTemplateInfo(template);
     const parser = this.parsers[templateInfo.parser] || this.parsers.generic;
-    
+
     try {
-      const parsed = parser(rawMessage);
+      const parsed = parser(rawMessage, lineNumber);
       return {
         ...parsed,
         raw: rawMessage
       };
     } catch (error) {
       console.error('Error parsing message:', error);
-      return this.parseGeneric(rawMessage);
+      return this.parseGeneric(rawMessage, lineNumber);
     }
   }
 
-  parseClaudeCode(rawMessage) {
+  parseClaudeCode(rawMessage, lineNumber = null) {
     // Handle different types based on actual Claude Code format
     const messageType = rawMessage.type || 'unknown';
     let role, content, toolsUsed = [], actions = [];
@@ -34,7 +34,7 @@ export class MessageParser {
     switch (messageType) {
       case 'summary':
         return {
-          id: rawMessage.leafUuid || this.generateId(),
+          id: this.makeUniqueId(rawMessage.leafUuid || this.generateId(), lineNumber),
           role: 'system',
           content: rawMessage.summary || '',
           contentKind: 'text',
@@ -70,7 +70,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || this.generateId(), lineNumber),
       role,
       content,
       contentKind: this.inferContentKind(content),
@@ -187,11 +187,11 @@ export class MessageParser {
     return actions;
   }
 
-  parseGeneric(rawMessage) {
+  parseGeneric(rawMessage, lineNumber = null) {
     const content = rawMessage.content || rawMessage.text || rawMessage.message || JSON.stringify(rawMessage);
-    
+
     return {
-      id: rawMessage.id || this.generateId(),
+      id: this.makeUniqueId(rawMessage.id || this.generateId(), lineNumber),
       role: rawMessage.role || rawMessage.author || rawMessage.sender || 'unknown',
       content,
       contentKind: this.inferContentKind(content),
@@ -238,7 +238,7 @@ export class MessageParser {
     return metadata;
   }
 
-  parseClaudeCodeV2Mixed(rawMessage) {
+  parseClaudeCodeV2Mixed(rawMessage, lineNumber = null) {
     // Enhanced parser for Claude conversation format with tool calls and thinking
     const messageType = rawMessage.type || 'unknown';
 
@@ -246,7 +246,7 @@ export class MessageParser {
       case 'summary':
         // These are AI-generated summaries, not user messages
         return {
-          id: rawMessage.leafUuid || this.generateId(),
+          id: this.makeUniqueId(rawMessage.leafUuid || this.generateId(), lineNumber),
           role: 'system',
           content: rawMessage.summary || 'AI Summary',
           contentKind: 'text',
@@ -265,23 +265,23 @@ export class MessageParser {
 
       case 'assistant':
         // Handle complex Claude assistant messages with tool calls and thinking
-        return this.parseClaudeAssistantMessage(rawMessage);
+        return this.parseClaudeAssistantMessage(rawMessage, lineNumber);
 
       case 'user':
         // Handle Claude user messages (including tool results)
-        return this.parseClaudeUserMessage(rawMessage);
+        return this.parseClaudeUserMessage(rawMessage, lineNumber);
 
       case 'system':
         // Handle Claude system messages
-        return this.parseClaudeSystemMessage(rawMessage);
+        return this.parseClaudeSystemMessage(rawMessage, lineNumber);
 
       default:
         // Handle other formats (legacy support)
-        return this.parseClaudeUnknownMessage(rawMessage);
+        return this.parseClaudeUnknownMessage(rawMessage, lineNumber);
     }
   }
 
-  parseClaudeAssistantMessage(rawMessage) {
+  parseClaudeAssistantMessage(rawMessage, lineNumber = null) {
     const message = rawMessage.message || {};
     const content = message.content || [];
 
@@ -314,7 +314,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || message.id || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || message.id || this.generateId(), lineNumber),
       role: 'assistant',
       content: mainContent,
       contentKind: 'text',
@@ -337,7 +337,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeUserMessage(rawMessage) {
+  parseClaudeUserMessage(rawMessage, lineNumber = null) {
     const message = rawMessage.message || {};
     const content = message.content || [];
 
@@ -361,7 +361,7 @@ export class MessageParser {
     }));
 
     return {
-      id: rawMessage.uuid || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || this.generateId(), lineNumber),
       role: 'user',
       content: mainContent,
       contentKind: 'text',
@@ -378,7 +378,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeSystemMessage(rawMessage) {
+  parseClaudeSystemMessage(rawMessage, lineNumber = null) {
     const content = rawMessage.content || '';
 
     // Detect system message types
@@ -397,7 +397,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || this.generateId(), lineNumber),
       role: 'system',
       content,
       contentKind: 'text',
@@ -416,7 +416,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeUnknownMessage(rawMessage) {
+  parseClaudeUnknownMessage(rawMessage, lineNumber = null) {
     // Legacy fallback for unknown message types
     let role = 'system';
     let content = '';
@@ -440,7 +440,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || rawMessage.id || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || rawMessage.id || this.generateId(), lineNumber),
       role,
       content,
       contentKind,
@@ -486,13 +486,13 @@ export class MessageParser {
     }
   }
 
-  parseClaudeCodeV3(rawMessage) {
+  parseClaudeCodeV3(rawMessage, lineNumber = null) {
     // Enhanced V3 parser - Universal compatibility for all Claude Code versions
     // Handles: V1.x, V2-mixed, V2.0+ with backward compatibility
 
     // V2.0+ detection: Check if message has 'role' field directly (new format)
     if (rawMessage.role && !rawMessage.type) {
-      return this.parseClaudeV2NewFormat(rawMessage);
+      return this.parseClaudeV2NewFormat(rawMessage, lineNumber);
     }
 
     // V1/V2-mixed detection: Use 'type' field (old format)
@@ -502,7 +502,7 @@ export class MessageParser {
       case 'summary':
         // AI-generated summaries as assistant messages
         return {
-          id: rawMessage.leafUuid || this.generateId(),
+          id: this.makeUniqueId(rawMessage.leafUuid || this.generateId(), lineNumber),
           role: 'assistant',
           content: rawMessage.summary || 'AI Summary',
           contentKind: 'text',
@@ -522,27 +522,27 @@ export class MessageParser {
 
       case 'file-history-snapshot':
         // Claude Code v2.0+ file history tracking (display as assistant system message)
-        return this.parseFileHistorySnapshot(rawMessage);
+        return this.parseFileHistorySnapshot(rawMessage, lineNumber);
 
       case 'assistant':
         // Handle complex Claude assistant messages with tool calls and thinking
-        return this.parseClaudeV3AssistantMessage(rawMessage);
+        return this.parseClaudeV3AssistantMessage(rawMessage, lineNumber);
 
       case 'user':
         // Handle Claude user messages (including tool results)
-        return this.parseClaudeV3UserMessage(rawMessage);
+        return this.parseClaudeV3UserMessage(rawMessage, lineNumber);
 
       case 'system':
         // Handle Claude system messages as assistant messages
-        return this.parseClaudeV3SystemMessage(rawMessage);
+        return this.parseClaudeV3SystemMessage(rawMessage, lineNumber);
 
       default:
         // Handle other formats and unknown messages
-        return this.parseClaudeV3UnknownMessage(rawMessage);
+        return this.parseClaudeV3UnknownMessage(rawMessage, lineNumber);
     }
   }
 
-  parseClaudeV3AssistantMessage(rawMessage) {
+  parseClaudeV3AssistantMessage(rawMessage, lineNumber = null) {
     const message = rawMessage.message || {};
     const content = message.content || [];
 
@@ -575,7 +575,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || message.id || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || message.id || this.generateId(), lineNumber),
       role: 'assistant',
       content: mainContent,
       contentKind: 'text',
@@ -598,7 +598,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeV3UserMessage(rawMessage) {
+  parseClaudeV3UserMessage(rawMessage, lineNumber = null) {
     const message = rawMessage.message || {};
     const content = message.content || [];
 
@@ -629,7 +629,7 @@ export class MessageParser {
       : this.extractToolResults(rawMessage);
 
     return {
-      id: rawMessage.uuid || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || this.generateId(), lineNumber),
       role: 'user',
       content: mainContent || 'User message',
       contentKind: 'text',
@@ -646,7 +646,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeV3SystemMessage(rawMessage) {
+  parseClaudeV3SystemMessage(rawMessage, lineNumber = null) {
     const content = rawMessage.content || '';
 
     // Detect system message types but display as assistant
@@ -665,7 +665,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || this.generateId(), lineNumber),
       role: 'assistant', // V3: System messages become assistant messages
       content,
       contentKind: 'text',
@@ -685,7 +685,7 @@ export class MessageParser {
     };
   }
 
-  parseClaudeV3UnknownMessage(rawMessage) {
+  parseClaudeV3UnknownMessage(rawMessage, lineNumber = null) {
     // Enhanced unknown message handling with only user/assistant roles
     const inferredRole = this.inferRoleFromContent(rawMessage);
     let content = this.extractUnknownContent(rawMessage);
@@ -711,7 +711,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.uuid || rawMessage.id || this.generateId(),
+      id: this.makeUniqueId(rawMessage.uuid || rawMessage.id || this.generateId(), lineNumber),
       role: inferredRole, // Only 'user' or 'assistant'
       content,
       contentKind,
@@ -779,7 +779,7 @@ export class MessageParser {
     return this.safeStringify(rawMessage);
   }
 
-  parseClaudeV2NewFormat(rawMessage) {
+  parseClaudeV2NewFormat(rawMessage, lineNumber = null) {
     // Handle Claude Code v2.0+ new format with 'role' field directly
     const role = rawMessage.role;
     const content = rawMessage.content || [];
@@ -795,7 +795,7 @@ export class MessageParser {
     const mappedRole = role === 'assistant' ? 'assistant' : 'user';
 
     return {
-      id: messageId,
+      id: this.makeUniqueId(messageId, lineNumber),
       role: mappedRole,
       content: textContent || 'Message content',
       contentKind: 'text',
@@ -815,7 +815,7 @@ export class MessageParser {
     };
   }
 
-  parseFileHistorySnapshot(rawMessage) {
+  parseFileHistorySnapshot(rawMessage, lineNumber = null) {
     // Handle file-history-snapshot messages from Claude Code v2.0+
     const snapshot = rawMessage.snapshot || {};
     const trackedFiles = snapshot.trackedFileBackups || {};
@@ -828,7 +828,7 @@ export class MessageParser {
     }
 
     return {
-      id: rawMessage.messageId || this.generateId(),
+      id: this.makeUniqueId(rawMessage.messageId || this.generateId(), lineNumber),
       role: 'assistant',
       content,
       contentKind: 'text',
@@ -851,5 +851,14 @@ export class MessageParser {
 
   generateId() {
     return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  makeUniqueId(sourceId, lineNumber = null) {
+    // Combine source ID with line number to ensure uniqueness
+    // This handles cases where the same message ID appears on multiple lines
+    if (lineNumber) {
+      return `${sourceId}-L${lineNumber}`;
+    }
+    return sourceId;
   }
 }
