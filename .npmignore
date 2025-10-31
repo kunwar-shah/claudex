@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# Development
+client/src/
+*.log
+npm-debug.log*
+*.swp
+*.swo
+*~
+
+# Testing
+server/tests/
+client/tests/
+coverage/
+.nyc_output/
+
+# Build artifacts (keep client/dist)
+server/data/
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (keep README.md)
+docs/
+SETUP.md
+INSTALL.md
+BRANCHING_STRATEGY.md
+GIT_SETUP.md
+ROADMAP.md
+
+# Screenshots
+screenshots/
+
+# Environment
+.env
+server/.env
+.env.local
+.env.*.local
+
+# Temporary
+.tmp/
+temp/
+*.tmp
+
+# Editor configs
+.editorconfig
+.prettierrc
+.eslintrc*
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore

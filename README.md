@@ -69,6 +69,23 @@
 
 ### Installation
 
+#### Option 1: npm (Recommended - Coming Soon)
+
+> **Note**: npm package will be available after Phase B.2 completion
+
+```bash
+# Global installation
+npm install -g claudex
+
+# Then run anywhere:
+claudex
+
+# Or use without installing (npx):
+npx claudex
+```
+
+#### Option 2: From Source
+
 1. **Clone the repository**:
 ```bash
 git clone https://github.com/kunwar-shah/claudex.git
