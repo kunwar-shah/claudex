@@ -16,6 +16,29 @@
 
 </div>
 
+---
+
+## 🆕 What's New
+
+### Version 1.1.1 (October 31, 2025)
+- **🐛 Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
+  - Line-based unique ID generation ensures all messages render correctly
+  - Eliminates React duplicate key warnings
+  - Handles Claude Code's multi-part message format seamlessly
+- **📄 Added LICENSE**: MIT License file for improved GitHub API discoverability ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
+- **🚀 Quick Start Script**: One-command installation leveraging existing system checker
+
+### Version 1.1.0 (October 27, 2025)
+- **🎯 Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content
+- **📊 Tremor Analytics Dashboard**: Re-enabled with proper Tailwind-based color system and multi-scale visualizations
+- **🐳 Docker Multi-Platform**: Support for amd64 and arm64 with optimized ~200MB images
+- **⚡ Performance**: 121x faster async search index rebuild
+- **🔧 System Checker**: Auto-fix capabilities for common setup issues (`npm run check:fix`)
+
+[View full changelog](https://kunwar-shah.github.io/claudex/#/changelog) | [Troubleshooting guide](https://kunwar-shah.github.io/claudex/#/troubleshooting)
+
+---
+
 ## 📸 Screenshots
 
 ### Home & Conversation View
@@ -375,6 +398,17 @@ npm run check:verbose
 This will check all common problems and provide actionable suggestions.
 
 ### Common Issues
+
+#### "No messages found" Despite Messages Existing
+**Fixed in v1.1.1** - If you see intermittent empty sessions or duplicate key warnings:
+```bash
+# Update to latest version
+cd claude-viewer
+git pull origin main
+npm install && cd server && npm install && cd ../client && npm install && cd ..
+npm run dev
+```
+See [detailed troubleshooting guide](https://kunwar-shah.github.io/claudex/#/troubleshooting) for more information.
 
 #### No Projects Found
 ```bash
