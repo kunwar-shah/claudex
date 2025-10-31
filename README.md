@@ -3,9 +3,11 @@
 
   # Claudex
 
-  **A powerful web application for viewing, searching, and analyzing Claude Code conversation histories.**
+  **Professional conversation viewer and analysis tool for Claude Code**
 
-  Features universal template support (V1.x, V2-mixed, V2.0+), full-text search with SQLite FTS5, and a modern React UI.
+  > **Category**: Development Tools · Conversation Analysis · Usage Monitoring
+
+  Claudex is a full-stack web application designed for developers, QA engineers, and researchers who need to inspect, search, and analyze Claude Code conversation histories. Built with React and Fastify, it provides enterprise-grade full-text search using SQLite FTS5, universal template support for all Claude Code versions, and comprehensive analytics dashboards.
 
   [![Version](https://img.shields.io/github/v/release/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/releases)
   [![License](https://img.shields.io/github/license/kunwar-shah/claudex)](LICENSE)
@@ -18,22 +20,22 @@
 
 ---
 
-## 🆕 What's New
+## What's New
 
 ### Version 1.1.1 (October 31, 2025)
-- **🐛 Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
-  - Line-based unique ID generation ensures all messages render correctly
-  - Eliminates React duplicate key warnings
-  - Handles Claude Code's multi-part message format seamlessly
-- **📄 Added LICENSE**: MIT License file for improved GitHub API discoverability ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
-- **🚀 Quick Start Script**: One-command installation leveraging existing system checker
+- **Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
+  - Implemented line-based unique ID generation (`{sourceId}-L{lineNumber}` format)
+  - Eliminates React duplicate key warnings in console
+  - Ensures correct rendering of Claude Code's multi-part message format
+- **Added MIT LICENSE**: Improves GitHub API discoverability and clarifies usage terms ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
+- **Quick Start Script**: One-command installation script leveraging existing system validation
 
 ### Version 1.1.0 (October 27, 2025)
-- **🎯 Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content
-- **📊 Tremor Analytics Dashboard**: Re-enabled with proper Tailwind-based color system and multi-scale visualizations
-- **🐳 Docker Multi-Platform**: Support for amd64 and arm64 with optimized ~200MB images
-- **⚡ Performance**: 121x faster async search index rebuild
-- **🔧 System Checker**: Auto-fix capabilities for common setup issues (`npm run check:fix`)
+- **Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content using heuristics
+- **Tremor Analytics Dashboard**: Re-enabled data visualization with proper Tailwind-based color system and multi-scale charts
+- **Docker Multi-Platform**: Container images for amd64 and arm64 architectures with optimized ~200MB size
+- **Performance Optimization**: 121x faster async search index rebuild (from 30s to 0.25s)
+- **System Checker**: Automated environment validation with auto-fix capabilities (`npm run check:fix`)
 
 [View full changelog](https://kunwar-shah.github.io/claudex/#/changelog) | [Troubleshooting guide](https://kunwar-shah.github.io/claudex/#/troubleshooting)
 
@@ -41,7 +43,7 @@
 
 ## 📸 Screenshots
 
-### Home & Conversation View
+### Conversation View
 <img src="screenshots/conversation-view.png" alt="Conversation View" width="800">
 
 ### Full-Text Search
@@ -49,14 +51,14 @@
 
 ## ✨ Features
 
-- 📁 **Auto Project Discovery**: Scans `~/.claude/projects` for all conversations
-- 🔍 **Full-Text Search**: SQLite FTS5-powered search across all messages with filters
-- 📝 **Universal Template Support**: Works with all Claude Code versions (V1.x, V2-mixed, V2.0+)
-- 🎯 **Smart Rendering**: Markdown, code blocks, diffs, JSON, tool usage visualization
-- 📊 **Session Analytics**: Message distribution, file operations, conversation stats
-- 📋 **Export Options**: JSON, HTML, and TXT formats for conversations
-- 🎨 **Modern UI**: Responsive design with fixed header/footer and smooth navigation
-- 🚀 **Hot Reload**: Development mode with auto-restart on code changes
+- **Auto Project Discovery**: Automatically scans `~/.claude/projects` directory to discover all available conversations across multiple projects
+- **Full-Text Search**: Enterprise-grade SQLite FTS5 search engine with advanced filtering by project, session, role, date range, and content highlighting
+- **Universal Template Support**: Intelligent template detection and parsing for all Claude Code versions (V1.x, V2-mixed, V2.0+) with automatic format detection
+- **Smart Content Rendering**: Syntax-highlighted code blocks, markdown rendering, diff visualization, JSON formatting, and tool usage tracking
+- **Session Analytics**: Comprehensive analytics dashboard with message distribution charts, file operation tracking, and conversation statistics using Tremor React
+- **Export Options**: Export conversations to JSON (structured data), HTML (readable format), or plain TXT for archival and sharing
+- **Modern UI**: Responsive React interface with fixed header/footer navigation, infinite scroll, and optimized for developer workflows
+- **Hot Reload**: Development mode with automatic restart on code changes for rapid iteration
 
 ## 🚀 Quick Start
 
