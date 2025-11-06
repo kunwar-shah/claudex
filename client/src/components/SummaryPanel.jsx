@@ -1,6 +1,7 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { projectsApi } from '../services/api'
+import SessionMetadataControls from './SessionMetadataControls'
 
 const SummaryPanel = ({ projectId, sessionId }) => {
   // Get the complete session for universal summary (not affected by pagination)
@@ -67,8 +68,18 @@ const SummaryPanel = ({ projectId, sessionId }) => {
           )}
         </div>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto p-1 space-y-1.5">
+        {/* Session Management */}
+        <div>
+          <h4 className="text-xs font-semibold text-slate-800 mb-1">Session Management</h4>
+          <SessionMetadataControls
+            projectId={projectId}
+            sessionId={sessionId}
+            currentTitle={session?.title || sessionId}
+          />
+        </div>
+
         {/* Overview */}
         <div>
           <h4 className="text-xs font-semibold text-slate-800 mb-1">Overview</h4>
