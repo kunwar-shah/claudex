@@ -56,9 +56,9 @@ export class SearchDatabase {
         template
       )
     `
-    
+
     await this.db.run(createTableSQL)
-    
+
     // Create metadata table for tracking index status
     const metadataTableSQL = `
       CREATE TABLE IF NOT EXISTS search_metadata (
@@ -67,8 +67,31 @@ export class SearchDatabase {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `
-    
+
     await this.db.run(metadataTableSQL)
+
+    // Create session metadata table for custom session names, tags, etc.
+    const sessionMetadataTableSQL = `
+      CREATE TABLE IF NOT EXISTS session_metadata (
+        session_id TEXT NOT NULL,
+        project_id TEXT NOT NULL,
+        custom_title TEXT,
+        original_title TEXT,
+        is_hidden INTEGER DEFAULT 0,
+        tags TEXT,
+        notes TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (session_id, project_id)
+      )
+    `
+
+    await this.db.run(sessionMetadataTableSQL)
+
+    // Create indexes for session_metadata table
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_project ON session_metadata(project_id)')
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_hidden ON session_metadata(is_hidden)')
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_tags ON session_metadata(tags)')
   }
 
   async indexMessage({
