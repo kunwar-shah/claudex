@@ -2,9 +2,35 @@ import { FileScanner } from '../services/fileScanner.js';
 import { SessionParser } from '../services/sessionParser.js';
 import { getProjectRoot } from '../utils/pathHelper.js';
 
+// Simple in-memory cache with TTL
+class SimpleCache {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  get(key) {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    if (Date.now() > item.expiry) {
+      this.cache.delete(key);
+      return null;
+    }
+    return item.value;
+  }
+
+  set(key, value, options = {}) {
+    const ttl = options.ttl || 300; // Default 5 minutes
+    this.cache.set(key, {
+      value,
+      expiry: Date.now() + (ttl * 1000)
+    });
+  }
+}
+
 export async function projectRoutes(fastify, options) {
   const fileScanner = new FileScanner(getProjectRoot());
   const sessionParser = new SessionParser();
+  const cache = new SimpleCache();
 
   // GET /api/projects
   fastify.get('/projects', async (request, reply) => {
@@ -193,6 +219,11 @@ export async function projectRoutes(fastify, options) {
 
       const sessions = await fileScanner.scanSessions(project.path);
 
+      // Simple 5-minute cache
+      const cacheKey = `token-stats-${projectId}`;
+      const cached = cache.get(cacheKey);
+      if (cached) return { tokens: cached };
+      
       // Aggregate token stats across all sessions
       const aggregatedStats = {
         totalInputTokens: 0,
@@ -235,6 +266,7 @@ export async function projectRoutes(fastify, options) {
       aggregatedStats.cacheHitRate = parseFloat(cacheHitRate);
       aggregatedStats.totalTokens = totalTokens + aggregatedStats.totalOutputTokens;
 
+      cache.set(cacheKey, aggregatedStats, { ttl: 300 });
       return { tokens: aggregatedStats };
     } catch (error) {
       reply.code(500).send({
