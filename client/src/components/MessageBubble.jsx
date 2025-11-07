@@ -6,6 +6,7 @@ import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 const MessageBubble = ({ message, isFirst, isLast }) => {
   const [showRaw, setShowRaw] = useState(false)
   const [showActions, setShowActions] = useState(false)
+  const [showUsage, setShowUsage] = useState(false)
   const [isExpanded, setIsExpanded] = useState(() => {
     // Only collapse for v2-mixed template messages that are explicitly marked as collapsed
     return message.metadata?.collapsed !== true
@@ -109,8 +110,17 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
               Line {message.lineNumber}
             </span>
           )}
+          {message.metadata?.usage && (
+            <button
+              onClick={() => setShowUsage(!showUsage)}
+              className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded hover:bg-indigo-200 transition-colors"
+              title="Click to see detailed token usage"
+            >
+              {message.metadata.usage.input_tokens?.toLocaleString() || 0} in / {message.metadata.usage.output_tokens?.toLocaleString() || 0} out
+            </button>
+          )}
         </div>
-        
+
         <div className="flex items-center space-x-1">
           {/* Collapse/Expand button only for v2-mixed template messages */}
           {message.metadata?.collapsed !== undefined && (
@@ -160,6 +170,51 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
         </div>
       </div>
 
+      {/* Token Usage Details */}
+      {showUsage && message.metadata?.usage && (
+        <div className="mb-3 p-3 bg-white bg-opacity-70 rounded border border-indigo-200">
+          <div className="text-sm font-medium text-gray-700 mb-2">Token Usage Details:</div>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Input:</span>
+              <span className="font-medium text-blue-600">{message.metadata.usage.input_tokens?.toLocaleString() || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Output:</span>
+              <span className="font-medium text-emerald-600">{message.metadata.usage.output_tokens?.toLocaleString() || 0}</span>
+            </div>
+            {message.metadata.usage.cache_creation_input_tokens > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Cache Creation:</span>
+                <span className="font-medium text-amber-600">{message.metadata.usage.cache_creation_input_tokens.toLocaleString()}</span>
+              </div>
+            )}
+            {message.metadata.usage.cache_read_input_tokens > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Cache Reads:</span>
+                <span className="font-medium text-purple-600">{message.metadata.usage.cache_read_input_tokens.toLocaleString()}</span>
+              </div>
+            )}
+            {message.metadata.usage.cache_creation && (
+              <>
+                {message.metadata.usage.cache_creation.ephemeral_5m_input_tokens > 0 && (
+                  <div className="flex justify-between col-span-2 pl-2 text-xs">
+                    <span className="text-gray-500">5m TTL:</span>
+                    <span className="font-medium">{message.metadata.usage.cache_creation.ephemeral_5m_input_tokens.toLocaleString()}</span>
+                  </div>
+                )}
+                {message.metadata.usage.cache_creation.ephemeral_1h_input_tokens > 0 && (
+                  <div className="flex justify-between col-span-2 pl-2 text-xs">
+                    <span className="text-gray-500">1h TTL:</span>
+                    <span className="font-medium">{message.metadata.usage.cache_creation.ephemeral_1h_input_tokens.toLocaleString()}</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Tools Used */}
       {showActions && message.toolsUsed && message.toolsUsed.length > 0 && (
         <div className="mb-3 p-2 bg-white bg-opacity-50 rounded border">
@@ -170,7 +225,7 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
                 <span className="font-medium">{tool.name}</span>
                 {tool.details && (
                   <span className="ml-2 text-gray-500">
-                    {typeof tool.details === 'string' 
+                    {typeof tool.details === 'string'
                       ? tool.details.slice(0, 100)
                       : JSON.stringify(tool.details).slice(0, 100)
                     }...

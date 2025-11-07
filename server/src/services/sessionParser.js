@@ -48,13 +48,16 @@ export class SessionParser {
         }
       }
 
+      const tokenStats = this.aggregateTokenStats(messages);
+
       return {
         messages,
         template,
         stats: {
           totalLines: lineNumber,
           parsedMessages: messages.length,
-          skippedLines
+          skippedLines,
+          tokens: tokenStats
         }
       };
 
@@ -75,7 +78,7 @@ export class SessionParser {
     let count = 0;
     for await (const line of rl) {
       if (count >= sampleSize) break;
-      
+
       const trimmedLine = line.trim();
       if (!trimmedLine) continue;
 
@@ -91,6 +94,48 @@ export class SessionParser {
 
     rl.close();
     return samples;
+  }
+
+  aggregateTokenStats(messages) {
+    const stats = {
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCacheCreationTokens: 0,
+      totalCacheReadTokens: 0,
+      ephemeral5mTokens: 0,
+      ephemeral1hTokens: 0,
+      messagesWithUsage: 0
+    };
+
+    for (const message of messages) {
+      if (message.metadata?.usage) {
+        const usage = message.metadata.usage;
+
+        stats.totalInputTokens += usage.input_tokens || 0;
+        stats.totalOutputTokens += usage.output_tokens || 0;
+        stats.totalCacheCreationTokens += usage.cache_creation_input_tokens || 0;
+        stats.totalCacheReadTokens += usage.cache_read_input_tokens || 0;
+
+        // Handle cache creation breakdown
+        if (usage.cache_creation) {
+          stats.ephemeral5mTokens += usage.cache_creation.ephemeral_5m_input_tokens || 0;
+          stats.ephemeral1hTokens += usage.cache_creation.ephemeral_1h_input_tokens || 0;
+        }
+
+        stats.messagesWithUsage++;
+      }
+    }
+
+    // Calculate cache efficiency metrics
+    const totalTokens = stats.totalInputTokens + stats.totalCacheCreationTokens + stats.totalCacheReadTokens;
+    const cacheHitRate = totalTokens > 0
+      ? ((stats.totalCacheReadTokens / totalTokens) * 100).toFixed(2)
+      : '0.00';
+
+    stats.cacheHitRate = parseFloat(cacheHitRate);
+    stats.totalTokens = totalTokens + stats.totalOutputTokens;
+
+    return stats;
   }
 
   async getMessagesPaginated(sessionFilePath, template, page = 1, pageSize = 50) {

@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { projectsApi } from '../services/api'
+import ProjectExportButton from './ProjectExportButton'
 
 const SessionList = ({ projectId, selectedSessionId }) => {
   const navigate = useNavigate()
@@ -12,6 +13,13 @@ const SessionList = ({ projectId, selectedSessionId }) => {
     queryFn: () => projectsApi.getSessions(projectId).then(res => res.data),
     enabled: !!projectId
   })
+
+  const { data: projectsData } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => projectsApi.getProjects().then(res => res.data)
+  })
+
+  const currentProject = projectsData?.projects?.find(p => p.id === projectId)
 
   const handleSessionSelect = (sessionId) => {
     navigate(`/projects/${projectId}/sessions/${sessionId}`)
@@ -43,11 +51,20 @@ const SessionList = ({ projectId, selectedSessionId }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="px-2 py-1 border-b border-gray-200 bg-white">
-        <div className="flex items-center justify-between">
+      <div className="px-2 py-1.5 border-b border-gray-200 bg-white">
+        <div className="flex items-center justify-between mb-1.5">
           <span className="text-xs font-semibold text-gray-900">Sessions</span>
           <span className="text-xs text-gray-500">{sessions.length}</span>
         </div>
+        {currentProject && (
+          <div className="flex justify-center">
+            <ProjectExportButton
+              projectId={projectId}
+              projectName={currentProject.name}
+              variant="compact"
+            />
+          </div>
+        )}
       </div>
       
       <div className="flex-1 overflow-y-auto">
