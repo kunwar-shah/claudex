@@ -74,15 +74,24 @@ export async function exportRoutes(fastify, options) {
   fastify.get('/export/project/:projectId', async (request, reply) => {
     try {
       const { projectId } = request.params;
+      
+      // Validate projectId format
+      if (!/^[a-zA-Z0-9\-_/]+$/.test(projectId)) {
+        return reply.code(400).send({ error: 'Invalid project ID format' });
+      }
 
       // Export the entire project
       const exportData = await projectExporter.exportProject(projectId);
 
       // Set appropriate headers
       const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `${exportData.project.name}-complete-${timestamp}.json`;
-
       reply.header('Content-Type', 'application/json');
+
+      // Sanitize filename to prevent special characters
+      const safeName = exportData.project.name
+        .replace(/[^a-zA-Z0-9-_]/g, '-')  // Replace special chars with dashes
+        .slice(0, 50);                     // Limit length
+      const filename = `${safeName}-complete-${timestamp}.json`;
       reply.header('Content-Disposition', `attachment; filename="${filename}"`);
 
       return exportData;

@@ -24,6 +24,14 @@ export class ProjectExporter {
         throw new Error(`No sessions found in project: ${projectId}`);
       }
 
+      // Add safety check for very large projects
+      if (sessions.length > 500) {
+        throw new Error(
+          `Project too large for export (${sessions.length} sessions). ` +
+          `Maximum supported: 500 sessions. Please export smaller date ranges or contact support.`
+        );
+      }
+
       // Parse all sessions
       const parsedSessions = [];
       for (const session of sessions) {
