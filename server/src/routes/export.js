@@ -1,11 +1,13 @@
 import { FileScanner } from '../services/fileScanner.js';
 import { SessionParser } from '../services/sessionParser.js';
+import { ProjectExporter } from '../services/projectExporter.js';
 import { formatDistanceToNow } from 'date-fns';
 import { getProjectRoot } from '../utils/pathHelper.js';
 
 export async function exportRoutes(fastify, options) {
   const fileScanner = new FileScanner(getProjectRoot());
   const sessionParser = new SessionParser();
+  const projectExporter = new ProjectExporter(getProjectRoot());
 
   // GET /api/export/session/:projectId/:sessionId?format=json|html|txt
   fastify.get('/export/session/:projectId/:sessionId', async (request, reply) => {
@@ -61,9 +63,35 @@ export async function exportRoutes(fastify, options) {
 
     } catch (error) {
       console.error('Export failed:', error);
-      reply.code(500).send({ 
+      reply.code(500).send({
         error: 'Failed to export session',
-        message: error.message 
+        message: error.message
+      });
+    }
+  });
+
+  // GET /api/export/project/:projectId - Export complete project
+  fastify.get('/export/project/:projectId', async (request, reply) => {
+    try {
+      const { projectId } = request.params;
+
+      // Export the entire project
+      const exportData = await projectExporter.exportProject(projectId);
+
+      // Set appropriate headers
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `${exportData.project.name}-complete-${timestamp}.json`;
+
+      reply.header('Content-Type', 'application/json');
+      reply.header('Content-Disposition', `attachment; filename="${filename}"`);
+
+      return exportData;
+
+    } catch (error) {
+      console.error('Project export failed:', error);
+      reply.code(500).send({
+        error: 'Failed to export project',
+        message: error.message
       });
     }
   });

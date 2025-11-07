@@ -17,6 +17,7 @@ import {
 } from '@tremor/react'
 import { formatDistanceToNow } from 'date-fns'
 import ConversationThread from './ConversationThread'
+import ProjectExportButton from './ProjectExportButton'
 import '../styles/tremor-dashboard.scss'
 
 const TremorProjectView = () => {
@@ -476,15 +477,26 @@ const TremorProjectView = () => {
               <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 overflow-y-auto pb-20">
                 <div className="max-w-7xl mx-auto">
                   <div className="mb-6">
-                    <Title className="text-2xl font-bold text-slate-800">
-                      Project Analytics Dashboard
-                    </Title>
-                    <Text className="mt-2 text-slate-600">
-                      Select a session from the sidebar to view detailed conversation analytics
-                    </Text>
-                    <Badge className="mt-2" color="indigo" size="md">
-                      {projectId} Project
-                    </Badge>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <Title className="text-2xl font-bold text-slate-800">
+                          Project Analytics Dashboard
+                        </Title>
+                        <Text className="mt-2 text-slate-600">
+                          Select a session from the sidebar to view detailed conversation analytics
+                        </Text>
+                        <Badge className="mt-2" color="indigo" size="md">
+                          {projectId} Project
+                        </Badge>
+                      </div>
+                      <div className="ml-4">
+                        <ProjectExportButton
+                          projectId={projectId}
+                          projectName={allProjects.find(p => p.id === projectId)?.name || projectId}
+                          variant="default"
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6 mb-8">
