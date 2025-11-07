@@ -51,6 +51,14 @@ const TremorProjectView = () => {
     enabled: !!(projectId && sessionId)
   })
 
+  // Get project-level token statistics
+  const { data: projectTokenStats } = useQuery({
+    queryKey: ['project-tokens', projectId],
+    queryFn: () => fetch(`http://localhost:3400/api/projects/${projectId}/token-stats`).then(res => res.json()),
+    enabled: !!(projectId && !sessionId),
+    staleTime: 5 * 60 * 1000 // Cache for 5 minutes
+  })
+
   const sessions = sessionsData?.sessions || []
   const currentSession = sessionData?.session
   const messages = sessionData?.messages || []
@@ -479,7 +487,7 @@ const TremorProjectView = () => {
                     </Badge>
                   </div>
                   
-                  <Grid numItems={1} numItemsSm={2} numItemsLg={4} className="gap-6 mb-8">
+                  <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6 mb-8">
                     <Card className="ring-1 ring-blue-200 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100">
                       <Flex alignItems="center" justifyContent="between">
                         <div>
@@ -494,7 +502,7 @@ const TremorProjectView = () => {
                         </div>
                       </Flex>
                     </Card>
-                    
+
                     <Card className="ring-1 ring-emerald-200 shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100">
                       <Flex alignItems="center" justifyContent="between">
                         <div>
@@ -511,7 +519,7 @@ const TremorProjectView = () => {
                         </div>
                       </Flex>
                     </Card>
-                    
+
                     <Card className="ring-1 ring-purple-200 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100">
                       <Flex alignItems="center" justifyContent="between">
                         <div>
@@ -528,23 +536,70 @@ const TremorProjectView = () => {
                         </div>
                       </Flex>
                     </Card>
-                    
-                    <Card className="ring-1 ring-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-amber-100">
-                      <Flex alignItems="center" justifyContent="between">
-                        <div>
-                          <Text className="text-amber-700 font-semibold">Most Active</Text>
-                          <Metric className="text-3xl font-bold text-amber-800">
-                            {sessions.length > 0 ? Math.max(...sessions.map(s => s.messageCount)) : 0}
-                          </Metric>
-                          <Text className="mt-1 text-amber-600 font-medium">Messages in top session</Text>
-                        </div>
-                        <div className="p-3 bg-amber-200 rounded-xl">
-                          <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                        </div>
-                      </Flex>
-                    </Card>
+
+                    {projectTokenStats?.tokens && projectTokenStats.tokens.messagesWithUsage > 0 && (
+                      <>
+                        <Card className="ring-1 ring-indigo-200 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100">
+                          <Flex alignItems="center" justifyContent="between">
+                            <div>
+                              <Text className="text-indigo-700 font-semibold">Total Tokens</Text>
+                              <Metric className="text-3xl font-bold text-indigo-800">
+                                {projectTokenStats.tokens.totalTokens > 1000000
+                                  ? `${(projectTokenStats.tokens.totalTokens / 1000000).toFixed(1)}M`
+                                  : projectTokenStats.tokens.totalTokens.toLocaleString()}
+                              </Metric>
+                              <Text className="mt-1 text-indigo-600 font-medium">
+                                {projectTokenStats.tokens.totalInputTokens.toLocaleString()} in / {projectTokenStats.tokens.totalOutputTokens.toLocaleString()} out
+                              </Text>
+                            </div>
+                            <div className="p-3 bg-indigo-200 rounded-xl">
+                              <svg className="w-6 h-6 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          </Flex>
+                        </Card>
+
+                        <Card className="ring-1 ring-pink-200 shadow-lg bg-gradient-to-br from-pink-50 to-pink-100">
+                          <Flex alignItems="center" justifyContent="between">
+                            <div>
+                              <Text className="text-pink-700 font-semibold">Cache Efficiency</Text>
+                              <Metric className="text-3xl font-bold text-pink-800">
+                                {projectTokenStats.tokens.cacheHitRate.toFixed(1)}%
+                              </Metric>
+                              <Text className="mt-1 text-pink-600 font-medium">
+                                {projectTokenStats.tokens.totalCacheReadTokens.toLocaleString()} cache reads
+                              </Text>
+                            </div>
+                            <div className="p-3 bg-pink-200 rounded-xl">
+                              <svg className="w-6 h-6 text-pink-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                            </div>
+                          </Flex>
+                          <ProgressBar value={Math.min(projectTokenStats.tokens.cacheHitRate, 100)} className="mt-2" color="pink" />
+                        </Card>
+
+                        <Card className="ring-1 ring-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-amber-100">
+                          <Flex alignItems="center" justifyContent="between">
+                            <div>
+                              <Text className="text-amber-700 font-semibold">Sessions with Usage</Text>
+                              <Metric className="text-3xl font-bold text-amber-800">
+                                {projectTokenStats.tokens.sessionsWithUsage}
+                              </Metric>
+                              <Text className="mt-1 text-amber-600 font-medium">
+                                {projectTokenStats.tokens.messagesWithUsage.toLocaleString()} messages tracked
+                              </Text>
+                            </div>
+                            <div className="p-3 bg-amber-200 rounded-xl">
+                              <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                              </svg>
+                            </div>
+                          </Flex>
+                        </Card>
+                      </>
+                    )}
                   </Grid>
 
                   <Grid numItems={1} numItemsLg={2} className="gap-6">
@@ -691,21 +746,21 @@ const TremorProjectView = () => {
                             {currentSession?.template || 'unknown'}
                           </Badge>
                         </div>
-                        
+
                         <div className="flex justify-between items-center">
                           <Text className="text-secondary">Created</Text>
                           <Text className="text-sm">
                             {currentSession?.createdAt ? new Date(currentSession.createdAt).toLocaleDateString() : 'Unknown'}
                           </Text>
                         </div>
-                        
+
                         <div className="flex justify-between items-center">
                           <Text className="text-secondary">Last Updated</Text>
                           <Text className="text-sm text-emerald-600">
                             {currentSession?.lastUpdatedAt ? formatDistanceToNow(new Date(currentSession.lastUpdatedAt), { addSuffix: true }) : 'Unknown'}
                           </Text>
                         </div>
-                        
+
                         <div className="mt-4 pt-3 border-t border-gray-200">
                           <Text className="text-secondary mb-2">Activity Level</Text>
                           <div className="flex justify-between text-sm mb-1">
@@ -715,7 +770,7 @@ const TremorProjectView = () => {
                             </span>
                           </div>
                           <div className="tremor-progress-bar">
-                            <div 
+                            <div
                               className={`progress-fill ${totalMessages > 50 ? 'emerald' : totalMessages > 20 ? 'blue' : 'red'}`}
                               style={{ width: `${Math.min((totalMessages / 100) * 100, 100)}%` }}
                             ></div>
@@ -723,6 +778,73 @@ const TremorProjectView = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Token Usage Card */}
+                    {sessionData?.stats?.tokens && sessionData.stats.tokens.messagesWithUsage > 0 && (
+                      <div className="tremor-card">
+                        <Title className="text-lg">Token Usage</Title>
+                        <div className="space-y-3 mt-4">
+                          <div className="flex justify-between items-center">
+                            <Text className="text-secondary">Total Tokens</Text>
+                            <Metric className="tremor-metric-sm">{sessionData.stats.tokens.totalTokens.toLocaleString()}</Metric>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <Text className="text-xs">Input</Text>
+                              </div>
+                              <Badge className="tremor-badge blue">{sessionData.stats.tokens.totalInputTokens.toLocaleString()}</Badge>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                <Text className="text-xs">Output</Text>
+                              </div>
+                              <Badge className="tremor-badge emerald">{sessionData.stats.tokens.totalOutputTokens.toLocaleString()}</Badge>
+                            </div>
+
+                            {sessionData.stats.tokens.totalCacheCreationTokens > 0 && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                                  <Text className="text-xs">Cache Creation</Text>
+                                </div>
+                                <Badge className="tremor-badge amber">{sessionData.stats.tokens.totalCacheCreationTokens.toLocaleString()}</Badge>
+                              </div>
+                            )}
+
+                            {sessionData.stats.tokens.totalCacheReadTokens > 0 && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                  <Text className="text-xs">Cache Reads</Text>
+                                </div>
+                                <Badge className="tremor-badge purple">{sessionData.stats.tokens.totalCacheReadTokens.toLocaleString()}</Badge>
+                              </div>
+                            )}
+                          </div>
+
+                          {(sessionData.stats.tokens.totalCacheCreationTokens > 0 || sessionData.stats.tokens.totalCacheReadTokens > 0) && (
+                            <div className="mt-4 pt-3 border-t border-gray-200">
+                              <Text className="text-secondary mb-2">Cache Efficiency</Text>
+                              <div className="flex justify-between text-sm mb-2">
+                                <span className="text-secondary">Hit Rate</span>
+                                <span className="text-primary font-semibold">{sessionData.stats.tokens.cacheHitRate.toFixed(2)}%</span>
+                              </div>
+                              <div className="tremor-progress-bar">
+                                <div
+                                  className="progress-fill indigo"
+                                  style={{ width: `${Math.min(sessionData.stats.tokens.cacheHitRate, 100)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
             </div>

@@ -149,32 +149,97 @@ export async function projectRoutes(fastify, options) {
 
       const projects = await fileScanner.scanProjects();
       const project = projects.find(p => p.id === projectId);
-      
+
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
       }
 
       const sessions = await fileScanner.scanSessions(project.path);
       const session = sessions.find(s => s.sessionId === sessionId);
-      
+
       if (!session) {
         return reply.code(404).send({ error: 'Session not found' });
       }
 
       const sampleMessages = await fileScanner.getSessionFirstMessages(session.filePath);
       const result = await sessionParser.parseSession(session.filePath, sampleMessages);
-      
+
       const message = result.messages.find(m => m.id === messageId);
-      
+
       if (!message) {
         return reply.code(404).send({ error: 'Message not found' });
       }
 
       return { message };
     } catch (error) {
-      reply.code(500).send({ 
+      reply.code(500).send({
         error: 'Failed to get message',
-        message: error.message 
+        message: error.message
+      });
+    }
+  });
+
+  // GET /api/projects/:projectId/token-stats
+  fastify.get('/projects/:projectId/token-stats', async (request, reply) => {
+    try {
+      const { projectId } = request.params;
+
+      const projects = await fileScanner.scanProjects();
+      const project = projects.find(p => p.id === projectId);
+
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const sessions = await fileScanner.scanSessions(project.path);
+
+      // Aggregate token stats across all sessions
+      const aggregatedStats = {
+        totalInputTokens: 0,
+        totalOutputTokens: 0,
+        totalCacheCreationTokens: 0,
+        totalCacheReadTokens: 0,
+        ephemeral5mTokens: 0,
+        ephemeral1hTokens: 0,
+        messagesWithUsage: 0,
+        sessionsWithUsage: 0
+      };
+
+      for (const session of sessions) {
+        try {
+          const sampleMessages = await fileScanner.getSessionFirstMessages(session.filePath);
+          const result = await sessionParser.parseSession(session.filePath, sampleMessages);
+
+          if (result.stats?.tokens && result.stats.tokens.messagesWithUsage > 0) {
+            aggregatedStats.totalInputTokens += result.stats.tokens.totalInputTokens;
+            aggregatedStats.totalOutputTokens += result.stats.tokens.totalOutputTokens;
+            aggregatedStats.totalCacheCreationTokens += result.stats.tokens.totalCacheCreationTokens;
+            aggregatedStats.totalCacheReadTokens += result.stats.tokens.totalCacheReadTokens;
+            aggregatedStats.ephemeral5mTokens += result.stats.tokens.ephemeral5mTokens;
+            aggregatedStats.ephemeral1hTokens += result.stats.tokens.ephemeral1hTokens;
+            aggregatedStats.messagesWithUsage += result.stats.tokens.messagesWithUsage;
+            aggregatedStats.sessionsWithUsage++;
+          }
+        } catch (error) {
+          // Skip sessions that fail to parse
+          console.warn(`Failed to parse session ${session.sessionId}:`, error.message);
+        }
+      }
+
+      // Calculate cache efficiency
+      const totalTokens = aggregatedStats.totalInputTokens + aggregatedStats.totalCacheCreationTokens + aggregatedStats.totalCacheReadTokens;
+      const cacheHitRate = totalTokens > 0
+        ? ((aggregatedStats.totalCacheReadTokens / totalTokens) * 100).toFixed(2)
+        : '0.00';
+
+      aggregatedStats.cacheHitRate = parseFloat(cacheHitRate);
+      aggregatedStats.totalTokens = totalTokens + aggregatedStats.totalOutputTokens;
+
+      return { tokens: aggregatedStats };
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to get token statistics',
+        message: error.message
       });
     }
   });
