@@ -78,6 +78,7 @@ export class SearchDatabase {
         custom_title TEXT,
         original_title TEXT,
         is_hidden INTEGER DEFAULT 0,
+        is_deleted INTEGER DEFAULT 0,
         tags TEXT,
         notes TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -88,9 +89,21 @@ export class SearchDatabase {
 
     await this.db.run(sessionMetadataTableSQL)
 
+    // Migration: Add is_deleted column if it doesn't exist (for existing databases)
+    try {
+      await this.db.run('ALTER TABLE session_metadata ADD COLUMN is_deleted INTEGER DEFAULT 0')
+      console.log('Migration: Added is_deleted column to session_metadata table')
+    } catch (error) {
+      // Column already exists, ignore error
+      if (!error.message.includes('duplicate column name')) {
+        console.error('Migration error:', error)
+      }
+    }
+
     // Create indexes for session_metadata table
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_project ON session_metadata(project_id)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_hidden ON session_metadata(is_hidden)')
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_deleted ON session_metadata(is_deleted)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_tags ON session_metadata(tags)')
   }
 

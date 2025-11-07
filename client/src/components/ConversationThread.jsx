@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { projectsApi } from '../services/api'
+import { projectsApi, sessionMetadataApi } from '../services/api'
 import MessageBubble from './MessageBubble'
 import ExportButton from './ExportButton'
 
@@ -16,7 +16,15 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
     enabled: !!(projectId && sessionId)
   })
 
-  const { session, messages = [], stats, pagination } = data || {}
+  // Fetch session metadata for custom title
+  const { data: metadataData } = useQuery({
+    queryKey: ['session-metadata', projectId, sessionId],
+    queryFn: () => sessionMetadataApi.getMetadata(projectId, sessionId).then(res => res.data),
+    enabled: !!(projectId && sessionId)
+  })
+
+  const { session, messages = [], stats, pagination} = data || {}
+  const metadata = metadataData?.metadata || null
 
   // Scroll to highlighted message when data loads
   useEffect(() => {
@@ -109,8 +117,13 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
         <div className="flex justify-between items-start mb-3">
           <div>
             <h2 className="text-sm font-semibold text-gray-900">
-              {session?.title || sessionId}
+              {metadata?.customTitle || session?.title || sessionId}
             </h2>
+            {metadata?.customTitle && (
+              <p className="text-xs text-blue-600 italic mt-0.5">
+                Original: {session?.title || sessionId}
+              </p>
+            )}
             <p className="text-xs text-gray-500 mt-0.5">
               {pagination ? `${pagination.total} total messages` : `${messages.length} messages`} • Template: {session?.template || 'unknown'}
             </p>
@@ -123,10 +136,10 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
               </div>
             )}
             
-            <ExportButton 
-              projectId={projectId} 
-              sessionId={sessionId} 
-              sessionTitle={session?.title}
+            <ExportButton
+              projectId={projectId}
+              sessionId={sessionId}
+              sessionTitle={metadata?.customTitle || session?.title}
             />
           </div>
         </div>

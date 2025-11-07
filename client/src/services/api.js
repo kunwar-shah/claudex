@@ -109,6 +109,19 @@ export const sessionMetadataApi = {
 
   batchAddTags: (projectId, sessionIds, tags) =>
     api.post(`/session-metadata/${projectId}/batch/tags`, { sessionIds, tags }),
+
+  // Soft delete operations
+  setDeleted: (projectId, sessionId, isDeleted) =>
+    api.patch(`/session-metadata/${projectId}/${sessionId}/deleted`, { isDeleted }),
+
+  getDeletedSessions: (projectId) =>
+    api.get(`/session-metadata/${projectId}/deleted`),
+
+  restoreSession: (projectId, sessionId) =>
+    api.post(`/session-metadata/${projectId}/${sessionId}/restore`),
+
+  batchSetDeleted: (projectId, sessionIds, isDeleted) =>
+    api.post(`/session-metadata/${projectId}/batch/deleted`, { sessionIds, isDeleted }),
 };
 
 export const healthApi = {

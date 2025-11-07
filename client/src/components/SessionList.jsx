@@ -7,19 +7,11 @@ import SessionMetadataControls from './SessionMetadataControls'
 
 const SessionList = ({ projectId, selectedSessionId }) => {
   const navigate = useNavigate()
-  const [filterTag, setFilterTag] = useState(null)
   const [showHidden, setShowHidden] = useState(false)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['sessions', projectId],
     queryFn: () => projectsApi.getSessions(projectId).then(res => res.data),
-    enabled: !!projectId
-  })
-
-  // Fetch all tags for filtering
-  const { data: tagsData } = useQuery({
-    queryKey: ['session-tags', projectId],
-    queryFn: () => sessionMetadataApi.getAllTags(projectId).then(res => res.data),
     enabled: !!projectId
   })
 
@@ -57,7 +49,6 @@ const SessionList = ({ projectId, selectedSessionId }) => {
   }
 
   const sessions = data?.sessions || []
-  const availableTags = tagsData?.tags || []
   const hiddenSessions = hiddenData?.hiddenSessions || []
 
   // Filter sessions based on visibility and tags
@@ -91,20 +82,6 @@ const SessionList = ({ projectId, selectedSessionId }) => {
           >
             {showHidden ? '👁️ All' : '👁️‍🗨️ Show Hidden'}
           </button>
-
-          {/* Tag filter */}
-          {availableTags.length > 0 && (
-            <select
-              value={filterTag || ''}
-              onChange={(e) => setFilterTag(e.target.value || null)}
-              className="text-xs px-2 py-0.5 border border-slate-300 rounded"
-            >
-              <option value="">All Tags</option>
-              {availableTags.map(tag => (
-                <option key={tag} value={tag}>🏷️ {tag}</option>
-              ))}
-            </select>
-          )}
         </div>
       </div>
 
@@ -136,22 +113,33 @@ const SessionList = ({ projectId, selectedSessionId }) => {
   )
 }
 
+// Helper function to clean title from IDE tags and unwanted content
+const cleanTitle = (title) => {
+  if (!title) return ''
+
+  // Remove IDE selection tags
+  let cleaned = title.replace(/<ide_selection>.*?<\/ide_selection>/gs, '')
+  cleaned = cleaned.replace(/<ide_opened_file>.*?<\/ide_opened_file>/gs, '')
+  cleaned = cleaned.replace(/<system-reminder>.*?<\/system-reminder>/gs, '')
+
+  // Trim whitespace
+  cleaned = cleaned.trim()
+
+  // If empty after cleaning, return original
+  return cleaned.length > 0 ? cleaned : title
+}
+
 // Separate component for each session item to handle metadata fetching
 const SessionListItem = ({ session, projectId, isSelected, isHidden, onSelect }) => {
   // Fetch metadata for this session
   const { data: metadataData } = useQuery({
     queryKey: ['session-metadata', projectId, session.sessionId],
-    queryFn: () => sessionMetadataApi.getMetadata(projectId, session.sessionId)
-      .then(res => res.data.metadata)
-      .catch(err => {
-        if (err.response?.status === 404) return null
-        throw err
-      }),
+    queryFn: () => sessionMetadataApi.getMetadata(projectId, session.sessionId).then(res => res.data),
     enabled: !!projectId && !!session.sessionId
   })
 
-  const metadata = metadataData || {}
-  const displayTitle = metadata.customTitle || session.title || session.sessionId
+  const metadata = metadataData?.metadata || {}
+  const displayTitle = metadata.customTitle || cleanTitle(session.title) || session.sessionId
 
   return (
     <div
@@ -162,10 +150,10 @@ const SessionListItem = ({ session, projectId, isSelected, isHidden, onSelect })
           : 'bg-white hover:bg-slate-50 border border-slate-200'
       } ${isHidden ? 'opacity-60' : ''}`}
     >
-      <div className="flex justify-between items-start mb-1">
-        <div className="flex items-center gap-1 flex-1">
-          {isHidden && <span className="text-xs">👁️‍🗨️</span>}
-          <h3 className="font-medium text-xs text-slate-900 truncate pr-1 leading-tight">
+      <div className="flex justify-between items-start mb-1 gap-1">
+        <div className="flex items-start gap-1 flex-1 min-w-0">
+          {isHidden && <span className="text-xs flex-shrink-0">👁️‍🗨️</span>}
+          <h3 className="font-medium text-xs text-slate-900 break-words line-clamp-2 leading-tight flex-1">
             {displayTitle}
             {metadata.customTitle && (
               <span className="ml-1 text-xs text-blue-600">✏️</span>

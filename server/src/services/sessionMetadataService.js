@@ -37,6 +37,7 @@ export class SessionMetadataService {
       customTitle: row.custom_title,
       originalTitle: row.original_title,
       isHidden: Boolean(row.is_hidden),
+      isDeleted: Boolean(row.is_deleted),
       tags: row.tags ? JSON.parse(row.tags) : [],
       notes: row.notes,
       createdAt: row.created_at,
@@ -52,6 +53,7 @@ export class SessionMetadataService {
       customTitle = null,
       originalTitle = null,
       isHidden = false,
+      isDeleted = false,
       tags = [],
       notes = null
     } = metadata
@@ -60,16 +62,17 @@ export class SessionMetadataService {
 
     await this.searchDb.db.run(`
       INSERT INTO session_metadata
-        (project_id, session_id, custom_title, original_title, is_hidden, tags, notes, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        (project_id, session_id, custom_title, original_title, is_hidden, is_deleted, tags, notes, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
       ON CONFLICT(session_id, project_id) DO UPDATE SET
         custom_title = excluded.custom_title,
         original_title = excluded.original_title,
         is_hidden = excluded.is_hidden,
+        is_deleted = excluded.is_deleted,
         tags = excluded.tags,
         notes = excluded.notes,
         updated_at = CURRENT_TIMESTAMP
-    `, [projectId, sessionId, customTitle, originalTitle, isHidden ? 1 : 0, tagsJson, notes])
+    `, [projectId, sessionId, customTitle, originalTitle, isHidden ? 1 : 0, isDeleted ? 1 : 0, tagsJson, notes])
 
     return await this.getMetadata(projectId, sessionId)
   }
@@ -273,6 +276,61 @@ export class SessionMetadataService {
     for (const sessionId of sessionIds) {
       await this.addTags(projectId, sessionId, tags)
     }
+    return { success: true, count: sessionIds.length }
+  }
+
+  /**
+   * Set soft delete flag for a session
+   */
+  async setDeleted(projectId, sessionId, isDeleted) {
+    const existing = await this.getMetadata(projectId, sessionId)
+
+    if (existing) {
+      await this.searchDb.db.run(`
+        UPDATE session_metadata
+        SET is_deleted = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE project_id = ? AND session_id = ?
+      `, [isDeleted ? 1 : 0, projectId, sessionId])
+    } else {
+      await this.searchDb.db.run(`
+        INSERT INTO session_metadata (project_id, session_id, is_deleted)
+        VALUES (?, ?, ?)
+      `, [projectId, sessionId, isDeleted ? 1 : 0])
+    }
+
+    return await this.getMetadata(projectId, sessionId)
+  }
+
+  /**
+   * Get all deleted sessions for a project (Trash)
+   */
+  async getDeletedSessions(projectId) {
+    const rows = await this.searchDb.db.all(
+      'SELECT session_id FROM session_metadata WHERE project_id = ? AND is_deleted = 1',
+      [projectId]
+    )
+    return rows.map(row => row.session_id)
+  }
+
+  /**
+   * Restore a deleted session (set is_deleted to false)
+   */
+  async restoreSession(projectId, sessionId) {
+    return await this.setDeleted(projectId, sessionId, false)
+  }
+
+  /**
+   * Batch soft delete sessions
+   */
+  async batchSetDeleted(projectId, sessionIds, isDeleted) {
+    await this.searchDb.db.run(`
+      INSERT INTO session_metadata (project_id, session_id, is_deleted)
+      VALUES ${sessionIds.map(() => '(?, ?, ?)').join(', ')}
+      ON CONFLICT(session_id, project_id) DO UPDATE SET
+        is_deleted = excluded.is_deleted,
+        updated_at = CURRENT_TIMESTAMP
+    `, sessionIds.flatMap(sid => [projectId, sid, isDeleted ? 1 : 0]))
+
     return { success: true, count: sessionIds.length }
   }
 

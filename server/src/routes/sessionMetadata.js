@@ -18,14 +18,12 @@ export async function sessionMetadataRoutes(fastify, options) {
 
       const metadata = await metadataService.getMetadata(projectId, sessionId)
 
-      if (!metadata) {
-        return reply.code(404).send({
-          error: 'Metadata not found',
-          message: `No custom metadata exists for session ${sessionId} in project ${projectId}`
-        })
+      // Return 200 even when metadata doesn't exist (null is a valid state)
+      // This prevents console errors for sessions without custom metadata
+      return {
+        metadata: metadata || null,
+        exists: !!metadata
       }
-
-      return { metadata }
     } catch (error) {
       reply.code(500).send({
         error: 'Failed to get session metadata',
@@ -284,6 +282,93 @@ export async function sessionMetadataRoutes(fastify, options) {
     } catch (error) {
       reply.code(500).send({
         error: 'Failed to batch add tags',
+        message: error.message
+      })
+    }
+  })
+
+  // PATCH /api/session-metadata/:projectId/:sessionId/deleted
+  // Soft delete session (set is_deleted flag)
+  fastify.patch('/session-metadata/:projectId/:sessionId/deleted', async (request, reply) => {
+    try {
+      const { projectId, sessionId } = request.params
+      const { isDeleted } = request.body
+
+      if (typeof isDeleted !== 'boolean') {
+        return reply.code(400).send({
+          error: 'Invalid isDeleted',
+          message: 'isDeleted must be a boolean'
+        })
+      }
+
+      const metadata = await metadataService.setDeleted(projectId, sessionId, isDeleted)
+      return { metadata }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to set delete flag',
+        message: error.message
+      })
+    }
+  })
+
+  // GET /api/session-metadata/:projectId/deleted
+  // Get all deleted sessions in a project (Trash)
+  fastify.get('/session-metadata/:projectId/deleted', async (request, reply) => {
+    try {
+      const { projectId } = request.params
+
+      const deletedSessions = await metadataService.getDeletedSessions(projectId)
+      return { projectId, deletedSessions, count: deletedSessions.length }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to get deleted sessions',
+        message: error.message
+      })
+    }
+  })
+
+  // POST /api/session-metadata/:projectId/:sessionId/restore
+  // Restore a deleted session
+  fastify.post('/session-metadata/:projectId/:sessionId/restore', async (request, reply) => {
+    try {
+      const { projectId, sessionId } = request.params
+
+      const metadata = await metadataService.restoreSession(projectId, sessionId)
+      return { metadata, message: 'Session restored successfully' }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to restore session',
+        message: error.message
+      })
+    }
+  })
+
+  // POST /api/session-metadata/:projectId/batch/deleted
+  // Batch soft delete sessions
+  fastify.post('/session-metadata/:projectId/batch/deleted', async (request, reply) => {
+    try {
+      const { projectId } = request.params
+      const { sessionIds, isDeleted } = request.body
+
+      if (!Array.isArray(sessionIds)) {
+        return reply.code(400).send({
+          error: 'Invalid sessionIds',
+          message: 'sessionIds must be an array'
+        })
+      }
+
+      if (typeof isDeleted !== 'boolean') {
+        return reply.code(400).send({
+          error: 'Invalid isDeleted',
+          message: 'isDeleted must be a boolean'
+        })
+      }
+
+      const result = await metadataService.batchSetDeleted(projectId, sessionIds, isDeleted)
+      return result
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to batch update deleted flag',
         message: error.message
       })
     }

@@ -17,6 +17,7 @@ import {
 } from '@tremor/react'
 import { formatDistanceToNow } from 'date-fns'
 import ConversationThread from './ConversationThread'
+import SessionMetadataControls from './SessionMetadataControls'
 import '../styles/tremor-dashboard.scss'
 
 const TremorProjectView = () => {
@@ -629,6 +630,16 @@ const TremorProjectView = () => {
 
               {!rightPanelCollapsed && (
                 <div className="panel-content space-y-4">
+                    {/* Session Management Section */}
+                    <div className="tremor-card">
+                      <Title className="text-lg mb-3">Session Management</Title>
+                      <SessionMetadataControls
+                        projectId={projectId}
+                        sessionId={sessionId}
+                        currentTitle={currentSession?.title || sessionId}
+                      />
+                    </div>
+
                     <div className="tremor-card">
                       <Title className="text-lg">Message Overview</Title>
                       <div className="space-y-4 mt-4">

@@ -23,17 +23,11 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
   // Fetch metadata
   const { data: metadataData, isLoading } = useQuery({
     queryKey: ['session-metadata', projectId, sessionId],
-    queryFn: () => sessionMetadataApi.getMetadata(projectId, sessionId)
-      .then(res => res.data.metadata)
-      .catch(err => {
-        // Return null if metadata doesn't exist yet (404)
-        if (err.response?.status === 404) return null
-        throw err
-      }),
+    queryFn: () => sessionMetadataApi.getMetadata(projectId, sessionId).then(res => res.data),
     enabled: !!projectId && !!sessionId
   })
 
-  const metadata = metadataData || {}
+  const metadata = metadataData?.metadata || {}
 
   // Mutations
   const setTitleMutation = useMutation({
