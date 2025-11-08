@@ -247,7 +247,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
         {messages
           .filter(message => {
             if (message.role === 'user' && !showUser) return false
-            if (message.role === 'assistant' && !showAssistant) return false
+            if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
             return true
           })
           .map((message, index, filteredMessages) => (
@@ -267,7 +267,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
         {/* No messages after filtering */}
         {messages.filter(message => {
           if (message.role === 'user' && !showUser) return false
-          if (message.role === 'assistant' && !showAssistant) return false
+          if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
           return true
         }).length === 0 && (
           <div className="h-full flex items-center justify-center">

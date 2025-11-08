@@ -79,7 +79,7 @@ const SessionList = ({ projectId, selectedSessionId }) => {
         </div>
 
         {/* Filter controls */}
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center justify-between gap-2 mt-1">
           {/* Show hidden toggle */}
           <button
             onClick={() => setShowHidden(!showHidden)}
@@ -91,16 +91,16 @@ const SessionList = ({ projectId, selectedSessionId }) => {
           >
             {showHidden ? '👁️ All' : '👁️‍🗨️ Show Hidden'}
           </button>
-        </div>
-        {currentProject && (
-          <div className="flex justify-center">
+
+          {/* Export button */}
+          {currentProject && (
             <ProjectExportButton
               projectId={projectId}
               projectName={currentProject.name}
               variant="compact"
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">

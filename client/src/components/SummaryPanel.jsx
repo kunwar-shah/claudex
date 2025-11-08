@@ -5,6 +5,7 @@ import SessionMetadataControls from './SessionMetadataControls'
 
 const SummaryPanel = ({ projectId, sessionId }) => {
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false)
+  const [isTokenUsageCollapsed, setIsTokenUsageCollapsed] = useState(true)
   const [isManagementCollapsed, setIsManagementCollapsed] = useState(true)
   // Get the complete session for universal summary (not affected by pagination)
   const { data, isLoading, error } = useQuery({
@@ -172,57 +173,80 @@ const SummaryPanel = ({ projectId, sessionId }) => {
 
         {/* SECTION 2: Token Usage (from PR #17) */}
         {stats?.tokens && stats.tokens.messagesWithUsage > 0 && (
-          <div className="p-1.5 border-b border-slate-200">
-            <h4 className="text-xs font-semibold text-slate-800 mb-1">Token Usage</h4>
-            <div className="text-xs text-slate-600 space-y-0.5">
-              <div className="flex justify-between">
-                <span>Total Tokens:</span>
-                <span className="font-medium">{stats.tokens.totalTokens.toLocaleString()}</span>
+          <div className="border-b border-slate-200">
+            <button
+              onClick={() => setIsTokenUsageCollapsed(!isTokenUsageCollapsed)}
+              className="w-full bg-gradient-to-r from-amber-50 to-orange-50 px-2 py-2 flex justify-between items-center hover:from-amber-100 hover:to-orange-100 transition-colors"
+            >
+              <div className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h4 className="text-xs font-semibold text-amber-900">Token Usage</h4>
               </div>
-              <div className="flex justify-between">
-                <span>Input:</span>
-                <span className="font-medium text-blue-600">{stats.tokens.totalInputTokens.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Output:</span>
-                <span className="font-medium text-emerald-600">{stats.tokens.totalOutputTokens.toLocaleString()}</span>
-              </div>
-              {stats.tokens.totalCacheCreationTokens > 0 && (
-                <div className="flex justify-between">
-                  <span>Cache Creation:</span>
-                  <span className="font-medium text-amber-600">{stats.tokens.totalCacheCreationTokens.toLocaleString()}</span>
-                </div>
-              )}
-              {stats.tokens.totalCacheReadTokens > 0 && (
-                <div className="flex justify-between">
-                  <span>Cache Reads:</span>
-                  <span className="font-medium text-purple-600">{stats.tokens.totalCacheReadTokens.toLocaleString()}</span>
-                </div>
-              )}
-              {(stats.tokens.totalCacheCreationTokens > 0 || stats.tokens.totalCacheReadTokens > 0) && (
-                <div className="flex justify-between pt-0.5 border-t border-slate-200">
-                  <span>Cache Hit Rate:</span>
-                  <span className="font-medium text-indigo-600">{stats.tokens.cacheHitRate.toFixed(2)}%</span>
-                </div>
-              )}
-              {(stats.tokens.ephemeral5mTokens > 0 || stats.tokens.ephemeral1hTokens > 0) && (
-                <div className="pt-0.5 border-t border-slate-200 mt-1">
-                  <div className="text-xs font-medium text-slate-700 mb-0.5">Cache Breakdown:</div>
-                  {stats.tokens.ephemeral5mTokens > 0 && (
-                    <div className="flex justify-between pl-2">
-                      <span>5m TTL:</span>
-                      <span className="font-medium">{stats.tokens.ephemeral5mTokens.toLocaleString()}</span>
+              <svg
+                className={`w-4 h-4 text-amber-600 transition-transform ${isTokenUsageCollapsed ? '' : 'rotate-180'}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {!isTokenUsageCollapsed && (
+              <div className="p-1.5 bg-slate-50">
+                <div className="text-xs text-slate-600 space-y-0.5">
+                  <div className="flex justify-between">
+                    <span>Total Tokens:</span>
+                    <span className="font-medium">{stats.tokens.totalTokens.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Input:</span>
+                    <span className="font-medium text-blue-600">{stats.tokens.totalInputTokens.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Output:</span>
+                    <span className="font-medium text-emerald-600">{stats.tokens.totalOutputTokens.toLocaleString()}</span>
+                  </div>
+                  {stats.tokens.totalCacheCreationTokens > 0 && (
+                    <div className="flex justify-between">
+                      <span>Cache Creation:</span>
+                      <span className="font-medium text-amber-600">{stats.tokens.totalCacheCreationTokens.toLocaleString()}</span>
                     </div>
                   )}
-                  {stats.tokens.ephemeral1hTokens > 0 && (
-                    <div className="flex justify-between pl-2">
-                      <span>1h TTL:</span>
-                      <span className="font-medium">{stats.tokens.ephemeral1hTokens.toLocaleString()}</span>
+                  {stats.tokens.totalCacheReadTokens > 0 && (
+                    <div className="flex justify-between">
+                      <span>Cache Reads:</span>
+                      <span className="font-medium text-purple-600">{stats.tokens.totalCacheReadTokens.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {(stats.tokens.totalCacheCreationTokens > 0 || stats.tokens.totalCacheReadTokens > 0) && (
+                    <div className="flex justify-between pt-0.5 border-t border-slate-200">
+                      <span>Cache Hit Rate:</span>
+                      <span className="font-medium text-indigo-600">{stats.tokens.cacheHitRate.toFixed(2)}%</span>
+                    </div>
+                  )}
+                  {(stats.tokens.ephemeral5mTokens > 0 || stats.tokens.ephemeral1hTokens > 0) && (
+                    <div className="pt-0.5 border-t border-slate-200 mt-1">
+                      <div className="text-xs font-medium text-slate-700 mb-0.5">Cache Breakdown:</div>
+                      {stats.tokens.ephemeral5mTokens > 0 && (
+                        <div className="flex justify-between pl-2">
+                          <span>5m TTL:</span>
+                          <span className="font-medium">{stats.tokens.ephemeral5mTokens.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {stats.tokens.ephemeral1hTokens > 0 && (
+                        <div className="flex justify-between pl-2">
+                          <span>1h TTL:</span>
+                          <span className="font-medium">{stats.tokens.ephemeral1hTokens.toLocaleString()}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
