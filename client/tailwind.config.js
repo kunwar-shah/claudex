@@ -52,6 +52,24 @@ export default {
         sans: ['var(--font-sans)'],
         mono: ['var(--font-mono)'],
       },
+      // Font weights from design system (shadcn/Tremor range)
+      fontWeight: {
+        light: '300',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+        black: '900',
+      },
+      // Letter spacing from design system
+      letterSpacing: {
+        tighter: 'var(--tracking-tighter)',
+        tight: 'var(--tracking-tight)',
+        normal: 'var(--tracking-normal)',
+        wide: 'var(--tracking-wide)',
+        wider: 'var(--tracking-wider)',
+      },
       // Spacing from design system
       spacing: {
         '0.5': 'var(--spacing-0_5)',

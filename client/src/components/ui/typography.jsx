@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const H1 = ({ className, children, ...props }) => (
   <h1
     className={cn(
-      "scroll-m-20 text-4xl font-bold tracking-tight text-text-primary",
+      "scroll-m-20 text-4xl font-extrabold tracking-tight text-text-primary",
       className
     )}
     {...props}
@@ -21,7 +21,7 @@ export const H1 = ({ className, children, ...props }) => (
 export const H2 = ({ className, children, ...props }) => (
   <h2
     className={cn(
-      "scroll-m-20 text-3xl font-semibold tracking-tight text-text-primary",
+      "scroll-m-20 text-3xl font-bold tracking-tight text-text-primary",
       className
     )}
     {...props}
@@ -33,7 +33,7 @@ export const H2 = ({ className, children, ...props }) => (
 export const H3 = ({ className, children, ...props }) => (
   <h3
     className={cn(
-      "scroll-m-20 text-2xl font-semibold tracking-tight text-text-primary",
+      "scroll-m-20 text-2xl font-bold tracking-tight text-text-primary",
       className
     )}
     {...props}
