@@ -2,9 +2,15 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
+import { Eye, EyeOff, Clock, MessageCircle } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
 import SessionMetadataControls from './SessionMetadataControls'
 import ProjectExportButton from './ProjectExportButton'
+import { Card, CardContent } from './ui/card'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Muted, Small } from './ui/typography'
+import { cn } from '@/lib/utils'
 
 const SessionList = ({ projectId, selectedSessionId }) => {
   const navigate = useNavigate()
@@ -16,14 +22,12 @@ const SessionList = ({ projectId, selectedSessionId }) => {
     enabled: !!projectId
   })
 
-  // Fetch hidden sessions (from dev-3.1)
   const { data: hiddenData } = useQuery({
     queryKey: ['hidden-sessions', projectId],
     queryFn: () => sessionMetadataApi.getHiddenSessions(projectId).then(res => res.data),
     enabled: !!projectId
   })
 
-  // Fetch projects data for export button (from main)
   const { data: projectsData } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getProjects().then(res => res.data)
@@ -37,22 +41,24 @@ const SessionList = ({ projectId, selectedSessionId }) => {
 
   if (isLoading) {
     return (
-      <div className="p-2">
-        <div className="animate-pulse space-y-1">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-8 bg-slate-200 rounded"></div>
-          ))}
-        </div>
+      <div className="p-4 space-y-3">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-20 bg-surface animate-pulse rounded-lg border border-border"></div>
+        ))}
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-2">
-        <div className="text-red-600 text-xs">
-          Failed to load sessions: {error.message}
-        </div>
+      <div className="p-4">
+        <Card className="border-error">
+          <CardContent className="p-4">
+            <Muted className="text-error">
+              Failed to load sessions: {error.message}
+            </Muted>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -60,9 +66,7 @@ const SessionList = ({ projectId, selectedSessionId }) => {
   const sessions = data?.sessions || []
   const hiddenSessions = hiddenData?.hiddenSessions || []
 
-  // Filter sessions based on visibility and tags
   const filteredSessions = sessions.filter(session => {
-    // Filter hidden sessions
     if (!showHidden && hiddenSessions.includes(session.sessionId)) {
       return false
     }
@@ -70,29 +74,14 @@ const SessionList = ({ projectId, selectedSessionId }) => {
   })
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
       {/* Header with filters */}
-      <div className="px-2 py-1.5 border-b border-gray-200 bg-white">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-semibold text-gray-900">Sessions</span>
-          <span className="text-xs text-gray-500">{filteredSessions.length}</span>
-        </div>
-
-        {/* Filter controls */}
-        <div className="flex items-center justify-between gap-2 mt-1">
-          {/* Show hidden toggle */}
-          <button
-            onClick={() => setShowHidden(!showHidden)}
-            className={`text-xs px-2 py-0.5 rounded ${
-              showHidden
-                ? 'bg-slate-200 text-slate-700'
-                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-            }`}
-          >
-            {showHidden ? '👁️ All' : '👁️‍🗨️ Show Hidden'}
-          </button>
-
-          {/* Export button */}
+      <div className="px-4 py-3 border-b border-border bg-surface">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <Small className="font-semibold">Sessions</Small>
+            <Muted className="text-xs mt-0.5">{filteredSessions.length} conversations</Muted>
+          </div>
           {currentProject && (
             <ProjectExportButton
               projectId={projectId}
@@ -101,18 +90,29 @@ const SessionList = ({ projectId, selectedSessionId }) => {
             />
           )}
         </div>
+
+        {/* Show hidden toggle */}
+        <Button
+          variant={showHidden ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowHidden(!showHidden)}
+          className="w-full gap-2"
+        >
+          {showHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          <span>{showHidden ? 'Showing All' : 'Show Hidden'}</span>
+        </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      {/* Sessions list */}
+      <div className="flex-1 overflow-y-auto p-3">
         {filteredSessions.length === 0 ? (
-          <div className="p-2 text-center text-gray-500 text-xs">
-            No sessions found
+          <div className="flex items-center justify-center h-32">
+            <Muted>No sessions found</Muted>
           </div>
         ) : (
-          <div className="space-y-0.5 p-1">
+          <div className="space-y-2">
             {filteredSessions.map((session) => {
               const isHidden = hiddenSessions.includes(session.sessionId)
-
               return (
                 <SessionListItem
                   key={session.sessionId}
@@ -131,25 +131,18 @@ const SessionList = ({ projectId, selectedSessionId }) => {
   )
 }
 
-// Helper function to clean title from IDE tags and unwanted content
+// Helper function to clean title
 const cleanTitle = (title) => {
   if (!title) return ''
-
-  // Remove IDE selection tags
   let cleaned = title.replace(/<ide_selection>.*?<\/ide_selection>/gs, '')
   cleaned = cleaned.replace(/<ide_opened_file>.*?<\/ide_opened_file>/gs, '')
   cleaned = cleaned.replace(/<system-reminder>.*?<\/system-reminder>/gs, '')
-
-  // Trim whitespace
   cleaned = cleaned.trim()
-
-  // If empty after cleaning, return original
   return cleaned.length > 0 ? cleaned : title
 }
 
-// Separate component for each session item to handle metadata fetching
+// Clean session item with shadcn Card + Typography
 const SessionListItem = ({ session, projectId, isSelected, isHidden, onSelect }) => {
-  // Fetch metadata for this session
   const { data: metadataData } = useQuery({
     queryKey: ['session-metadata', projectId, session.sessionId],
     queryFn: () => sessionMetadataApi.getMetadata(projectId, session.sessionId).then(res => res.data),
@@ -160,57 +153,57 @@ const SessionListItem = ({ session, projectId, isSelected, isHidden, onSelect })
   const displayTitle = metadata.customTitle || cleanTitle(session.title) || session.sessionId
 
   return (
-    <div
+    <Card
+      className={cn(
+        "cursor-pointer transition-all duration-200 hover:shadow-md",
+        isSelected && "ring-2 ring-primary shadow-md",
+        isHidden && "opacity-60"
+      )}
       onClick={() => onSelect(session.sessionId)}
-      className={`p-1.5 rounded cursor-pointer transition-colors ${
-        isSelected
-          ? 'bg-blue-50 border border-blue-200'
-          : 'bg-white hover:bg-slate-50 border border-slate-200'
-      } ${isHidden ? 'opacity-60' : ''}`}
     >
-      <div className="flex justify-between items-start mb-1 gap-1">
-        <div className="flex items-start gap-1 flex-1 min-w-0">
-          {isHidden && <span className="text-xs flex-shrink-0">👁️‍🗨️</span>}
-          <h3 className="font-medium text-xs text-slate-900 break-words line-clamp-2 leading-tight flex-1">
-            {displayTitle}
-            {metadata.customTitle && (
-              <span className="ml-1 text-xs text-blue-600">✏️</span>
-            )}
-          </h3>
+      <CardContent className="p-4">
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-start gap-2 flex-1 min-w-0">
+            {isHidden && <EyeOff className="w-4 h-4 text-text-secondary flex-shrink-0 mt-0.5" />}
+            <Small className="font-semibold line-clamp-2 flex-1">
+              {displayTitle}
+            </Small>
+          </div>
+          <Badge variant="outline" className="flex-shrink-0">
+            <MessageCircle className="w-3 h-3 mr-1" />
+            {session.messageCount}
+          </Badge>
         </div>
-        <span className="text-xs text-slate-500 flex-shrink-0">
-          {session.messageCount}
-        </span>
-      </div>
 
-      {/* Tags */}
-      {metadata.tags?.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-1">
-          {metadata.tags.slice(0, 3).map(tag => (
-            <span
-              key={tag}
-              className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-xs"
-            >
-              {tag}
-            </span>
-          ))}
-          {metadata.tags.length > 3 && (
-            <span className="text-xs text-slate-400">+{metadata.tags.length - 3}</span>
+        {/* Tags */}
+        {metadata.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {metadata.tags.slice(0, 3).map(tag => (
+              <Badge key={tag} variant="secondary">
+                {tag}
+              </Badge>
+            ))}
+            {metadata.tags.length > 3 && (
+              <Muted className="text-xs">+{metadata.tags.length - 3} more</Muted>
+            )}
+          </div>
+        )}
+
+        {/* Footer row */}
+        <div className="flex items-center justify-between gap-2">
+          <Muted className="text-xs flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
+          </Muted>
+          {session.template && session.template !== 'unknown' && (
+            <Badge variant="outline" className="text-xs">
+              {session.template.slice(0, 8)}
+            </Badge>
           )}
         </div>
-      )}
-
-      <div className="flex justify-between items-center text-xs text-slate-400">
-        <span className="text-xs truncate pr-1">
-          {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
-        </span>
-        {session.template && session.template !== 'unknown' && (
-          <span className="bg-slate-100 px-1 py-0.5 rounded text-xs flex-shrink-0">
-            {session.template.slice(0,8)}
-          </span>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
