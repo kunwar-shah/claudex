@@ -13,6 +13,7 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/kunwar-shah/claudex/blob/main/LICENSE)
   [![Documentation](https://img.shields.io/badge/docs-github--pages-blue)](https://kunwar-shah.github.io/claudex/)
   [![Discussions](https://img.shields.io/github/discussions/kunwar-shah/claudex)](https://github.com/kunwar-shah/claudex/discussions)
+  [![Mentioned in Awesome Claude Code](https://awesome.re/mentioned-badge.svg)](https://github.com/hesreallyhim/awesome-claude-code)
 
   **📚 [Documentation](https://kunwar-shah.github.io/claudex/)** | **💬 [Discussions](https://github.com/kunwar-shah/claudex/discussions)** | **🐛 [Issues](https://github.com/kunwar-shah/claudex/issues)**
 

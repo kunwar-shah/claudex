@@ -170,7 +170,63 @@ const SummaryPanel = ({ projectId, sessionId }) => {
           )}
         </div>
 
-        {/* SECTION 2: Session Management */}
+        {/* SECTION 2: Token Usage (from PR #17) */}
+        {stats?.tokens && stats.tokens.messagesWithUsage > 0 && (
+          <div className="p-1.5 border-b border-slate-200">
+            <h4 className="text-xs font-semibold text-slate-800 mb-1">Token Usage</h4>
+            <div className="text-xs text-slate-600 space-y-0.5">
+              <div className="flex justify-between">
+                <span>Total Tokens:</span>
+                <span className="font-medium">{stats.tokens.totalTokens.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Input:</span>
+                <span className="font-medium text-blue-600">{stats.tokens.totalInputTokens.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Output:</span>
+                <span className="font-medium text-emerald-600">{stats.tokens.totalOutputTokens.toLocaleString()}</span>
+              </div>
+              {stats.tokens.totalCacheCreationTokens > 0 && (
+                <div className="flex justify-between">
+                  <span>Cache Creation:</span>
+                  <span className="font-medium text-amber-600">{stats.tokens.totalCacheCreationTokens.toLocaleString()}</span>
+                </div>
+              )}
+              {stats.tokens.totalCacheReadTokens > 0 && (
+                <div className="flex justify-between">
+                  <span>Cache Reads:</span>
+                  <span className="font-medium text-purple-600">{stats.tokens.totalCacheReadTokens.toLocaleString()}</span>
+                </div>
+              )}
+              {(stats.tokens.totalCacheCreationTokens > 0 || stats.tokens.totalCacheReadTokens > 0) && (
+                <div className="flex justify-between pt-0.5 border-t border-slate-200">
+                  <span>Cache Hit Rate:</span>
+                  <span className="font-medium text-indigo-600">{stats.tokens.cacheHitRate.toFixed(2)}%</span>
+                </div>
+              )}
+              {(stats.tokens.ephemeral5mTokens > 0 || stats.tokens.ephemeral1hTokens > 0) && (
+                <div className="pt-0.5 border-t border-slate-200 mt-1">
+                  <div className="text-xs font-medium text-slate-700 mb-0.5">Cache Breakdown:</div>
+                  {stats.tokens.ephemeral5mTokens > 0 && (
+                    <div className="flex justify-between pl-2">
+                      <span>5m TTL:</span>
+                      <span className="font-medium">{stats.tokens.ephemeral5mTokens.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {stats.tokens.ephemeral1hTokens > 0 && (
+                    <div className="flex justify-between pl-2">
+                      <span>1h TTL:</span>
+                      <span className="font-medium">{stats.tokens.ephemeral1hTokens.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 3: Session Management (from dev-3.1) */}
         <div className="border-b border-slate-200">
           <button
             onClick={() => setIsManagementCollapsed(!isManagementCollapsed)}
