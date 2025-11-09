@@ -1,7 +1,23 @@
 import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
+import {
+  User,
+  Bot,
+  Settings,
+  Info,
+  ChevronRight,
+  Copy,
+  Code,
+  Wrench,
+  BarChart3
+} from 'lucide-react'
 import MessageRenderer from './MessageRenderer'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
+import { Card, CardContent } from './ui/card'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Muted, Small } from './ui/typography'
+import { cn } from '@/lib/utils'
 
 const MessageBubble = ({ message, isFirst, isLast }) => {
   const [showRaw, setShowRaw] = useState(false)
@@ -46,240 +62,247 @@ const MessageBubble = ({ message, isFirst, isLast }) => {
     }
   }
 
-  const getRoleColor = (role) => {
+  const getRoleStyles = (role) => {
     switch (role) {
       case 'user':
-        return 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200'
+        return {
+          card: 'bg-primary/5 border-primary/20',
+          icon: User,
+          iconColor: 'text-primary'
+        }
       case 'assistant':
-        return 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
+        return {
+          card: 'bg-accent/5 border-accent/20',
+          icon: Bot,
+          iconColor: 'text-accent'
+        }
       case 'system':
-        return 'bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200'
+        return {
+          card: 'bg-muted border-border',
+          icon: Settings,
+          iconColor: 'text-muted-foreground'
+        }
       default:
-        return 'bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200'
+        return {
+          card: 'bg-muted border-border',
+          icon: Info,
+          iconColor: 'text-muted-foreground'
+        }
     }
   }
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case 'user':
-        return (
-          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-          </svg>
-        )
-      case 'assistant':
-        return (
-          <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )
-      case 'system':
-        return (
-          <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-          </svg>
-        )
-      default:
-        return (
-          <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
-        )
-    }
-  }
+  const roleStyles = getRoleStyles(message.role)
+  const RoleIcon = roleStyles.icon
 
   return (
-    <div className={`border rounded-lg p-4 max-w-full overflow-hidden ${getRoleColor(message.role)}`}>
-      {/* Message Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          {getRoleIcon(message.role)}
-          <span className="font-medium text-gray-900 capitalize">
-            {message.role}
+    <Card className={cn("max-w-full", roleStyles.card)}>
+      <CardContent className="p-4">
+        {/* Message Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <RoleIcon className={cn("w-4 h-4", roleStyles.iconColor)} />
+            <Small className="font-semibold capitalize">
+              {message.role}
+            </Small>
             {message.role === 'system' && message.metadata?.displayType === 'summary' && (
-              <span className="ml-1 text-xs text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+              <Badge variant="secondary" className="h-5">
                 Summary
-              </span>
+              </Badge>
             )}
-          </span>
-          <span className="text-sm text-gray-500">
-            {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
-          </span>
-          {message.lineNumber && (
-            <span className="text-xs text-gray-400">
-              Line {message.lineNumber}
-            </span>
-          )}
-          {message.metadata?.usage && (
-            <button
-              onClick={() => setShowUsage(!showUsage)}
-              className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded hover:bg-indigo-200 transition-colors"
-              title="Click to see detailed token usage"
+            <Muted className="text-xs">
+              {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
+            </Muted>
+            {message.lineNumber && (
+              <Muted className="text-xs">
+                Line {message.lineNumber}
+              </Muted>
+            )}
+            {message.metadata?.usage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowUsage(!showUsage)}
+                className="h-6 px-2 gap-1"
+                title="Click to see detailed token usage"
+              >
+                <BarChart3 className="w-3 h-3" />
+                <span className="text-xs">
+                  {message.metadata.usage.input_tokens?.toLocaleString() || 0} in / {message.metadata.usage.output_tokens?.toLocaleString() || 0} out
+                </span>
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1">
+            {/* Collapse/Expand button only for v2-mixed template messages */}
+            {message.metadata?.collapsed !== undefined && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="h-7 w-7"
+                title={isExpanded ? "Collapse" : "Expand"}
+              >
+                <ChevronRight className={cn(
+                  "w-4 h-4 transition-transform",
+                  isExpanded && "rotate-90"
+                )} />
+              </Button>
+            )}
+
+            {message.toolsUsed && message.toolsUsed.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowActions(!showActions)}
+                className="h-7 w-7"
+                title="Show tools used"
+              >
+                <Wrench className="w-4 h-4" />
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={copyToClipboard}
+              className="h-7 w-7"
+              title="Copy message"
             >
-              {message.metadata.usage.input_tokens?.toLocaleString() || 0} in / {message.metadata.usage.output_tokens?.toLocaleString() || 0} out
-            </button>
-          )}
+              <Copy className="w-4 h-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowRaw(!showRaw)}
+              className="h-7 w-7"
+              title="Show raw JSON"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-1">
-          {/* Collapse/Expand button only for v2-mixed template messages */}
-          {message.metadata?.collapsed !== undefined && (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 text-gray-400 hover:text-gray-600"
-              title={isExpanded ? "Collapse" : "Expand"}
-            >
-              <svg className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-
-          {message.toolsUsed && message.toolsUsed.length > 0 && (
-            <button
-              onClick={() => setShowActions(!showActions)}
-              className="p-1 text-gray-400 hover:text-gray-600"
-              title="Show tools used"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-          )}
-          
-          <button
-            onClick={copyToClipboard}
-            className="p-1 text-gray-400 hover:text-gray-600"
-            title="Copy message"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          </button>
-          
-          <button
-            onClick={() => setShowRaw(!showRaw)}
-            className="p-1 text-gray-400 hover:text-gray-600"
-            title="Show raw JSON"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Token Usage Details */}
-      {showUsage && message.metadata?.usage && (
-        <div className="mb-3 p-3 bg-white bg-opacity-70 rounded border border-indigo-200">
-          <div className="text-sm font-medium text-gray-700 mb-2">Token Usage Details:</div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Input:</span>
-              <span className="font-medium text-blue-600">{message.metadata.usage.input_tokens?.toLocaleString() || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Output:</span>
-              <span className="font-medium text-emerald-600">{message.metadata.usage.output_tokens?.toLocaleString() || 0}</span>
-            </div>
-            {message.metadata.usage.cache_creation_input_tokens > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-600">Cache Creation:</span>
-                <span className="font-medium text-amber-600">{message.metadata.usage.cache_creation_input_tokens.toLocaleString()}</span>
-              </div>
-            )}
-            {message.metadata.usage.cache_read_input_tokens > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-600">Cache Reads:</span>
-                <span className="font-medium text-purple-600">{message.metadata.usage.cache_read_input_tokens.toLocaleString()}</span>
-              </div>
-            )}
-            {message.metadata.usage.cache_creation && (
-              <>
-                {message.metadata.usage.cache_creation.ephemeral_5m_input_tokens > 0 && (
-                  <div className="flex justify-between col-span-2 pl-2 text-xs">
-                    <span className="text-gray-500">5m TTL:</span>
-                    <span className="font-medium">{message.metadata.usage.cache_creation.ephemeral_5m_input_tokens.toLocaleString()}</span>
+        {/* Token Usage Details */}
+        {showUsage && message.metadata?.usage && (
+          <Card className="mb-3 bg-background/50">
+            <CardContent className="p-3">
+              <Small className="font-semibold mb-2">Token Usage Details:</Small>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <Muted>Input:</Muted>
+                  <span className="font-medium text-primary">{message.metadata.usage.input_tokens?.toLocaleString() || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <Muted>Output:</Muted>
+                  <span className="font-medium text-accent">{message.metadata.usage.output_tokens?.toLocaleString() || 0}</span>
+                </div>
+                {message.metadata.usage.cache_creation_input_tokens > 0 && (
+                  <div className="flex justify-between">
+                    <Muted>Cache Creation:</Muted>
+                    <span className="font-medium text-warning">{message.metadata.usage.cache_creation_input_tokens.toLocaleString()}</span>
                   </div>
                 )}
-                {message.metadata.usage.cache_creation.ephemeral_1h_input_tokens > 0 && (
-                  <div className="flex justify-between col-span-2 pl-2 text-xs">
-                    <span className="text-gray-500">1h TTL:</span>
-                    <span className="font-medium">{message.metadata.usage.cache_creation.ephemeral_1h_input_tokens.toLocaleString()}</span>
+                {message.metadata.usage.cache_read_input_tokens > 0 && (
+                  <div className="flex justify-between">
+                    <Muted>Cache Reads:</Muted>
+                    <span className="font-medium text-success">{message.metadata.usage.cache_read_input_tokens.toLocaleString()}</span>
                   </div>
                 )}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Tools Used */}
-      {showActions && message.toolsUsed && message.toolsUsed.length > 0 && (
-        <div className="mb-3 p-2 bg-white bg-opacity-50 rounded border">
-          <div className="text-sm font-medium text-gray-700 mb-2">Tools Used:</div>
-          <div className="space-y-1">
-            {message.toolsUsed.map((tool, index) => (
-              <div key={index} className="text-sm text-gray-600">
-                <span className="font-medium">{tool.name}</span>
-                {tool.details && (
-                  <span className="ml-2 text-gray-500">
-                    {typeof tool.details === 'string'
-                      ? tool.details.slice(0, 100)
-                      : JSON.stringify(tool.details).slice(0, 100)
-                    }...
-                  </span>
+                {message.metadata.usage.cache_creation && (
+                  <>
+                    {message.metadata.usage.cache_creation.ephemeral_5m_input_tokens > 0 && (
+                      <div className="flex justify-between col-span-2 pl-2">
+                        <Muted className="text-xs">5m TTL:</Muted>
+                        <span className="text-xs font-medium">{message.metadata.usage.cache_creation.ephemeral_5m_input_tokens.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {message.metadata.usage.cache_creation.ephemeral_1h_input_tokens > 0 && (
+                      <div className="flex justify-between col-span-2 pl-2">
+                        <Muted className="text-xs">1h TTL:</Muted>
+                        <span className="text-xs font-medium">{message.metadata.usage.cache_creation.ephemeral_1h_input_tokens.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
-            ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tools Used */}
+        {showActions && message.toolsUsed && message.toolsUsed.length > 0 && (
+          <Card className="mb-3 bg-background/50">
+            <CardContent className="p-3">
+              <Small className="font-semibold mb-2">Tools Used:</Small>
+              <div className="space-y-1">
+                {message.toolsUsed.map((tool, index) => (
+                  <div key={index} className="text-sm">
+                    <span className="font-medium text-text-primary">{tool.name}</span>
+                    {tool.details && (
+                      <Muted className="ml-2">
+                        {typeof tool.details === 'string'
+                          ? tool.details.slice(0, 100)
+                          : JSON.stringify(tool.details).slice(0, 100)
+                        }...
+                      </Muted>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Actions */}
+        {message.actions && message.actions.length > 0 && (
+          <Card className="mb-3 bg-background/50">
+            <CardContent className="p-3">
+              <Small className="font-semibold mb-2">Actions:</Small>
+              <div className="flex flex-wrap gap-1.5">
+                {message.actions.map((action, index) => (
+                  <Badge key={index} variant="secondary">
+                    {action}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Message Content */}
+        {isExpanded ? (
+          <div className="prose prose-sm max-w-none overflow-hidden">
+            {/* Use ClaudeMessageRenderer for v2-mixed and v3 templates, otherwise use regular MessageRenderer */}
+            {(message.metadata?.template === 'claude-code-v2-mixed' || message.metadata?.template === 'claude-code-v3') ? (
+              <ClaudeMessageRenderer message={message} />
+            ) : (
+              <MessageRenderer content={message.content} contentKind={message.contentKind} />
+            )}
           </div>
-        </div>
-      )}
+        ) : (
+          <Muted className="text-sm italic">
+            {message.metadata?.displayType === 'summary' ? (
+              <span>AI Summary: {message.content?.slice(0, 100)}...</span>
+            ) : (
+              <span>System message (click to expand)</span>
+            )}
+          </Muted>
+        )}
 
-      {/* Actions */}
-      {message.actions && message.actions.length > 0 && (
-        <div className="mb-3 p-2 bg-white bg-opacity-50 rounded border">
-          <div className="text-sm font-medium text-gray-700 mb-2">Actions:</div>
-          <div className="flex flex-wrap gap-1">
-            {message.actions.map((action, index) => (
-              <span key={index} className="inline-block px-2 py-1 bg-gray-100 text-xs text-gray-700 rounded">
-                {action}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Message Content */}
-      {isExpanded ? (
-        <div className="prose prose-sm max-w-none overflow-hidden">
-          {/* Use ClaudeMessageRenderer for v2-mixed and v3 templates, otherwise use regular MessageRenderer */}
-          {(message.metadata?.template === 'claude-code-v2-mixed' || message.metadata?.template === 'claude-code-v3') ? (
-            <ClaudeMessageRenderer message={message} />
-          ) : (
-            <MessageRenderer content={message.content} contentKind={message.contentKind} />
-          )}
-        </div>
-      ) : (
-        <div className="text-sm text-gray-600 italic">
-          {message.metadata?.displayType === 'summary' ? (
-            <span>AI Summary: {message.content?.slice(0, 100)}...</span>
-          ) : (
-            <span>System message (click to expand)</span>
-          )}
-        </div>
-      )}
-
-      {/* Raw JSON */}
-      {showRaw && message.raw && (
-        <div className="mt-3 p-3 bg-gray-100 rounded text-xs font-mono overflow-hidden">
-          <pre className="whitespace-pre-wrap break-words overflow-x-auto">
-            {JSON.stringify(message.raw, null, 2)}
-          </pre>
-        </div>
-      )}
-    </div>
+        {/* Raw JSON */}
+        {showRaw && message.raw && (
+          <Card className="mt-3 bg-muted/50">
+            <CardContent className="p-3">
+              <pre className="text-xs font-mono whitespace-pre-wrap break-words overflow-x-auto">
+                {JSON.stringify(message.raw, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
