@@ -1,6 +1,10 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Search, X } from 'lucide-react'
 import { sessionMetadataApi } from '../services/api'
+import { Input } from './ui/input'
+import { Button } from './ui/button'
+import { Small } from './ui/typography'
 
 /**
  * SessionManagementFilters - Filter controls for session management
@@ -31,58 +35,48 @@ const SessionManagementFilters = ({
 
   const availableTags = tagsData?.tags || []
 
+  const hasActiveFilters = searchQuery || tagFilter || showFilter !== 'visible' || sortBy !== 'updated'
+
   return (
     <div className="flex items-center gap-4 flex-wrap">
       {/* Search */}
       <div className="flex-1 min-w-[200px]">
         <div className="relative">
-          <input
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search sessions..."
-            className="w-full px-4 py-2 pl-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="pl-9"
           />
-          <svg
-            className="absolute left-3 top-2.5 w-4 h-4 text-slate-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
         </div>
       </div>
 
       {/* Show Filter */}
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-slate-700">Show:</label>
+        <Small className="text-text-secondary">Show:</Small>
         <select
           value={showFilter}
           onChange={(e) => setShowFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+          className="h-9 px-3 text-sm rounded-md border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option key="all" value="all">All Sessions</option>
-          <option key="visible" value="visible">Visible Only</option>
-          <option key="hidden" value="hidden">Hidden Only</option>
-          <option key="trash" value="trash">🗑️ Trash</option>
+          <option value="all">All Sessions</option>
+          <option value="visible">Visible Only</option>
+          <option value="hidden">Hidden Only</option>
+          <option value="trash">Trash</option>
         </select>
       </div>
 
       {/* Tag Filter */}
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-slate-700">Tag:</label>
+        <Small className="text-text-secondary">Tag:</Small>
         <select
           value={tagFilter || ''}
           onChange={(e) => setTagFilter(e.target.value || null)}
-          className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+          className="h-9 px-3 text-sm rounded-md border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option key="all-tags" value="">All Tags</option>
+          <option value="">All Tags</option>
           {availableTags.map(tag => (
             <option key={tag.tag} value={tag.tag}>
               {tag.tag} ({tag.count})
@@ -93,31 +87,34 @@ const SessionManagementFilters = ({
 
       {/* Sort */}
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-slate-700">Sort:</label>
+        <Small className="text-text-secondary">Sort:</Small>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+          className="h-9 px-3 text-sm rounded-md border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option key="updated" value="updated">Last Updated</option>
-          <option key="title" value="title">Title (A-Z)</option>
-          <option key="messages" value="messages">Message Count</option>
+          <option value="updated">Last Updated</option>
+          <option value="title">Title (A-Z)</option>
+          <option value="messages">Message Count</option>
         </select>
       </div>
 
       {/* Clear Filters */}
-      {(searchQuery || tagFilter || showFilter !== 'visible' || sortBy !== 'updated') && (
-        <button
+      {hasActiveFilters && (
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => {
             setSearchQuery('')
             setTagFilter(null)
             setShowFilter('visible')
             setSortBy('updated')
           }}
-          className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 underline"
+          className="gap-1"
         >
+          <X className="w-3 h-3" />
           Clear Filters
-        </button>
+        </Button>
       )}
     </div>
   )
