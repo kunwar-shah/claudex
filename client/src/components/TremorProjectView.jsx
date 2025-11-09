@@ -472,7 +472,7 @@ const TremorProjectView = () => {
                           <Title className="text-2xl font-bold text-text-primary">
                             Project Analytics Dashboard
                           </Title>
-                          <Badge color="blue" size="sm" className="flex-shrink-0">
+                          <Badge color="blue" size="sm" className="flex-shrink-0 text-white font-semibold">
                             Live
                           </Badge>
                         </div>
@@ -512,7 +512,7 @@ const TremorProjectView = () => {
                           <Metric className="text-3xl font-bold text-success mb-1">
                             {sessions.reduce((acc, s) => acc + s.messageCount, 0).toLocaleString()}
                           </Metric>
-                          <Badge color="emerald" size="xs" className="mt-2">Across all sessions</Badge>
+                          <Badge color="emerald" size="xs" className="mt-2 text-white font-medium">Across all sessions</Badge>
                         </div>
                         <div className="p-3 bg-success/10 rounded-xl border border-success/20">
                           <MessageSquare className="w-7 h-7 text-success" />
@@ -527,7 +527,7 @@ const TremorProjectView = () => {
                           <Metric className="text-3xl font-bold text-accent mb-1">
                             {Math.round(sessions.reduce((acc, s) => acc + s.messageCount, 0) / sessions.length || 0)}
                           </Metric>
-                          <Badge color="purple" size="xs" className="mt-2">Per Session</Badge>
+                          <Badge color="purple" size="xs" className="mt-2 text-white font-medium">Per Session</Badge>
                         </div>
                         <div className="p-3 bg-accent/10 rounded-xl border border-accent/20">
                           <BarChart3 className="w-7 h-7 text-accent" />
@@ -546,7 +546,7 @@ const TremorProjectView = () => {
                                   ? `${(projectTokenStats.tokens.totalTokens / 1000000).toFixed(1)}M`
                                   : projectTokenStats.tokens.totalTokens.toLocaleString()}
                               </Metric>
-                              <Badge color="blue" size="xs" className="mt-2">
+                              <Badge color="blue" size="xs" className="mt-2 text-white font-medium">
                                 {projectTokenStats.tokens.totalInputTokens.toLocaleString()} in / {projectTokenStats.tokens.totalOutputTokens.toLocaleString()} out
                               </Badge>
                             </div>
@@ -564,7 +564,7 @@ const TremorProjectView = () => {
                                 {projectTokenStats.tokens.cacheHitRate.toFixed(1)}%
                               </Metric>
                               <ProgressBar value={Math.min(projectTokenStats.tokens.cacheHitRate, 100)} className="mt-2" color="emerald" />
-                              <Badge color="emerald" size="xs" className="mt-3">
+                              <Badge color="emerald" size="xs" className="mt-3 text-white font-medium">
                                 {projectTokenStats.tokens.totalCacheReadTokens.toLocaleString()} cache reads
                               </Badge>
                             </div>
@@ -581,7 +581,7 @@ const TremorProjectView = () => {
                               <Metric className="text-3xl font-bold text-warning mb-1">
                                 {projectTokenStats.tokens.sessionsWithUsage}
                               </Metric>
-                              <Badge color="amber" size="xs" className="mt-2">
+                              <Badge color="amber" size="xs" className="mt-2 text-white font-medium">
                                 {projectTokenStats.tokens.messagesWithUsage.toLocaleString()} messages tracked
                               </Badge>
                             </div>
@@ -599,7 +599,7 @@ const TremorProjectView = () => {
                     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
                       <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                         <Title className="text-xl font-bold text-text-primary">Top Sessions</Title>
-                        <Badge color="blue" size="sm">Top 8</Badge>
+                        <Badge color="blue" size="sm" className="text-white font-semibold">Top 8</Badge>
                       </div>
                       <div className="space-y-3">
                         {sessions
@@ -633,7 +633,7 @@ const TremorProjectView = () => {
                     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
                       <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                         <Title className="text-xl font-bold text-text-primary">Session Activity</Title>
-                        <Badge color="emerald" size="sm">Top 10</Badge>
+                        <Badge color="emerald" size="sm" className="text-white font-semibold">Top 10</Badge>
                       </div>
                       <BarChart
                         className="h-64"
