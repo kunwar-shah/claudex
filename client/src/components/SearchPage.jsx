@@ -1,12 +1,30 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { projectsApi, searchApi } from '../services/api'
 import { formatDistanceToNow } from 'date-fns'
+import {
+  Search,
+  Filter,
+  ExternalLink,
+  Copy,
+  Check,
+  X,
+  Loader2,
+  AlertCircle,
+  MessageSquare
+} from 'lucide-react'
+import { projectsApi, searchApi } from '../services/api'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 import RebuildIndexModal from './RebuildIndexModal'
 import IndexStatusCard from './IndexStatusCard'
 import IndexStatusBadge from './IndexStatusBadge'
+import { Card, CardContent } from './ui/card'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { H1, Muted, Small } from './ui/typography'
+import EmptyState from './layout/EmptyState'
+import { cn } from '@/lib/utils'
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -131,244 +149,244 @@ const SearchPage = () => {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50">
+    <div className="h-full flex flex-col bg-background">
       {/* Search Header */}
-      <div className="bg-gradient-to-r from-white to-slate-50 border-b border-slate-200 p-3">
+      <div className="border-b border-border bg-surface p-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-lg font-bold text-slate-800 mb-3">Search Conversations</h1>
+          <H1 className="text-lg mb-3">Search Conversations</H1>
           
           {/* Search Form */}
           <form onSubmit={handleSearch} className="space-y-3">
-            <div className="flex items-center space-x-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               {/* Search Input */}
-              <div className="flex-1 min-w-64">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search across all conversations..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-3 py-2 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                    <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                </div>
+              <div className="flex-1 min-w-64 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Search across all conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
               </div>
 
               {/* Project Selector */}
-              <div className="relative">
-                <select
-                  value={selectedProject?.id || ''}
-                  onChange={(e) => {
-                    const project = (projectsData?.projects || []).find(p => p.id === e.target.value)
-                    setSelectedProject(project || null)
-                  }}
-                  className="px-3 py-2 text-xs border border-slate-300 rounded bg-white focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="">All Projects</option>
-                  {(projectsData?.projects || []).map(project => (
-                    <option key={project.id} value={project.id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={selectedProject?.id || ''}
+                onChange={(e) => {
+                  const project = (projectsData?.projects || []).find(p => p.id === e.target.value)
+                  setSelectedProject(project || null)
+                }}
+                className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+              >
+                <option value="">All Projects</option>
+                {(projectsData?.projects || []).map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
 
               {/* Filter Toggle */}
-              <button
+              <Button
                 type="button"
+                variant={showFilters ? "default" : "outline"}
+                size="icon"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors ${showFilters ? 'text-blue-600 bg-blue-50' : ''}`}
                 title="Advanced filters"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-              </button>
+                <Filter className="w-4 h-4" />
+              </Button>
 
               {/* Search Button */}
-              <button
+              <Button
                 type="submit"
                 disabled={isSearching || !searchQuery.trim()}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSearching ? 'Searching...' : 'Search'}
-              </button>
+                {isSearching ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  'Search'
+                )}
+              </Button>
 
               {/* Clear Button */}
               {hasSearched && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={clearSearch}
-                  className="px-3 py-2 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors"
                 >
                   Clear
-                </button>
+                </Button>
               )}
             </div>
 
             {/* Advanced Filters */}
             {showFilters && (
-              <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Role</label>
-                    <select
-                      value={filters.role}
-                      onChange={(e) => handleFilterChange('role', e.target.value)}
-                      className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white"
-                    >
-                      <option value="">All Roles</option>
-                      <option value="user">User</option>
-                      <option value="assistant">Assistant</option>
-                    </select>
+              <Card className="bg-surface/50">
+                <CardContent className="p-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-text-primary mb-1">Role</label>
+                      <select
+                        value={filters.role}
+                        onChange={(e) => handleFilterChange('role', e.target.value)}
+                        className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                      >
+                        <option value="">All Roles</option>
+                        <option value="user">User</option>
+                        <option value="assistant">Assistant</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-primary mb-1">From Date</label>
+                      <Input
+                        type="date"
+                        value={filters.from}
+                        onChange={(e) => handleFilterChange('from', e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-primary mb-1">To Date</label>
+                      <Input
+                        type="date"
+                        value={filters.to}
+                        onChange={(e) => handleFilterChange('to', e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-primary mb-1">Template</label>
+                      <select
+                        value={filters.template}
+                        onChange={(e) => handleFilterChange('template', e.target.value)}
+                        className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                      >
+                        <option value="">All Templates</option>
+                        <option value="claude-code-v3">Claude Code v3 (Universal)</option>
+                        <option value="claude-code-v2-mixed">Claude Code v2 Mixed</option>
+                        <option value="claude-code-v1">Claude Code v1</option>
+                        <option value="general">General</option>
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">From Date</label>
-                    <input
-                      type="date"
-                      value={filters.from}
-                      onChange={(e) => handleFilterChange('from', e.target.value)}
-                      className="w-full px-2 py-1 text-xs border border-slate-300 rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">To Date</label>
-                    <input
-                      type="date"
-                      value={filters.to}
-                      onChange={(e) => handleFilterChange('to', e.target.value)}
-                      className="w-full px-2 py-1 text-xs border border-slate-300 rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Template</label>
-                    <select
-                      value={filters.template}
-                      onChange={(e) => handleFilterChange('template', e.target.value)}
-                      className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white"
-                    >
-                      <option value="">All Templates</option>
-                      <option value="claude-code-v3">Claude Code v3 (Universal)</option>
-                      <option value="claude-code-v2-mixed">Claude Code v2 Mixed</option>
-                      <option value="claude-code-v1">Claude Code v1</option>
-                      <option value="general">General</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
           </form>
         </div>
       </div>
 
       {/* Search Results */}
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-6xl mx-auto">
           {isSearching && (
             <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-              <p className="text-slate-600 text-sm">Searching conversations...</p>
+              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
+              <Muted>Searching conversations...</Muted>
             </div>
           )}
 
           {!isSearching && hasSearched && (
             <>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <h2 className="text-sm font-semibold text-slate-800">
+                <div className="flex items-center gap-3">
+                  <Small className="font-semibold">
                     Search Results {searchResults.length > 0 && `(${searchResults.length} found)`}
-                  </h2>
+                  </Small>
                   <IndexStatusBadge />
                 </div>
                 {searchQuery && (
-                  <p className="text-xs text-slate-500">
+                  <Muted className="text-xs">
                     Searching for: "<span className="font-medium">{searchQuery}</span>"
                     {selectedProject && ` in ${selectedProject.name}`}
-                  </p>
+                  </Muted>
                 )}
               </div>
 
               {searchResults.length === 0 ? (
-                <div className="text-center py-12">
-                  <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.137 0-4.146-.832-5.657-2.343m0 0L3.172 9.485a.75.75 0 011.06-1.06L7.515 11.7M3.172 9.485A7.962 7.962 0 0115 4c1.346 0 2.62.332 3.728.925" />
-                  </svg>
-                  <h3 className="text-slate-600 font-medium mb-1">No results found</h3>
-                  <p className="text-slate-500 text-sm">Try adjusting your search terms or filters</p>
-                </div>
+                <EmptyState
+                  icon={AlertCircle}
+                  title="No results found"
+                  description="Try adjusting your search terms or filters"
+                />
               ) : (
                 <div className="space-y-3">
                   {searchResults.map((result, index) => {
-                    const getRoleClasses = (role) => {
-                      if (role === 'user') return 'bg-blue-100 text-blue-800'
-                      if (role === 'assistant') return 'bg-emerald-100 text-emerald-800'
-                      return 'bg-slate-100 text-slate-800'
-                    }
-
                     const conversationUrl = `/projects/${result.projectId}/sessions/${result.sessionId}${result.messageId ? `?highlight=${result.messageId}` : ''}`
 
                     return (
-                      <div key={index} className="bg-white border border-slate-200 rounded p-3 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getRoleClasses(result.role)}`}>
-                              {result.role}
-                            </span>
-                            <span className="text-xs text-slate-500">
-                              {result.sessionTitle || result.sessionId}
-                            </span>
-                            <span className="text-xs text-slate-400">
-                              {result.timestamp && formatDistanceToNow(new Date(result.timestamp), { addSuffix: true })}
-                            </span>
+                      <Card key={index} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant={result.role === 'user' ? 'default' : 'secondary'}>
+                                {result.role}
+                              </Badge>
+                              <Muted className="text-xs">
+                                {result.sessionTitle || result.sessionId}
+                              </Muted>
+                              <Muted className="text-xs">
+                                {result.timestamp && formatDistanceToNow(new Date(result.timestamp), { addSuffix: true })}
+                              </Muted>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <Muted className="text-xs">
+                                {result.projectName}
+                              </Muted>
+                              <Button
+                                asChild
+                                variant="ghost"
+                                size="sm"
+                                className="h-7"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <a
+                                  href={conversationUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Open in new tab with highlight"
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />
+                                  Open
+                                </a>
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-slate-400">
-                              {result.projectName}
-                            </span>
-                            <a 
-                              href={conversationUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                              title="Open in new tab with highlight"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                              Open
-                            </a>
-                          </div>
-                        </div>
                         
-                        <div
-                          onClick={() => handleResultClick(result)}
-                          className="block cursor-pointer"
-                        >
-                          <div className="text-sm text-slate-700 hover:text-slate-900 transition-colors line-clamp-4">
-                            {result.snippet || result.content || result.excerpt || 'No content preview'}
+                          <div
+                            onClick={() => handleResultClick(result)}
+                            className="block cursor-pointer mb-3"
+                          >
+                            <Muted className="text-sm hover:text-text-primary transition-colors line-clamp-4">
+                              {result.snippet || result.content || result.excerpt || 'No content preview'}
+                            </Muted>
                           </div>
-                        </div>
 
-                        {result.matchContext && (
-                          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                            <p className="text-xs text-yellow-800">
-                              <strong>Match context:</strong> {result.matchContext}
-                            </p>
-                          </div>
-                        )}
+                          {result.matchContext && (
+                            <Card className="bg-warning/5 border-warning/20 mb-2">
+                              <CardContent className="p-2">
+                                <Muted className="text-xs">
+                                  <strong>Match context:</strong> {result.matchContext}
+                                </Muted>
+                              </CardContent>
+                            </Card>
+                          )}
 
-                        {(result.score || result.line) && (
-                          <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
-                            {result.score && <span>Relevance: {result.score}</span>}
-                            {result.line && <span>Line: {result.line}</span>}
-                          </div>
-                        )}
-                      </div>
+                          {(result.score || result.line) && (
+                            <div className="flex items-center justify-between">
+                              {result.score && <Muted className="text-xs">Relevance: {result.score}</Muted>}
+                              {result.line && <Muted className="text-xs">Line: {result.line}</Muted>}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     )
                   })}
                 </div>
@@ -377,14 +395,12 @@ const SearchPage = () => {
           )}
 
           {!hasSearched && (
-            <div className="text-center py-6">
-              <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <h2 className="text-slate-800 font-semibold mb-2 text-base">Search Your Conversations</h2>
-              <p className="text-slate-600 text-xs mb-4 max-w-md mx-auto">
+            <div className="text-center py-12">
+              <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <Small className="font-semibold mb-2 block">Search Your Conversations</Small>
+              <Muted className="text-sm mb-6 max-w-md mx-auto block">
                 Enter keywords to search across all your Claude conversations.
-              </p>
+              </Muted>
 
               <IndexStatusCard onRebuildClick={() => setShowRebuildModal(true)} />
             </div>
@@ -394,87 +410,75 @@ const SearchPage = () => {
 
       {/* Message Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-800">
-                Full Message Content
-              </h3>
-              <div className="flex items-center space-x-2">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <Small className="font-semibold">Full Message Content</Small>
+              <div className="flex items-center gap-2">
                 {selectedMessage && !selectedMessage.error && (
-                  <button
+                  <Button
                     onClick={() => copyToClipboard(selectedMessage.content || selectedMessage.text || selectedMessage.snippet || '')}
-                    className={`inline-flex items-center px-3 py-1.5 text-sm rounded transition-colors ${
-                      copySuccess
-                        ? 'text-green-600 bg-green-50 border border-green-200'
-                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
-                    }`}
+                    variant={copySuccess ? "outline" : "ghost"}
+                    size="sm"
+                    className={cn(
+                      copySuccess && "text-success bg-success/10 border-success/20"
+                    )}
                     title="Copy message to clipboard"
                   >
                     {copySuccess ? (
                       <>
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-4 h-4 mr-1" />
                         Copied!
                       </>
                     ) : (
                       <>
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
+                        <Copy className="w-4 h-4 mr-1" />
                         Copy
                       </>
                     )}
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   onClick={closeModal}
-                  className="p-2 hover:bg-slate-100 rounded transition-colors"
+                  variant="ghost"
+                  size="icon"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <X className="w-5 h-5" />
+                </Button>
               </div>
             </div>
 
             {/* Copy Success Message */}
             {copySuccess && (
-              <div className="px-4 py-2 bg-green-50 border-b border-green-200">
-                <div className="flex items-center text-sm text-green-800">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {copySuccess}
+              <div className="px-4 py-2 bg-success/10 border-b border-success/20">
+                <div className="flex items-center">
+                  <Check className="w-4 h-4 mr-2 text-success" />
+                  <Muted className="text-sm text-success">{copySuccess}</Muted>
                 </div>
               </div>
             )}
 
-            <div className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <CardContent className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
               {isLoadingMessage ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mr-3"></div>
-                  <span className="text-slate-600">Loading full message...</span>
+                  <Loader2 className="w-6 h-6 animate-spin text-primary mr-3" />
+                  <Muted>Loading full message...</Muted>
                 </div>
               ) : selectedMessage?.error ? (
-                <div className="text-red-600 text-center py-8">
-                  <p>{selectedMessage.error}</p>
+                <div className="text-center py-8">
+                  <AlertCircle className="w-8 h-8 text-error mx-auto mb-2" />
+                  <Muted className="text-error">{selectedMessage.error}</Muted>
                 </div>
               ) : selectedMessage ? (
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-sm text-slate-600">
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      selectedMessage.role === 'user' ? 'bg-blue-100 text-blue-800' :
-                      selectedMessage.role === 'assistant' ? 'bg-emerald-100 text-emerald-800' :
-                      'bg-slate-100 text-slate-800'
-                    }`}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={selectedMessage.role === 'user' ? 'default' : 'secondary'}>
                       {selectedMessage.role}
-                    </span>
+                    </Badge>
                     {selectedMessage.timestamp && (
-                      <span className="text-xs text-slate-400">
+                      <Muted className="text-xs">
                         {formatDistanceToNow(new Date(selectedMessage.timestamp), { addSuffix: true })}
-                      </span>
+                      </Muted>
                     )}
                   </div>
 
@@ -484,17 +488,17 @@ const SearchPage = () => {
                         message={selectedMessage}
                       />
                     ) : selectedMessage.snippet ? (
-                      <div className="whitespace-pre-wrap text-slate-700">
+                      <div className="whitespace-pre-wrap">
                         {highlightSearchText(selectedMessage.snippet, selectedMessage.searchQuery)}
                       </div>
                     ) : (
-                      <div className="text-slate-500">No content available</div>
+                      <Muted>No content available</Muted>
                     )}
                   </div>
                 </div>
               ) : null}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
