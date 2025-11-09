@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { 
-  BarChart3, 
-  MessageSquare, 
-  Folder, 
-  Zap, 
-  Clock, 
-  ChevronRight, 
+import {
+  BarChart3,
+  MessageSquare,
+  Folder,
+  Zap,
+  Clock,
+  ChevronRight,
   ChevronLeft,
   Activity
 } from 'lucide-react'
@@ -40,7 +40,7 @@ const TremorProjectView = () => {
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false)
 
   const handleSessionSelect = (sessionId) => {
-    navigate(\`/tremor-preview/projects/\${projectId}/sessions/\${sessionId}\`)
+    navigate(`/tremor-preview/projects/${projectId}/sessions/${sessionId}`)
   }
 
   // Get all projects data for dashboard overview
@@ -66,7 +66,7 @@ const TremorProjectView = () => {
   // Get project-level token statistics
   const { data: projectTokenStats } = useQuery({
     queryKey: ['project-tokens', projectId],
-    queryFn: () => fetch(\`http://localhost:3400/api/projects/\${projectId}/token-stats\`).then(res => res.json()),
+    queryFn: () => fetch(`http://localhost:3400/api/projects/${projectId}/token-stats`).then(res => res.json()),
     enabled: !!(projectId && !sessionId),
     staleTime: 5 * 60 * 1000 // Cache for 5 minutes
   })
@@ -82,7 +82,7 @@ const TremorProjectView = () => {
   const assistantMessages = messages.filter(m => m.role === 'assistant').length
   const systemMessages = messages.filter(m => m.role === 'system').length
 
-  // Chart data for message distribution
+  // Chart data for message distribution over time
   const messageDistribution = [
     { name: 'User', Messages: userMessages, color: 'blue' },
     { name: 'Assistant', Messages: assistantMessages, color: 'emerald' },
@@ -111,7 +111,7 @@ const TremorProjectView = () => {
       <div className="tremor-dashboard-page scrollable">
         <div className="main-content">
           <div className="tremor-container py-10">
-            {/* Header */}
+            {/* Header with gradient background */}
             <div className="mb-8 -mx-8 px-8 py-8 bg-surface border-2 border-border rounded-lg shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -171,7 +171,7 @@ const TremorProjectView = () => {
                   <div>
                     <Text className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Total Messages</Text>
                     <Metric className="tremor-metric-sm mt-2">
-                      {totalMessagesCount > 1000 ? \`\${(totalMessagesCount / 1000).toFixed(1)}K\` : totalMessagesCount}
+                      {totalMessagesCount > 1000 ? `${(totalMessagesCount / 1000).toFixed(1)}K` : totalMessagesCount}
                     </Metric>
                   </div>
                   <div className="p-3 bg-accent/10 rounded-lg">
@@ -203,7 +203,7 @@ const TremorProjectView = () => {
               </Card>
             </div>
 
-            {/* Charts Section */}
+            {/* Charts Section - Enterprise Design */}
             <div className="tremor-grid cols-2 mb-8">
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
                 <div className="mb-6 flex items-center justify-between">
@@ -231,16 +231,25 @@ const TremorProjectView = () => {
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-border">
                   <div className="text-center">
-                    <Text className="text-xs text-text-secondary mb-1">User</Text>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#3b82f6'}}></div>
+                      <Text className="text-xs text-text-secondary">User</Text>
+                    </div>
                     <Metric className="text-lg text-primary">{Math.floor(totalMessagesCount * 0.44).toLocaleString()}</Metric>
                   </div>
                   <div className="text-center">
-                    <Text className="text-xs text-text-secondary mb-1">Assistant</Text>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#10b981'}}></div>
+                      <Text className="text-xs text-text-secondary">Assistant</Text>
+                    </div>
                     <Metric className="text-lg text-success">{Math.floor(totalMessagesCount * 0.47).toLocaleString()}</Metric>
                   </div>
                   <div className="text-center">
-                    <Text className="text-xs text-text-secondary mb-1">System</Text>
-                    <Metric className="text-lg text-muted-foreground">{Math.floor(totalMessagesCount * 0.09).toLocaleString()}</Metric>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#64748b'}}></div>
+                      <Text className="text-xs text-text-secondary">System</Text>
+                    </div>
+                    <Metric className="text-lg text-text-secondary">{Math.floor(totalMessagesCount * 0.09).toLocaleString()}</Metric>
                   </div>
                 </div>
               </Card>
@@ -255,9 +264,10 @@ const TremorProjectView = () => {
                 </div>
                 {projectActivityData.length > 0 ? (
                   <div className="space-y-6">
+                    {/* Sessions Chart */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-text-primary">Sessions by Project</Text>
+                        <Text className="font-semibold text-gray-700">Sessions by Project</Text>
                         <Badge color="blue" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.sessions, 0)}</Badge>
                       </div>
                       <BarList
@@ -270,9 +280,10 @@ const TremorProjectView = () => {
                       />
                     </div>
 
+                    {/* Messages Chart */}
                     <div className="pt-4 border-t border-border">
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-text-primary">Messages by Project</Text>
+                        <Text className="font-semibold text-gray-700">Messages by Project</Text>
                         <Badge color="emerald" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.messages, 0).toLocaleString()}</Badge>
                       </div>
                       <BarList
@@ -296,7 +307,7 @@ const TremorProjectView = () => {
               </Card>
             </div>
 
-            {/* Project List */}
+            {/* Project List - Enterprise Design */}
             <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
               <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                 <div>
@@ -319,7 +330,7 @@ const TremorProjectView = () => {
                     <div
                       key={project.id}
                       className="group flex items-center justify-between p-4 border border-border rounded-lg hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all duration-200 hover:shadow-md"
-                      onClick={() => navigate(\`/tremor-preview/projects/\${project.id}\`)}
+                      onClick={() => navigate(`/tremor-preview/projects/${project.id}`)}
                     >
                       <div className="flex items-center space-x-4 flex-1">
                         <div className="flex-shrink-0">
@@ -340,7 +351,7 @@ const TremorProjectView = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-6">
-                        <div className="text-center px-3 py-2 bg-primary/10 rounded-lg">
+                        <div className="text-center px-3 py-2 bg-primary/5 rounded-lg">
                           <Text className="text-xs text-primary font-medium">Sessions</Text>
                           <Metric className="text-base text-primary">{project.sessionCount || 0}</Metric>
                         </div>
@@ -371,10 +382,11 @@ const TremorProjectView = () => {
   return (
     <div className="tremor-dashboard-page scrollable">
       <div className="flex" style={{height: 'calc(100vh - 120px)'}}>
-        {/* Left Panel - Sessions */}
-        <div className={\`\${
+        {/* Left Panel - Sessions with Tremor */}
+        <div className={`${
           leftPanelCollapsed ? 'w-12' : 'w-80'
-        } sidebar-panel transition-all duration-300 flex-shrink-0\`}>
+        } sidebar-panel transition-all duration-300 flex-shrink-0`}>
+          {/* Panel Header */}
           <div className="panel-header">
             {!leftPanelCollapsed && (
               <Text className="font-semibold text-text-primary">Sessions</Text>
@@ -384,61 +396,62 @@ const TremorProjectView = () => {
               className="p-1 hover:bg-surface rounded transition-colors"
             >
               {leftPanelCollapsed ? (
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className="w-4 h-4 text-text-secondary" />
               ) : (
-                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                <ChevronLeft className="w-4 h-4 text-text-secondary" />
               )}
             </button>
           </div>
 
+          {/* Sessions Content with Tremor Cards */}
           <div className="panel-content">
             {!leftPanelCollapsed && (
               <div className="space-y-2">
                 {sessions.map((session) => (
-                  <div
-                    key={session.sessionId}
-                    className={\`session-card \${
-                      sessionId === session.sessionId ? 'active' : ''
-                    }\`}
-                    onClick={() => handleSessionSelect(session.sessionId)}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <Text className="text-xs font-medium truncate">
-                        {session.title || \`Session \${session.sessionId.slice(0, 8)}...\`}
-                      </Text>
-                      <Badge size="xs" color={sessionId === session.sessionId ? 'blue' : 'gray'} className="tremor-badge">
-                        {session.messageCount}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Text className="text-xs text-secondary">
-                        {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
-                      </Text>
-                      <div className="flex items-center space-x-1">
-                        <div className={\`w-2 h-2 rounded-full \${
-                          session.messageCount > 50 ? 'bg-success' :
-                          session.messageCount > 20 ? 'bg-warning' : 'bg-muted-foreground'
-                        }\`}></div>
-                        <Text className="text-xs text-secondary">
-                          {session.messageCount > 50 ? 'high' : session.messageCount > 20 ? 'med' : 'low'}
+                    <div
+                      key={session.sessionId}
+                      className={`session-card ${
+                        sessionId === session.sessionId ? 'active' : ''
+                      }`}
+                      onClick={() => handleSessionSelect(session.sessionId)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <Text className="text-xs font-medium truncate">
+                          {session.title || `Session ${session.sessionId.slice(0, 8)}...`}
                         </Text>
-                      </div>
-                    </div>
-                    
-                    {sessionId === session.sessionId && (
-                      <div className="mt-2 pt-2 border-t border-border">
-                        <Badge size="xs" color="blue" className="tremor-badge blue">
-                          ● Active
+                        <Badge size="xs" color={sessionId === session.sessionId ? 'blue' : 'gray'} className="tremor-badge">
+                          {session.messageCount}
                         </Badge>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                      
+                      <div className="flex items-center justify-between">
+                        <Text className="text-xs text-secondary">
+                          {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
+                        </Text>
+                        <div className="flex items-center space-x-1">
+                          <div className={`w-2 h-2 rounded-full ${
+                            session.messageCount > 50 ? 'bg-success' :
+                            session.messageCount > 20 ? 'bg-warning' : 'bg-muted-foreground'
+                          }`}></div>
+                          <Text className="text-xs text-secondary">
+                            {session.messageCount > 50 ? 'high' : session.messageCount > 20 ? 'med' : 'low'}
+                          </Text>
+                        </div>
+                      </div>
+                      
+                      {sessionId === session.sessionId && (
+                        <div className="mt-2 pt-2 border-t border-border">
+                          <Badge size="xs" color="blue" className="tremor-badge blue">
+                            ● Active
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
@@ -525,16 +538,16 @@ const TremorProjectView = () => {
                           <Flex alignItems="center" justifyContent="between">
                             <div>
                               <Text className="text-primary font-semibold">Total Tokens</Text>
-                              <Metric className="text-3xl font-bold text-primary">
+                              <Metric className="text-3xl font-bold text-indigo-800">
                                 {projectTokenStats.tokens.totalTokens > 1000000
-                                  ? \`\${(projectTokenStats.tokens.totalTokens / 1000000).toFixed(1)}M\`
+                                  ? `${(projectTokenStats.tokens.totalTokens / 1000000).toFixed(1)}M`
                                   : projectTokenStats.tokens.totalTokens.toLocaleString()}
                               </Metric>
                               <Text className="mt-1 text-primary font-medium">
                                 {projectTokenStats.tokens.totalInputTokens.toLocaleString()} in / {projectTokenStats.tokens.totalOutputTokens.toLocaleString()} out
                               </Text>
                             </div>
-                            <div className="p-3 bg-primary/20 rounded-xl">
+                            <div className="p-3 bg-indigo-200 rounded-xl">
                               <Activity className="w-6 h-6 text-primary" />
                             </div>
                           </Flex>
@@ -551,7 +564,7 @@ const TremorProjectView = () => {
                                 {projectTokenStats.tokens.totalCacheReadTokens.toLocaleString()} cache reads
                               </Text>
                             </div>
-                            <div className="p-3 bg-success/20 rounded-xl">
+                            <div className="p-3 bg-pink-200 rounded-xl">
                               <Zap className="w-6 h-6 text-success" />
                             </div>
                           </Flex>
@@ -562,7 +575,7 @@ const TremorProjectView = () => {
                           <Flex alignItems="center" justifyContent="between">
                             <div>
                               <Text className="text-warning font-semibold">Sessions with Usage</Text>
-                              <Metric className="text-3xl font-bold text-warning">
+                              <Metric className="text-3xl font-bold text-amber-800">
                                 {projectTokenStats.tokens.sessionsWithUsage}
                               </Metric>
                               <Text className="mt-1 text-warning font-medium">
@@ -594,7 +607,7 @@ const TremorProjectView = () => {
                                 </Badge>
                                 <div>
                                   <Text className="font-medium text-text-primary truncate max-w-xs">
-                                    {session.title || \`Session \${session.sessionId.slice(0, 8)}...\`}
+                                    {session.title || `Session ${session.sessionId.slice(0, 8)}...`}
                                   </Text>
                                   <Text className="text-xs text-text-secondary">
                                     {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
@@ -618,7 +631,7 @@ const TremorProjectView = () => {
                           .sort((a, b) => b.messageCount - a.messageCount)
                           .slice(0, 10)
                           .map((session, index) => ({
-                            name: \`Session \${index + 1}\`,
+                            name: `Session ${index + 1}`,
                             messages: session.messageCount,
                             session: session.title?.slice(0, 15) || session.sessionId.slice(0, 8)
                           }))}
@@ -635,20 +648,20 @@ const TremorProjectView = () => {
             )}
           </div>
           
-          {/* Right Panel - Analytics */}
+          {/* Right Panel - Analytics with Tremor */}
           {sessionId && (
-            <div className={\`\${
+            <div className={`${
               rightPanelCollapsed ? 'w-12' : 'w-80'
-            } sidebar-panel transition-all duration-300 flex-shrink-0 border-l border-border\`}>
+            } sidebar-panel transition-all duration-300 flex-shrink-0 border-l border-border`}>
               <div className="panel-header">
                 <button
                   onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}
                   className="p-1 hover:bg-surface rounded transition-colors"
                 >
                   {rightPanelCollapsed ? (
-                    <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                    <ChevronLeft className="w-4 h-4 text-text-secondary" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    <ChevronRight className="w-4 h-4 text-text-secondary" />
                   )}
                 </button>
                 {!rightPanelCollapsed && (
@@ -658,156 +671,179 @@ const TremorProjectView = () => {
 
               {!rightPanelCollapsed && (
                 <div className="panel-content space-y-4">
-                  {/* Session Management */}
-                  <div className="tremor-card">
-                    <Title className="text-lg mb-3">Session Management</Title>
-                    <SessionMetadataControls
-                      projectId={projectId}
-                      sessionId={sessionId}
-                      currentTitle={currentSession?.title || sessionId}
-                    />
-                  </div>
-
-                  {/* Message Overview */}
-                  <div className="tremor-card">
-                    <Title className="text-lg">Message Overview</Title>
-                    <div className="space-y-4 mt-4">
-                      <div className="flex justify-between items-center">
-                        <Text className="text-secondary">Total Messages</Text>
-                        <Metric className="tremor-metric-sm">{totalMessages}</Metric>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Text className="text-xs">User Messages</Text>
-                          <Badge className="tremor-badge blue">{userMessages}</Badge>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <Text className="text-xs">Assistant Messages</Text>
-                          <Badge className="tremor-badge emerald">{assistantMessages}</Badge>
-                        </div>
-                        
-                        {systemMessages > 0 && (
-                          <div className="flex items-center justify-between">
-                            <Text className="text-xs">System Messages</Text>
-                            <Badge className="tremor-badge gray">{systemMessages}</Badge>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="mt-4">
-                        <Text className="text-sm text-secondary mb-2">Distribution</Text>
-                        <div className="tremor-chart">
-                          <DonutChart
-                            className="h-32"
-                            data={messageDistribution}
-                            category="Messages"
-                            index="name"
-                            colors={['blue', 'emerald', 'slate']}
-                            showLabel={false}
-                            showAnimation={false}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Session Details */}
-                  <div className="tremor-card">
-                    <Title className="text-lg">Session Details</Title>
-                    <div className="space-y-3 mt-4">
-                      <div className="flex justify-between items-center">
-                        <Text className="text-secondary">Template</Text>
-                        <Badge className="tremor-badge blue">
-                          {currentSession?.template || 'unknown'}
-                        </Badge>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <Text className="text-secondary">Created</Text>
-                        <Text className="text-sm">
-                          {currentSession?.createdAt ? new Date(currentSession.createdAt).toLocaleDateString() : 'Unknown'}
-                        </Text>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <Text className="text-secondary">Last Updated</Text>
-                        <Text className="text-sm text-success">
-                          {currentSession?.lastUpdatedAt ? formatDistanceToNow(new Date(currentSession.lastUpdatedAt), { addSuffix: true }) : 'Unknown'}
-                        </Text>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-border">
-                        <Text className="text-secondary mb-2">Activity Level</Text>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-secondary">Engagement</span>
-                          <span className="text-primary">
-                            {totalMessages > 50 ? 'High' : totalMessages > 20 ? 'Medium' : 'Low'}
-                          </span>
-                        </div>
-                        <ProgressBar 
-                          value={Math.min((totalMessages / 100) * 100, 100)}
-                          color={totalMessages > 50 ? 'emerald' : totalMessages > 20 ? 'blue' : 'red'}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Token Usage */}
-                  {sessionData?.stats?.tokens && sessionData.stats.tokens.messagesWithUsage > 0 && (
+                    {/* Session Management Section */}
                     <div className="tremor-card">
-                      <Title className="text-lg">Token Usage</Title>
-                      <div className="space-y-3 mt-4">
+                      <Title className="text-lg mb-3">Session Management</Title>
+                      <SessionMetadataControls
+                        projectId={projectId}
+                        sessionId={sessionId}
+                        currentTitle={currentSession?.title || sessionId}
+                      />
+                    </div>
+
+                    <div className="tremor-card">
+                      <Title className="text-lg">Message Overview</Title>
+                      <div className="space-y-4 mt-4">
                         <div className="flex justify-between items-center">
-                          <Text className="text-secondary">Total Tokens</Text>
-                          <Metric className="tremor-metric-sm">{sessionData.stats.tokens.totalTokens.toLocaleString()}</Metric>
+                          <Text className="text-secondary">Total Messages</Text>
+                          <Metric className="tremor-metric-sm">{totalMessages}</Metric>
                         </div>
-
-                        <div className="space-y-2">
+                        
+                        <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <Text className="text-xs">Input</Text>
-                            <Badge className="tremor-badge blue">{sessionData.stats.tokens.totalInputTokens.toLocaleString()}</Badge>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-primary/50 rounded-full"></div>
+                              <Text className="text-xs">User Messages</Text>
+                            </div>
+                            <Badge className="tremor-badge blue">{userMessages}</Badge>
                           </div>
-
+                          
                           <div className="flex items-center justify-between">
-                            <Text className="text-xs">Output</Text>
-                            <Badge className="tremor-badge emerald">{sessionData.stats.tokens.totalOutputTokens.toLocaleString()}</Badge>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-success/100 rounded-full"></div>
+                              <Text className="text-xs">Assistant Messages</Text>
+                            </div>
+                            <Badge className="tremor-badge emerald">{assistantMessages}</Badge>
                           </div>
-
-                          {sessionData.stats.tokens.totalCacheCreationTokens > 0 && (
+                          
+                          {systemMessages > 0 && (
                             <div className="flex items-center justify-between">
-                              <Text className="text-xs">Cache Creation</Text>
-                              <Badge className="tremor-badge amber">{sessionData.stats.tokens.totalCacheCreationTokens.toLocaleString()}</Badge>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-surface0 rounded-full"></div>
+                                <Text className="text-xs">System Messages</Text>
+                              </div>
+                              <Badge className="tremor-badge gray">{systemMessages}</Badge>
                             </div>
                           )}
-
-                          {sessionData.stats.tokens.totalCacheReadTokens > 0 && (
-                            <div className="flex items-center justify-between">
-                              <Text className="text-xs">Cache Reads</Text>
-                              <Badge className="tremor-badge purple">{sessionData.stats.tokens.totalCacheReadTokens.toLocaleString()}</Badge>
-                            </div>
-                          )}
                         </div>
-
-                        {(sessionData.stats.tokens.totalCacheCreationTokens > 0 || sessionData.stats.tokens.totalCacheReadTokens > 0) && (
-                          <div className="mt-4 pt-3 border-t border-border">
-                            <Text className="text-secondary mb-2">Cache Efficiency</Text>
-                            <div className="flex justify-between text-sm mb-2">
-                              <span className="text-secondary">Hit Rate</span>
-                              <span className="text-primary font-semibold">{sessionData.stats.tokens.cacheHitRate.toFixed(2)}%</span>
-                            </div>
-                            <ProgressBar 
-                              value={Math.min(sessionData.stats.tokens.cacheHitRate, 100)}
-                              color="indigo"
+                        
+                        <div className="mt-4">
+                          <Text className="text-sm text-secondary mb-2">Distribution</Text>
+                          <div className="tremor-chart">
+                            <DonutChart
+                              className="h-32"
+                              data={messageDistribution}
+                              category="Messages"
+                              index="name"
+                              colors={['blue', 'emerald', 'slate']}
+                              showLabel={false}
+                              showAnimation={false}
                             />
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
+
+                    <div className="tremor-card">
+                      <Title className="text-lg">Session Details</Title>
+                      <div className="space-y-3 mt-4">
+                        <div className="flex justify-between items-center">
+                          <Text className="text-secondary">Template</Text>
+                          <Badge className="tremor-badge blue">
+                            {currentSession?.template || 'unknown'}
+                          </Badge>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <Text className="text-secondary">Created</Text>
+                          <Text className="text-sm">
+                            {currentSession?.createdAt ? new Date(currentSession.createdAt).toLocaleDateString() : 'Unknown'}
+                          </Text>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <Text className="text-secondary">Last Updated</Text>
+                          <Text className="text-sm text-success">
+                            {currentSession?.lastUpdatedAt ? formatDistanceToNow(new Date(currentSession.lastUpdatedAt), { addSuffix: true }) : 'Unknown'}
+                          </Text>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-border">
+                          <Text className="text-secondary mb-2">Activity Level</Text>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-secondary">Engagement</span>
+                            <span className="text-primary">
+                              {totalMessages > 50 ? 'High' : totalMessages > 20 ? 'Medium' : 'Low'}
+                            </span>
+                          </div>
+                          <div className="tremor-progress-bar">
+                            <div
+                              className={`progress-fill ${totalMessages > 50 ? 'emerald' : totalMessages > 20 ? 'blue' : 'red'}`}
+                              style={{ width: `${Math.min((totalMessages / 100) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Token Usage Card */}
+                    {sessionData?.stats?.tokens && sessionData.stats.tokens.messagesWithUsage > 0 && (
+                      <div className="tremor-card">
+                        <Title className="text-lg">Token Usage</Title>
+                        <div className="space-y-3 mt-4">
+                          <div className="flex justify-between items-center">
+                            <Text className="text-secondary">Total Tokens</Text>
+                            <Metric className="tremor-metric-sm">{sessionData.stats.tokens.totalTokens.toLocaleString()}</Metric>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-primary/50 rounded-full"></div>
+                                <Text className="text-xs">Input</Text>
+                              </div>
+                              <Badge className="tremor-badge blue">{sessionData.stats.tokens.totalInputTokens.toLocaleString()}</Badge>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-success/100 rounded-full"></div>
+                                <Text className="text-xs">Output</Text>
+                              </div>
+                              <Badge className="tremor-badge emerald">{sessionData.stats.tokens.totalOutputTokens.toLocaleString()}</Badge>
+                            </div>
+
+                            {sessionData.stats.tokens.totalCacheCreationTokens > 0 && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-3 h-3 bg-warning/100 rounded-full"></div>
+                                  <Text className="text-xs">Cache Creation</Text>
+                                </div>
+                                <Badge className="tremor-badge amber">{sessionData.stats.tokens.totalCacheCreationTokens.toLocaleString()}</Badge>
+                              </div>
+                            )}
+
+                            {sessionData.stats.tokens.totalCacheReadTokens > 0 && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-3 h-3 bg-accent/100 rounded-full"></div>
+                                  <Text className="text-xs">Cache Reads</Text>
+                                </div>
+                                <Badge className="tremor-badge purple">{sessionData.stats.tokens.totalCacheReadTokens.toLocaleString()}</Badge>
+                              </div>
+                            )}
+                          </div>
+
+                          {(sessionData.stats.tokens.totalCacheCreationTokens > 0 || sessionData.stats.tokens.totalCacheReadTokens > 0) && (
+                            <div className="mt-4 pt-3 border-t border-border">
+                              <Text className="text-secondary mb-2">Cache Efficiency</Text>
+                              <div className="flex justify-between text-sm mb-2">
+                                <span className="text-secondary">Hit Rate</span>
+                                <span className="text-primary font-semibold">{sessionData.stats.tokens.cacheHitRate.toFixed(2)}%</span>
+                              </div>
+                              <div className="tremor-progress-bar">
+                                <div
+                                  className="progress-fill indigo"
+                                  style={{ width: `${Math.min(sessionData.stats.tokens.cacheHitRate, 100)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
             </div>
           )}
         </div>
@@ -815,5 +851,6 @@ const TremorProjectView = () => {
     </div>
   )
 }
+
 
 export default TremorProjectView
