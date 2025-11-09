@@ -131,7 +131,7 @@ const TremorProjectView = () => {
             </div>
 
             {/* KPI Cards - Enterprise Level */}
-            <div className="tremor-grid cols-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-primary">
                 <Flex alignItems="start" justifyContent="between">
                   <div>
@@ -204,7 +204,7 @@ const TremorProjectView = () => {
             </div>
 
             {/* Charts Section - Enterprise Design */}
-            <div className="tremor-grid cols-2 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
                 <div className="mb-6 flex items-center justify-between">
                   <div>
@@ -488,7 +488,8 @@ const TremorProjectView = () => {
                     </div>
                   </div>
                   
-                  <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6 mb-8">
+                  {/* KPI Cards Grid - 3 columns on large screens */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <Card className="ring-1 ring-primary/20 shadow-lg bg-primary/5">
                       <Flex alignItems="center" justifyContent="between">
                         <div>
@@ -589,9 +590,10 @@ const TremorProjectView = () => {
                         </Card>
                       </>
                     )}
-                  </Grid>
+                  </div>
 
-                  <Grid numItems={1} numItemsLg={2} className="gap-6">
+                  {/* Charts Section - 2 columns on large screens */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <Card className="shadow-lg">
                       <Title className="mb-4 text-xl font-bold text-text-primary">Top Sessions</Title>
                       <div className="space-y-3">
@@ -599,7 +601,7 @@ const TremorProjectView = () => {
                           .sort((a, b) => b.messageCount - a.messageCount)
                           .slice(0, 8)
                           .map((session, index) => (
-                            <div key={session.sessionId} 
+                            <div key={session.sessionId}
                                  className="flex justify-between items-center p-3 bg-surface rounded-lg hover:bg-primary/5 transition-colors">
                               <div className="flex items-center space-x-3">
                                 <Badge className="flex-shrink-0" color="blue" size="xs">
@@ -622,7 +624,7 @@ const TremorProjectView = () => {
                           ))}
                       </div>
                     </Card>
-                    
+
                     <Card className="shadow-lg">
                       <Title className="mb-4 text-xl font-bold text-text-primary">Session Activity</Title>
                       <BarChart
@@ -642,7 +644,7 @@ const TremorProjectView = () => {
                         showAnimation={true}
                       />
                     </Card>
-                  </Grid>
+                  </div>
                 </div>
               </div>
             )}
