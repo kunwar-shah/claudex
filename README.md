@@ -53,6 +53,31 @@
 
 ## 📸 Screenshots
 
+### 🎨 NEW in v1.2.0: Theming & Customization
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/01-theme-selector.png" alt="10 Professional Themes" width="100%">
+      <p align="center"><strong>10 Professional Themes</strong><br/>Classic, Emerald, Blue, Purple, Orange, Red, Rose, Yellow, Green, Default</p>
+    </td>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/02-font-family-preview.png" alt="29 Font Families" width="100%">
+      <p align="center"><strong>29 Font Families</strong><br/>Visual preview showing actual typefaces</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/03-font-size-border-radius.png" alt="Font Size & Border Radius" width="100%">
+      <p align="center"><strong>Granular Font Sizing</strong><br/>5 precise options (14px-18px) + border radius control</p>
+    </td>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/04-settings-tabs-soon-badges.png" alt="Settings Modal" width="100%">
+      <p align="center"><strong>Settings Modal</strong><br/>Appearance functional, more settings coming soon</p>
+    </td>
+  </tr>
+</table>
+
 ### Conversation View
 <img src="screenshots/conversation-view.png" alt="Conversation View" width="800">
 
