@@ -1,0 +1,11 @@
+# GitHub Sponsors Configuration
+# Displays "Sponsor" button on GitHub repository
+
+# Ko-fi username
+ko_fi: kunwarshah
+
+# Custom donation links (PayPal)
+custom: ["https://paypal.me/kunwarJhamat"]
+
+# GitHub Sponsors (uncomment when approved)
+# github: kunwar-shah
