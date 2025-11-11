@@ -95,6 +95,29 @@
 - **Modern UI**: Responsive React interface with fixed header/footer navigation, infinite scroll, and optimized for developer workflows
 - **Hot Reload**: Development mode with automatic restart on code changes for rapid iteration
 
+---
+
+## 💖 Support This Project
+
+Claudex is free and open source. If it saves you time and improves your workflow, please consider:
+
+- ⭐ **Star the repo** - Help others discover Claudex
+- 🐛 **Report bugs** - Your feedback makes us better
+- 💡 **Share ideas** - Request features in [Discussions](https://github.com/kunwar-shah/claudex/discussions)
+- ☕ **Buy me a coffee** - Support continued development
+
+<div align="center">
+
+  [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E5B?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/kunwarshah)
+  [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?logo=paypal&style=for-the-badge)](https://paypal.me/kunwarJhamat)
+  <!-- [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github&style=for-the-badge)](https://github.com/sponsors/kunwar-shah) -->
+
+  **Every contribution helps keep this project alive and growing!** 🚀
+
+</div>
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -611,25 +634,6 @@ Access at: http://localhost:3400
 - [ ] Authentication for multi-user
 - [ ] Plugin system for custom parsers
 - [ ] Diff viewer for file changes
-
-## 💖 Support This Project
-
-Claudex is free and open source. If it saves you time and improves your workflow, please consider:
-
-- ⭐ **Star the repo** - Help others discover Claudex
-- 🐛 **Report bugs** - Your feedback makes us better
-- 💡 **Share ideas** - Request features in [Discussions](https://github.com/kunwar-shah/claudex/discussions)
-- ☕ **Buy me a coffee** - Support continued development
-
-<div align="center">
-
-  [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E5B?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/kunwarshah)
-  [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?logo=paypal&style=for-the-badge)](https://paypal.me/kunwarJhamat)
-  <!-- [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github&style=for-the-badge)](https://github.com/sponsors/kunwar-shah) -->
-
-  **Every contribution helps keep this project alive and growing!** 🚀
-
-</div>
 
 ---
 
