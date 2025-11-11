@@ -1,11 +1,15 @@
 {
   "name": "claudex",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Professional conversation viewer and analysis tool for Claude Code. Search, analyze, and export your AI conversations with enterprise-grade full-text search and multi-platform support.",
   "main": "index.js",
   "bin": {
     "claudex": "./bin/claude-viewer.js"
   },
+  "workspaces": [
+    "server",
+    "client"
+  ],
   "files": [
     "bin/",
     "server/src/",
@@ -16,7 +20,6 @@
     "client/package.json",
     "client/vite.config.js",
     "scripts/check-system.mjs",
-    "scripts/postinstall.js",
     "LICENSE",
     "README.md",
     "quick-start.sh"
@@ -24,12 +27,10 @@
   "preferGlobal": true,
   "scripts": {
     "start": "node bin/claude-viewer.js",
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "build": "npm run build --prefix client",
-    "install-deps": "npm install --prefix server && npm install --prefix client",
-    "postinstall": "node scripts/postinstall.js",
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "build": "npm run build --workspace=client",
     "prepublishOnly": "npm run build && npm test",
-    "test": "npm test --prefix server && npm test --prefix client",
+    "test": "npm test --workspaces",
     "check": "node scripts/check-system.mjs",
     "check:verbose": "node scripts/check-system.mjs --verbose",
     "check:fix": "node scripts/check-system.mjs --fix",
