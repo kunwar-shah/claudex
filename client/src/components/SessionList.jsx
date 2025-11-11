@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
-import { Eye, EyeOff, Clock, MessageCircle } from 'lucide-react'
+import { Circle, CircleDot, Clock, MessageCircle } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
 import SessionMetadataControls from './SessionMetadataControls'
 import ProjectExportButton from './ProjectExportButton'
@@ -98,7 +98,7 @@ const SessionList = ({ projectId, selectedSessionId }) => {
           onClick={() => setShowHidden(!showHidden)}
           className="w-full gap-2"
         >
-          {showHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          {showHidden ? <CircleDot className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
           <span>{showHidden ? 'Showing All' : 'Show Hidden'}</span>
         </Button>
       </div>
@@ -165,7 +165,7 @@ const SessionListItem = ({ session, projectId, isSelected, isHidden, onSelect })
         {/* Title row */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-start gap-2 flex-1 min-w-0">
-            {isHidden && <EyeOff className="w-4 h-4 text-text-secondary flex-shrink-0 mt-0.5" />}
+            {isHidden && <CircleDot className="w-4 h-4 text-text-secondary flex-shrink-0 mt-0.5" />}
             <Small className="font-semibold line-clamp-2 flex-1">
               {displayTitle}
             </Small>

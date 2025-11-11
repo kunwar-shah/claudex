@@ -15,7 +15,7 @@ const RebuildIndexButton = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-slate-600 hover:bg-slate-700 rounded-md transition-colors"
+        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-hover))] rounded-md transition-colors"
         title="Rebuild search index (use this if search results seem outdated)"
       >
         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
 import MessageBubble from './MessageBubble'
+import MessagingBubble from './MessagingBubble'
 import ExportButton from './ExportButton'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
@@ -17,8 +18,10 @@ import { Card, CardContent } from './ui/card'
 import { Muted, Small } from './ui/typography'
 import EmptyState from './layout/EmptyState'
 import { cn } from '@/lib/utils'
+import { useSettings } from '../contexts/SettingsContext'
 
 const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
+  const { settings } = useSettings()
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(50)
   const [showUser, setShowUser] = useState(true)
@@ -246,26 +249,45 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2 conversation-scroll-area">
+      <div className={cn(
+        "flex-1 overflow-y-auto overflow-x-hidden conversation-scroll-area",
+        settings.conversationView === 'messaging'
+          ? "p-4 bg-background"
+          : "p-2 space-y-2"
+      )}>
         {messages
           .filter(message => {
             if (message.role === 'user' && !showUser) return false
             if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
             return true
           })
-          .map((message, index, filteredMessages) => (
-            <div 
-              key={message.id || index}
-              id={message.id ? `message-${message.id}` : undefined}
-              className="max-w-full"
-            >
-              <MessageBubble
-                message={message}
-                isFirst={index === 0}
-                isLast={index === filteredMessages.length - 1}
-              />
-            </div>
-          ))}
+          .map((message, index, filteredMessages) => {
+            // Use messaging view if enabled
+            if (settings.conversationView === 'messaging') {
+              return (
+                <MessagingBubble
+                  key={message.id || index}
+                  message={message}
+                  showTimestamp={settings.showTimestamps === 'always'}
+                />
+              )
+            }
+
+            // Use detailed view (default)
+            return (
+              <div
+                key={message.id || index}
+                id={message.id ? `message-${message.id}` : undefined}
+                className="max-w-full"
+              >
+                <MessageBubble
+                  message={message}
+                  isFirst={index === 0}
+                  isLast={index === filteredMessages.length - 1}
+                />
+              </div>
+            )
+          })}
         
         {/* No messages after filtering */}
         {messages.filter(message => {

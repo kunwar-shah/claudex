@@ -20,8 +20,38 @@
 /* JetBrains Mono - Better code font than Fira Code (used by shadcn) */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* Geist font (optional - requires local install or CDN) */
-/* Using Inter as primary since Geist requires npm package */
+/* Geist font from Vercel - Used by shadcn/ui */
+@import url('https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/font.css');
+
+/* Popular Google Fonts - Trending in 2024/2025 */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* Additional Popular Google Fonts - More variety */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   /* Font Families - Inter as primary (Tremor pattern) */
@@ -261,4 +291,245 @@ h1, h2, h3, h4, h5, h6 {
 *:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
+}
+
+/* ==================== THEME-AWARE UTILITY CLASSES ==================== */
+
+/* Background utilities using theme variables */
+.bg-primary-header {
+  background-color: hsl(var(--primary));
+}
+
+.bg-primary-header-hover:hover {
+  background-color: hsl(var(--primary-hover));
+}
+
+.bg-primary-hover\\/30:hover {
+  background-color: hsl(var(--primary-hover) / 0.3);
+}
+
+.bg-primary-light {
+  background-color: hsl(var(--primary-light));
+}
+
+.bg-primary-dark {
+  background-color: hsl(var(--primary-dark));
+}
+
+/* Text utilities using theme variables */
+.text-on-primary {
+  color: hsl(var(--text-on-primary));
+}
+
+.text-primary-light {
+  color: hsl(var(--primary-light));
+}
+
+/* Border utilities using theme variables */
+.border-primary {
+  border-color: hsl(var(--primary));
+}
+
+.border-primary-light {
+  border-color: hsl(var(--primary-light) / 0.4);
+}
+
+.divide-primary > * + * {
+  border-color: hsl(var(--primary) / 0.4);
+}
+
+/* ==================== FONT SIZE SETTINGS ==================== */
+
+/* Font Size: Small (14px base) */
+html.font-size-small {
+  font-size: 14px;
+}
+
+html.font-size-small h1 { font-size: 1.5rem; }    /* 21px */
+html.font-size-small h2 { font-size: 1.25rem; }   /* 17.5px */
+html.font-size-small h3 { font-size: 1.125rem; }  /* 15.75px */
+
+/* Font Size: Medium (16px base - default) */
+html.font-size-medium {
+  font-size: 16px;
+}
+
+/* Font Size: Large (18px base) */
+html.font-size-large {
+  font-size: 18px;
+}
+
+html.font-size-large h1 { font-size: 2rem; }      /* 36px */
+html.font-size-large h2 { font-size: 1.625rem; }  /* 29.25px */
+html.font-size-large h3 { font-size: 1.375rem; }  /* 24.75px */
+
+/* Font Size: Extra Large (20px base) */
+html.font-size-extra-large {
+  font-size: 20px;
+}
+
+html.font-size-extra-large h1 { font-size: 2.25rem; }   /* 45px */
+html.font-size-extra-large h2 { font-size: 1.875rem; }  /* 37.5px */
+html.font-size-extra-large h3 { font-size: 1.5rem; }    /* 30px */
+
+/* ==================== DENSITY SETTINGS ==================== */
+
+/* Density: Compact (reduced spacing) */
+html.density-compact {
+  --spacing-multiplier: 0.75;
+}
+
+html.density-compact .p-4 { padding: 0.75rem; }
+html.density-compact .p-6 { padding: 1.125rem; }
+html.density-compact .py-4 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+html.density-compact .py-6 { padding-top: 1.125rem; padding-bottom: 1.125rem; }
+html.density-compact .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+html.density-compact .px-6 { padding-left: 1.125rem; padding-right: 1.125rem; }
+html.density-compact .gap-2 { gap: 0.375rem; }
+html.density-compact .gap-3 { gap: 0.5625rem; }
+html.density-compact .gap-4 { gap: 0.75rem; }
+html.density-compact .space-y-2 > * + * { margin-top: 0.375rem; }
+html.density-compact .space-y-3 > * + * { margin-top: 0.5625rem; }
+html.density-compact .space-y-4 > * + * { margin-top: 0.75rem; }
+
+/* Density: Comfortable (default spacing) */
+html.density-comfortable {
+  --spacing-multiplier: 1;
+}
+
+/* Density: Spacious (increased spacing) */
+html.density-spacious {
+  --spacing-multiplier: 1.25;
+}
+
+html.density-spacious .p-4 { padding: 1.25rem; }
+html.density-spacious .p-6 { padding: 1.875rem; }
+html.density-spacious .py-4 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+html.density-spacious .py-6 { padding-top: 1.875rem; padding-bottom: 1.875rem; }
+html.density-spacious .px-4 { padding-left: 1.25rem; padding-right: 1.25rem; }
+html.density-spacious .px-6 { padding-left: 1.875rem; padding-right: 1.875rem; }
+html.density-spacious .gap-2 { gap: 0.625rem; }
+html.density-spacious .gap-3 { gap: 0.9375rem; }
+html.density-spacious .gap-4 { gap: 1.25rem; }
+html.density-spacious .space-y-2 > * + * { margin-top: 0.625rem; }
+html.density-spacious .space-y-3 > * + * { margin-top: 0.9375rem; }
+html.density-spacious .space-y-4 > * + * { margin-top: 1.25rem; }
+
+/* ==================== ANIMATION SETTINGS ==================== */
+
+/* When animations are disabled, set all animation and transition durations to 0 */
+html:has([style*="--animation-duration: 0s"]) *,
+html:has([style*="--animation-duration: 0s"]) *::before,
+html:has([style*="--animation-duration: 0s"]) *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Tailwind animation classes respect the setting */
+html:has([style*="--animation-duration: 0s"]) .animate-fade-in,
+html:has([style*="--animation-duration: 0s"]) .animate-fade-in-up,
+html:has([style*="--animation-duration: 0s"]) .animate-slide-in,
+html:has([style*="--animation-duration: 0s"]) .animate-spin,
+html:has([style*="--animation-duration: 0s"]) .animate-pulse,
+html:has([style*="--animation-duration: 0s"]) .animate-bounce {
+  animation: none !important;
+}
+
+/* ==================== FONT FAMILY SETTINGS ==================== */
+
+/* Apply font family from settings - Override everything */
+html,
+body,
+#root,
+*:not(.font-preview) {
+  font-family: var(--font-family, var(--font-sans)) !important;
+}
+
+/* Preserve monospace for code elements */
+code,
+pre,
+kbd,
+samp,
+.font-mono,
+[class*="mono"] {
+  font-family: var(--font-mono) !important;
+}
+
+/* Font preview in settings - allow inline styles to work */
+.font-preview {
+  /* Inline styles will take precedence here */
+}
+
+/* ==================== FONT SIZE SETTINGS ==================== */
+
+/* Apply font size from settings */
+html {
+  font-size: var(--base-font-size, 1rem);
+}
+
+/* Scale headings proportionally */
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1.125em; }
+h5 { font-size: 1em; }
+h6 { font-size: 0.875em; }
+
+/* ==================== BORDER RADIUS SETTINGS ==================== */
+
+/* Apply border radius to cards and rounded components */
+html.border-sharp .rounded,
+html.border-sharp .rounded-lg,
+html.border-sharp .rounded-md,
+html.border-sharp .rounded-xl,
+html.border-sharp [class*="tremor-"] {
+  border-radius: 0 !important;
+}
+
+html.border-rounded .rounded {
+  border-radius: 0.375rem !important;
+}
+
+html.border-rounded .rounded-md {
+  border-radius: 0.5rem !important;
+}
+
+html.border-rounded .rounded-lg {
+  border-radius: 0.5rem !important;
+}
+
+html.border-rounded .rounded-xl {
+  border-radius: 0.75rem !important;
+}
+
+html.border-extra-rounded .rounded {
+  border-radius: 0.75rem !important;
+}
+
+html.border-extra-rounded .rounded-md {
+  border-radius: 1rem !important;
+}
+
+html.border-extra-rounded .rounded-lg {
+  border-radius: 1rem !important;
+}
+
+html.border-extra-rounded .rounded-xl {
+  border-radius: 1.5rem !important;
+}
+
+/* Tremor Card Styling - Apply border radius */
+[class*="tremor-Card-root"],
+[class*="tremor-Card"],
+.tremor-Card-root {
+  border-radius: var(--border-radius, 0.5rem) !important;
+}
+
+/* Ensure Tremor charts and components use the border radius */
+[class*="tremor-BarChart"],
+[class*="tremor-DonutChart"],
+[class*="tremor-ProgressBar"] {
+  border-radius: var(--border-radius, 0.5rem) !important;
 }

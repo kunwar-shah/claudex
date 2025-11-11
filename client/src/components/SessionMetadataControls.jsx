@@ -130,11 +130,11 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
 
   // Full version (for session detail page)
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+    <div className="bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg p-4 space-y-4">
       {/* Title Section */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-semibold text-slate-700">Session Title</label>
+          <label className="text-sm font-semibold text-[hsl(var(--text-primary))]">Session Title</label>
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="text-xs text-blue-600 hover:text-blue-700"
@@ -150,7 +150,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
               value={customTitle}
               onChange={(e) => setCustomTitle(e.target.value)}
               placeholder={currentTitle}
-              className="flex-1 px-3 py-2 border border-slate-300 rounded text-sm"
+              className="flex-1 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
               autoFocus
             />
             <button
@@ -162,10 +162,10 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
             </button>
           </div>
         ) : (
-          <div className="text-sm text-slate-900">
+          <div className="text-sm text-[hsl(var(--text-primary))]">
             {displayTitle}
             {metadata.customTitle && (
-              <span className="ml-2 text-xs text-slate-500">(custom)</span>
+              <span className="ml-2 text-xs text-[hsl(var(--text-tertiary))]">(custom)</span>
             )}
           </div>
         )}
@@ -174,13 +174,13 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
       {/* Visibility Toggle */}
       <div>
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-slate-700">Visibility</label>
+          <label className="text-sm font-semibold text-[hsl(var(--text-primary))]">Visibility</label>
           <button
             onClick={() => toggleVisibilityMutation.mutate()}
             disabled={toggleVisibilityMutation.isPending}
             className={`px-3 py-1.5 rounded text-xs font-medium ${
               metadata.isHidden
-                ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                ? 'bg-[hsl(var(--border))] text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--border))]'
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
@@ -191,7 +191,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
 
       {/* Tags Section */}
       <div>
-        <label className="text-sm font-semibold text-slate-700 block mb-2">Tags</label>
+        <label className="text-sm font-semibold text-[hsl(var(--text-primary))] block mb-2">Tags</label>
 
         {/* Existing tags */}
         {metadata.tags?.length > 0 && (
@@ -220,7 +220,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             placeholder="Add tags (comma-separated)"
-            className="flex-1 px-3 py-2 border border-slate-300 rounded text-sm"
+            className="flex-1 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
             onKeyPress={(e) => e.key === 'Enter' && handleAddTags()}
           />
           <button
@@ -236,7 +236,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
       {/* Notes Section */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-semibold text-slate-700">Notes</label>
+          <label className="text-sm font-semibold text-[hsl(var(--text-primary))]">Notes</label>
           <button
             onClick={() => setShowNotes(!showNotes)}
             className="text-xs text-blue-600 hover:text-blue-700"
@@ -251,7 +251,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
               value={notesInput}
               onChange={(e) => setNotesInput(e.target.value)}
               placeholder="Add notes about this session..."
-              className="w-full px-3 py-2 border border-slate-300 rounded text-sm"
+              className="w-full px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
               rows={4}
             />
             <button
@@ -263,7 +263,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
             </button>
           </div>
         ) : metadata.notes ? (
-          <div className="text-sm text-slate-600 bg-slate-50 p-2 rounded">
+          <div className="text-sm text-[hsl(var(--text-secondary))] bg-[hsl(var(--background-secondary))] p-2 rounded">
             {metadata.notes}
           </div>
         ) : null}
@@ -271,7 +271,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
 
       {/* Reset Metadata */}
       {metadata.customTitle || metadata.tags?.length > 0 || metadata.notes ? (
-        <div className="pt-2 border-t border-slate-200">
+        <div className="pt-2 border-t border-[hsl(var(--border))]">
           <button
             onClick={() => {
               if (confirm('Reset all custom metadata for this session?')) {

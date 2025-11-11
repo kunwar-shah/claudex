@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ClipboardList, Folder, Edit, Tag, Eye, Loader2 } from 'lucide-react'
+import { ClipboardList, FolderOpen, PencilLine, Tags, Sparkles, Loader2, Circle } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
 import ProjectComboBox from '../components/ProjectComboBox'
 import SessionTable from '../components/SessionTable'
@@ -91,31 +91,31 @@ const SessionManagementPage = () => {
   if (!projectId) {
     return (
       <div className="h-full bg-background overflow-y-auto">
-        <div className="min-h-full flex items-center justify-center p-6">
+        <div className="min-h-full flex items-center justify-center p-4">
           <div className="max-w-xl w-full">
             {/* Header */}
-            <div className="mb-6 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <ClipboardList className="w-8 h-8 text-primary" />
-                <H1>Session Management</H1>
+            <div className="mb-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <ClipboardList className="w-6 h-6 text-primary" />
+                <h1 className="text-2xl font-bold">Session Management</h1>
               </div>
-              <P className="text-text-secondary">
+              <p className="text-sm text-text-secondary">
                 Organize, rename, tag, and manage your Claude Code sessions
-              </P>
+              </p>
             </div>
 
             {/* Project Selector */}
             <Card className="shadow-xl">
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <Folder className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <H2 className="mb-2">Select a Project</H2>
-                  <Muted className="mb-6">
+              <CardContent className="p-6">
+                <div className="text-center mb-4">
+                  <FolderOpen className="w-12 h-12 text-primary mx-auto mb-3" />
+                  <h2 className="text-lg font-semibold mb-1" style={{ fontVariant: 'small-caps', letterSpacing: '0.05em' }}>Select a Project</h2>
+                  <p className="text-sm text-muted-foreground mb-4">
                     Choose a project to view and manage its sessions
-                  </Muted>
+                  </p>
                 </div>
 
-                <div className="mb-6">
+                <div className="mb-4">
                   <ProjectComboBox
                     projects={projects}
                     selectedProject={selectedProject}
@@ -124,19 +124,19 @@ const SessionManagementPage = () => {
                   />
                 </div>
 
-                <div className="pt-6 border-t border-border">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="pt-4 border-t border-border">
+                  <div className="grid grid-cols-3 gap-3 text-center">
                     <div>
-                      <Edit className="w-6 h-6 text-primary mx-auto mb-2" />
-                      <Muted className="text-xs">Rename Sessions</Muted>
+                      <PencilLine className="w-5 h-5 text-primary mx-auto mb-1.5" />
+                      <p className="text-xs text-muted-foreground">Rename Sessions</p>
                     </div>
                     <div>
-                      <Tag className="w-6 h-6 text-success mx-auto mb-2" />
-                      <Muted className="text-xs">Add Tags</Muted>
+                      <Tags className="w-5 h-5 text-success mx-auto mb-1.5" />
+                      <p className="text-xs text-muted-foreground">Add Tags</p>
                     </div>
                     <div>
-                      <Eye className="w-6 h-6 text-accent mx-auto mb-2" />
-                      <Muted className="text-xs">Hide/Show</Muted>
+                      <Sparkles className="w-5 h-5 text-accent mx-auto mb-1.5" />
+                      <p className="text-xs text-muted-foreground">Hide/Show</p>
                     </div>
                   </div>
                 </div>

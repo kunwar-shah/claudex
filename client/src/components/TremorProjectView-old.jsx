@@ -102,16 +102,16 @@ const TremorProjectView = () => {
         <div className="main-content">
           <div className="tremor-container py-10">
             {/* Header with gradient background */}
-            <div className="mb-8 -mx-8 px-8 py-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-gray-300 rounded-lg shadow-sm">
+            <div className="mb-8 -mx-8 px-8 py-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-[hsl(var(--border-hover))] rounded-lg shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-[hsl(var(--text-primary))] flex items-center gap-3">
                     <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     Analytics Dashboard
                   </h1>
-                  <p className="mt-2 text-sm text-gray-600 max-w-2xl">
+                  <p className="mt-2 text-sm text-[hsl(var(--text-secondary))] max-w-2xl">
                     Comprehensive insights into your Claude Code conversations, projects, and usage patterns.
                   </p>
                 </div>
@@ -129,7 +129,7 @@ const TremorProjectView = () => {
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-blue-500">
                 <Flex alignItems="start" justifyContent="between">
                   <div>
-                    <Text className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Projects</Text>
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--text-tertiary))]">Total Projects</Text>
                     <Metric className="tremor-metric-sm mt-2">{totalProjectsCount}</Metric>
                   </div>
                   <div className="p-3 bg-blue-100 rounded-lg">
@@ -139,7 +139,7 @@ const TremorProjectView = () => {
                   </div>
                 </Flex>
                 <div className="mt-4">
-                  <Text className="text-xs text-gray-600">
+                  <Text className="text-xs text-[hsl(var(--text-secondary))]">
                     Organized workspace collections
                   </Text>
                 </div>
@@ -148,7 +148,7 @@ const TremorProjectView = () => {
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-emerald-500">
                 <Flex alignItems="start" justifyContent="between">
                   <div>
-                    <Text className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Sessions</Text>
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--text-tertiary))]">Total Sessions</Text>
                     <Metric className="tremor-metric-sm mt-2">{totalSessionsCount.toLocaleString()}</Metric>
                   </div>
                   <div className="p-3 bg-emerald-100 rounded-lg">
@@ -158,7 +158,7 @@ const TremorProjectView = () => {
                   </div>
                 </Flex>
                 <div className="mt-4">
-                  <Text className="text-xs text-gray-600">
+                  <Text className="text-xs text-[hsl(var(--text-secondary))]">
                     Conversation threads tracked
                   </Text>
                 </div>
@@ -167,7 +167,7 @@ const TremorProjectView = () => {
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-purple-500">
                 <Flex alignItems="start" justifyContent="between">
                   <div>
-                    <Text className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Messages</Text>
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--text-tertiary))]">Total Messages</Text>
                     <Metric className="tremor-metric-sm mt-2">
                       {totalMessagesCount > 1000 ? `${(totalMessagesCount / 1000).toFixed(1)}K` : totalMessagesCount}
                     </Metric>
@@ -179,7 +179,7 @@ const TremorProjectView = () => {
                   </div>
                 </Flex>
                 <div className="mt-4">
-                  <Text className="text-xs text-gray-600">
+                  <Text className="text-xs text-[hsl(var(--text-secondary))]">
                     AI interactions processed
                   </Text>
                 </div>
@@ -188,7 +188,7 @@ const TremorProjectView = () => {
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-amber-500">
                 <Flex alignItems="start" justifyContent="between">
                   <div>
-                    <Text className="text-xs font-semibold uppercase tracking-wider text-gray-500">Active Today</Text>
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--text-tertiary))]">Active Today</Text>
                     <Metric className="tremor-metric-sm mt-2">{activeTodayCount}</Metric>
                   </div>
                   <div className="p-3 bg-amber-100 rounded-lg">
@@ -198,7 +198,7 @@ const TremorProjectView = () => {
                   </div>
                 </Flex>
                 <div className="mt-4">
-                  <Text className="text-xs text-gray-600">
+                  <Text className="text-xs text-[hsl(var(--text-secondary))]">
                     Projects modified today
                   </Text>
                 </div>
@@ -231,27 +231,27 @@ const TremorProjectView = () => {
                     variant="donut"
                   />
                 </div>
-                <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-[hsl(var(--border))]">
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#3b82f6'}}></div>
-                      <Text className="text-xs text-gray-500">User</Text>
+                      <Text className="text-xs text-[hsl(var(--text-tertiary))]">User</Text>
                     </div>
                     <Metric className="text-lg text-blue-600">{Math.floor(totalMessagesCount * 0.44).toLocaleString()}</Metric>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#10b981'}}></div>
-                      <Text className="text-xs text-gray-500">Assistant</Text>
+                      <Text className="text-xs text-[hsl(var(--text-tertiary))]">Assistant</Text>
                     </div>
                     <Metric className="text-lg text-emerald-600">{Math.floor(totalMessagesCount * 0.47).toLocaleString()}</Metric>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#64748b'}}></div>
-                      <Text className="text-xs text-gray-500">System</Text>
+                      <Text className="text-xs text-[hsl(var(--text-tertiary))]">System</Text>
                     </div>
-                    <Metric className="text-lg text-slate-600">{Math.floor(totalMessagesCount * 0.09).toLocaleString()}</Metric>
+                    <Metric className="text-lg text-[hsl(var(--text-secondary))]">{Math.floor(totalMessagesCount * 0.09).toLocaleString()}</Metric>
                   </div>
                 </div>
               </Card>
@@ -269,7 +269,7 @@ const TremorProjectView = () => {
                     {/* Sessions Chart */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-gray-700">Sessions by Project</Text>
+                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Sessions by Project</Text>
                         <Badge color="blue" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.sessions, 0)}</Badge>
                       </div>
                       <BarList
@@ -283,9 +283,9 @@ const TremorProjectView = () => {
                     </div>
 
                     {/* Messages Chart */}
-                    <div className="pt-4 border-t border-gray-200">
+                    <div className="pt-4 border-t border-[hsl(var(--border))]">
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-gray-700">Messages by Project</Text>
+                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Messages by Project</Text>
                         <Badge color="emerald" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.messages, 0).toLocaleString()}</Badge>
                       </div>
                       <BarList
@@ -299,12 +299,12 @@ const TremorProjectView = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex h-48 items-center justify-center bg-gray-50 rounded-lg">
+                  <div className="flex h-48 items-center justify-center bg-[hsl(var(--background-secondary))] rounded-lg">
                     <div className="text-center">
                       <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <Text className="text-gray-500">Loading project data...</Text>
+                      <Text className="text-[hsl(var(--text-tertiary))]">Loading project data...</Text>
                     </div>
                   </div>
                 )}
@@ -313,7 +313,7 @@ const TremorProjectView = () => {
 
             {/* Project List - Enterprise Design */}
             <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
-              <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
+              <div className="mb-6 flex items-center justify-between border-b border-[hsl(var(--border))] pb-4">
                 <div>
                   <Title className="text-xl font-bold">All Projects</Title>
                   <Text className="text-sm">Select a project to view detailed analytics</Text>
@@ -323,19 +323,19 @@ const TremorProjectView = () => {
                 </Badge>
               </div>
               {allProjects.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="text-center py-12 bg-[hsl(var(--background-secondary))] rounded-lg">
                   <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
-                  <Title className="text-gray-600 mb-2">No Projects Found</Title>
-                  <Text className="text-gray-500">Start using Claude Code to create conversation projects</Text>
+                  <Title className="text-[hsl(var(--text-secondary))] mb-2">No Projects Found</Title>
+                  <Text className="text-[hsl(var(--text-tertiary))]">Start using Claude Code to create conversation projects</Text>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {allProjects.slice(0, 10).map((project, index) => (
                     <div
                       key={project.id}
-                      className="group flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer transition-all duration-200 hover:shadow-md"
+                      className="group flex items-center justify-between p-4 border border-[hsl(var(--border))] rounded-lg hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer transition-all duration-200 hover:shadow-md"
                       onClick={() => navigate(`/tremor-preview/projects/${project.id}`)}
                     >
                       <div className="flex items-center space-x-4 flex-1">
@@ -345,14 +345,14 @@ const TremorProjectView = () => {
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <Text className="font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                          <Text className="font-semibold text-[hsl(var(--text-primary))] truncate group-hover:text-indigo-600 transition-colors">
                             {project.name.replace('-mnt-c-laragon-www-', '').replace('-home-boss-', '')}
                           </Text>
                           <div className="flex items-center space-x-2 mt-1">
                             <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <Text className="text-xs text-gray-500">
+                            <Text className="text-xs text-[hsl(var(--text-tertiary))]">
                               Updated {formatDistanceToNow(new Date(project.lastModified), { addSuffix: true })}
                             </Text>
                           </div>
@@ -374,8 +374,8 @@ const TremorProjectView = () => {
                     </div>
                   ))}
                   {allProjects.length > 10 && (
-                    <div className="text-center pt-4 border-t border-gray-200 mt-4">
-                      <Text className="text-sm text-gray-500">
+                    <div className="text-center pt-4 border-t border-[hsl(var(--border))] mt-4">
+                      <Text className="text-sm text-[hsl(var(--text-tertiary))]">
                         Showing 10 of {allProjects.length} projects
                       </Text>
                     </div>
@@ -399,13 +399,13 @@ const TremorProjectView = () => {
           {/* Panel Header */}
           <div className="panel-header">
             {!leftPanelCollapsed && (
-              <Text className="font-semibold text-gray-900">Sessions</Text>
+              <Text className="font-semibold text-[hsl(var(--text-primary))]">Sessions</Text>
             )}
             <button
               onClick={() => setLeftPanelCollapsed(!leftPanelCollapsed)}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-1 hover:bg-[hsl(var(--surface-hover))] rounded transition-colors"
             >
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-[hsl(var(--text-tertiary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {leftPanelCollapsed ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 ) : (
@@ -452,7 +452,7 @@ const TremorProjectView = () => {
                       </div>
                       
                       {sessionId === session.sessionId && (
-                        <div className="mt-2 pt-2 border-t border-gray-200">
+                        <div className="mt-2 pt-2 border-t border-[hsl(var(--border))]">
                           <Badge size="xs" color="blue" className="tremor-badge blue">
                             ● Active
                           </Badge>
@@ -480,10 +480,10 @@ const TremorProjectView = () => {
                   <div className="mb-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <Title className="text-2xl font-bold text-slate-800">
+                        <Title className="text-2xl font-bold text-[hsl(var(--text-primary))]">
                           Project Analytics Dashboard
                         </Title>
-                        <Text className="mt-2 text-slate-600">
+                        <Text className="mt-2 text-[hsl(var(--text-secondary))]">
                           Select a session from the sidebar to view detailed conversation analytics
                         </Text>
                         <Badge className="mt-2" color="indigo" size="md">
@@ -617,30 +617,30 @@ const TremorProjectView = () => {
 
                   <Grid numItems={1} numItemsLg={2} className="gap-6">
                     <Card className="shadow-lg">
-                      <Title className="mb-4 text-xl font-bold text-slate-800">Top Sessions</Title>
+                      <Title className="mb-4 text-xl font-bold text-[hsl(var(--text-primary))]">Top Sessions</Title>
                       <div className="space-y-3">
                         {sessions
                           .sort((a, b) => b.messageCount - a.messageCount)
                           .slice(0, 8)
                           .map((session, index) => (
                             <div key={session.sessionId} 
-                                 className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                 className="flex justify-between items-center p-3 bg-[hsl(var(--background-secondary))] rounded-lg hover:bg-[hsl(var(--surface-hover))] transition-colors">
                               <div className="flex items-center space-x-3">
                                 <Badge className="flex-shrink-0" color="blue" size="xs">
                                   #{index + 1}
                                 </Badge>
                                 <div>
-                                  <Text className="font-medium text-slate-700 truncate max-w-xs">
+                                  <Text className="font-medium text-[hsl(var(--text-primary))] truncate max-w-xs">
                                     {session.title || `Session ${session.sessionId.slice(0, 8)}...`}
                                   </Text>
-                                  <Text className="text-xs text-slate-500">
+                                  <Text className="text-xs text-[hsl(var(--text-tertiary))]">
                                     {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
                                   </Text>
                                 </div>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Badge color="emerald" size="sm">{session.messageCount}</Badge>
-                                <Text className="text-xs text-slate-500">msgs</Text>
+                                <Text className="text-xs text-[hsl(var(--text-tertiary))]">msgs</Text>
                               </div>
                             </div>
                           ))}
@@ -648,7 +648,7 @@ const TremorProjectView = () => {
                     </Card>
                     
                     <Card className="shadow-lg">
-                      <Title className="mb-4 text-xl font-bold text-slate-800">Session Activity</Title>
+                      <Title className="mb-4 text-xl font-bold text-[hsl(var(--text-primary))]">Session Activity</Title>
                       <BarChart
                         className="h-64"
                         data={sessions
@@ -676,13 +676,13 @@ const TremorProjectView = () => {
           {sessionId && (
             <div className={`${
               rightPanelCollapsed ? 'w-12' : 'w-80'
-            } sidebar-panel transition-all duration-300 flex-shrink-0 border-l border-gray-200`}>
+            } sidebar-panel transition-all duration-300 flex-shrink-0 border-l border-[hsl(var(--border))]`}>
               <div className="panel-header">
                 <button
                   onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  className="p-1 hover:bg-[hsl(var(--surface-hover))] rounded transition-colors"
                 >
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[hsl(var(--text-tertiary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {rightPanelCollapsed ? (
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     ) : (
@@ -691,7 +691,7 @@ const TremorProjectView = () => {
                   </svg>
                 </button>
                 {!rightPanelCollapsed && (
-                  <Text className="font-semibold text-gray-900">Analytics</Text>
+                  <Text className="font-semibold text-[hsl(var(--text-primary))]">Analytics</Text>
                 )}
               </div>
 
@@ -735,7 +735,7 @@ const TremorProjectView = () => {
                           {systemMessages > 0 && (
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
-                                <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
+                                <div className="w-3 h-3 bg-[hsl(var(--background-secondary))]0 rounded-full"></div>
                                 <Text className="text-xs">System Messages</Text>
                               </div>
                               <Badge className="tremor-badge gray">{systemMessages}</Badge>
@@ -784,7 +784,7 @@ const TremorProjectView = () => {
                           </Text>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-gray-200">
+                        <div className="mt-4 pt-3 border-t border-[hsl(var(--border))]">
                           <Text className="text-secondary mb-2">Activity Level</Text>
                           <div className="flex justify-between text-sm mb-1">
                             <span className="text-secondary">Engagement</span>
@@ -851,7 +851,7 @@ const TremorProjectView = () => {
                           </div>
 
                           {(sessionData.stats.tokens.totalCacheCreationTokens > 0 || sessionData.stats.tokens.totalCacheReadTokens > 0) && (
-                            <div className="mt-4 pt-3 border-t border-gray-200">
+                            <div className="mt-4 pt-3 border-t border-[hsl(var(--border))]">
                               <Text className="text-secondary mb-2">Cache Efficiency</Text>
                               <div className="flex justify-between text-sm mb-2">
                                 <span className="text-secondary">Hit Rate</span>

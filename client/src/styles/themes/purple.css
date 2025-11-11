@@ -46,13 +46,4 @@
   --button-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
-/* Dark Mode Support (Future) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: 222 47% 11%;
-    --surface: 217 33% 17%;
-    --text-primary: 210 40% 98%;
-    --text-secondary: 215 20% 65%;
-    --border: 217 33% 24%;
-  }
-}
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

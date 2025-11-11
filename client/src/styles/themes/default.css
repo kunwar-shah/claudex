@@ -1,0 +1,54 @@
+/**
+ * Default Theme - Neutral Slate
+ * Professional black/white/gray aesthetic
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Slate */
+  --primary: 215 20% 25%;        /* Dark slate (#3B4556) */
+  --primary-hover: 215 25% 18%;  /* Darker slate */
+  --primary-light: 215 20% 95%;  /* Very light slate */
+  --primary-dark: 215 25% 15%;   /* Very dark slate */
+
+  /* Secondary Accent - Neutral Gray */
+  --secondary: 215 15% 50%;      /* Medium gray */
+  --secondary-hover: 215 15% 40%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 215 20% 25%;           /* Same as primary */
+
+  /* Background Colors - Near White */
+  --background: 0 0% 100%;       /* Pure white */
+  --background-secondary: 0 0% 98%;
+  --surface: 0 0% 100%;
+  --surface-hover: 0 0% 97%;
+
+  /* Text Colors - Slate/Charcoal */
+  --text-primary: 215 25% 12%;   /* Almost black */
+  --text-secondary: 215 16% 40%; /* Medium gray */
+  --text-tertiary: 215 14% 60%;  /* Light gray */
+  --text-on-primary: 0 0% 100%;  /* White */
+
+  /* Border Colors - Light Gray */
+  --border: 215 14% 91%;         /* Light gray */
+  --border-hover: 215 16% 84%;
+  --border-focus: 215 20% 25%;
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 215 14% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 215 14% 91%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific */
+  --header-bg: 215 20% 25%;      /* Dark slate header */
+  --header-text: 0 0% 100%;      /* White text */
+  --header-border: 215 25% 18%;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

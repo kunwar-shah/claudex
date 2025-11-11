@@ -5,6 +5,7 @@ import SessionList from './SessionList'
 import ConversationThread from './ConversationThread'
 import SummaryPanel from './SummaryPanel'
 import EmptyState from './layout/EmptyState'
+import LandingPage from './LandingPage'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 
@@ -15,15 +16,9 @@ const ProjectView = () => {
   const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false)
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false)
 
-  // No project selected - Clean empty state
+  // No project selected - Show animated landing page
   if (!projectId) {
-    return (
-      <EmptyState
-        icon={MessageSquare}
-        title="Welcome to Claudex"
-        description="Select a project from the header to start browsing conversations"
-      />
-    )
+    return <LandingPage />
   }
 
   return (

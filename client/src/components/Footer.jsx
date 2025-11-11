@@ -124,20 +124,20 @@ ${technicalMessages
 
 
   return (
-    <footer className="border-t border-border bg-surface px-6 py-3">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
+    <footer className="border-t border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-6 py-1.5">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
         {/* Left Section - Session Info */}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           {sessionId && sessionData && (
             <>
-              <div className="flex items-center gap-2">
-                <Activity className="w-3.5 h-3.5 text-success animate-pulse" />
-                <span className="text-sm font-medium text-text-primary">
+              <div className="flex items-center gap-1.5">
+                <Activity className="w-3 h-3 text-success animate-pulse" />
+                <span className="text-xs font-medium text-text-primary">
                   {sessionData.pagination?.total || 0} messages
                 </span>
               </div>
 
-              <div className="text-sm text-text-secondary">
+              <div className="text-xs text-text-secondary">
                 Template: <span className="font-medium text-primary">{sessionData.session?.template || 'unknown'}</span>
               </div>
 
@@ -145,10 +145,10 @@ ${technicalMessages
                 variant="ghost"
                 size="sm"
                 onClick={copyProjectContext}
-                className="gap-2"
+                className="gap-1.5 h-7 text-xs"
                 title="Copy project context for Claude Code"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3 h-3" />
                 <span className="hidden sm:inline">Copy Context</span>
               </Button>
 
@@ -163,8 +163,8 @@ ${technicalMessages
         </div>
 
         {/* Right Section - Links & Controls */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="text-xs text-text-tertiary font-medium">
               Claudex v1.1
             </span>
@@ -173,10 +173,10 @@ ${technicalMessages
               href="https://github.com/kunwar-shah/claudex"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-primary transition-colors duration-fast"
+              className="flex items-center gap-1 text-xs text-text-secondary hover:text-primary transition-colors duration-fast"
               title="View on GitHub"
             >
-              <Github className="w-4 h-4" />
+              <Github className="w-3 h-3" />
               <span className="hidden sm:inline">GitHub</span>
             </a>
 
@@ -184,24 +184,25 @@ ${technicalMessages
               href="https://kunwar-shah.github.io/claudex/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-primary transition-colors duration-fast"
+              className="flex items-center gap-1 text-xs text-text-secondary hover:text-primary transition-colors duration-fast"
               title="View Documentation"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-3 h-3" />
               <span className="hidden sm:inline">Docs</span>
             </a>
           </div>
 
-          <div className="h-6 w-px bg-border" />
+          <div className="h-5 w-px bg-border" />
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <Button
               variant="ghost"
               size="icon"
               onClick={scrollToTop}
               title="Scroll to top"
+              className="h-7 w-7"
             >
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-3 h-3" />
             </Button>
 
             <Button
@@ -209,8 +210,9 @@ ${technicalMessages
               size="icon"
               onClick={scrollToBottom}
               title="Scroll to bottom"
+              className="h-7 w-7"
             >
-              <ArrowDown className="w-4 h-4" />
+              <ArrowDown className="w-3 h-3" />
             </Button>
           </div>
         </div>

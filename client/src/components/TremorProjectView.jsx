@@ -38,6 +38,8 @@ const TremorProjectView = () => {
   const navigate = useNavigate()
   const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false)
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false)
+  const [projectsPerPage, setProjectsPerPage] = useState(10)
+  const [currentProjectPage, setCurrentProjectPage] = useState(1)
 
   const handleSessionSelect = (sessionId) => {
     navigate(`/tremor-preview/projects/${projectId}/sessions/${sessionId}`)
@@ -112,7 +114,7 @@ const TremorProjectView = () => {
         <div className="main-content">
           <div className="tremor-container py-10">
             {/* Header with gradient background */}
-            <div className="mb-8 -mx-8 px-8 py-8 bg-surface border-2 border-border rounded-lg shadow-sm">
+            <div className="mb-8 px-8 py-8 bg-surface border-2 border-border rounded-lg shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -123,7 +125,7 @@ const TremorProjectView = () => {
                     Comprehensive insights into your Claude Code conversations, projects, and usage patterns.
                   </p>
                 </div>
-                <Badge size="lg" color="indigo">
+                <Badge size="lg" className="bg-indigo-500/10 text-indigo-600 rounded">
                   <Zap className="w-4 h-4 mr-1" />
                   Live Data
                 </Badge>
@@ -211,7 +213,7 @@ const TremorProjectView = () => {
                     <Title className="text-lg font-bold">Message Distribution</Title>
                     <Text className="text-sm">Breakdown by conversation role</Text>
                   </div>
-                  <Badge color="blue" size="sm">Live</Badge>
+                  <Badge size="sm" className="bg-blue-500/10 text-blue-600 rounded">Live</Badge>
                 </div>
                 <div className="tremor-chart">
                   <DonutChart
@@ -260,15 +262,15 @@ const TremorProjectView = () => {
                     <Title className="text-lg font-bold">Project Activity</Title>
                     <Text className="text-sm">Top 5 projects by engagement</Text>
                   </div>
-                  <Badge color="emerald" size="sm">Updated</Badge>
+                  <Badge size="sm" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Updated</Badge>
                 </div>
                 {projectActivityData.length > 0 ? (
                   <div className="space-y-6">
                     {/* Sessions Chart */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-gray-700">Sessions by Project</Text>
-                        <Badge color="blue" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.sessions, 0)}</Badge>
+                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Sessions by Project</Text>
+                        <Badge size="xs" className="bg-blue-500/10 text-blue-600 rounded">Total: {projectActivityData.reduce((sum, p) => sum + p.sessions, 0)}</Badge>
                       </div>
                       <BarList
                         data={projectActivityData.map(p => ({
@@ -283,8 +285,8 @@ const TremorProjectView = () => {
                     {/* Messages Chart */}
                     <div className="pt-4 border-t border-border">
                       <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-gray-700">Messages by Project</Text>
-                        <Badge color="emerald" size="xs">Total: {projectActivityData.reduce((sum, p) => sum + p.messages, 0).toLocaleString()}</Badge>
+                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Messages by Project</Text>
+                        <Badge size="xs" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Total: {projectActivityData.reduce((sum, p) => sum + p.messages, 0).toLocaleString()}</Badge>
                       </div>
                       <BarList
                         data={projectActivityData.map(p => ({
@@ -314,7 +316,7 @@ const TremorProjectView = () => {
                   <Title className="text-xl font-bold">All Projects</Title>
                   <Text className="text-sm">Select a project to view detailed analytics</Text>
                 </div>
-                <Badge color="indigo" size="lg">
+                <Badge size="lg" className="bg-indigo-500/10 text-indigo-600 rounded">
                   {allProjects.length} Total
                 </Badge>
               </div>
@@ -325,52 +327,84 @@ const TremorProjectView = () => {
                   <Text className="text-text-secondary">Start using Claude Code to create conversation projects</Text>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {allProjects.slice(0, 10).map((project, index) => (
-                    <div
-                      key={project.id}
-                      className="group flex items-center justify-between p-4 border border-border rounded-lg hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all duration-200 hover:shadow-md"
-                      onClick={() => navigate(`/tremor-preview/projects/${project.id}`)}
-                    >
-                      <div className="flex items-center space-x-4 flex-1">
-                        <div className="flex-shrink-0">
-                          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">
-                            {index + 1}
+                <>
+                  <div className="space-y-2">
+                    {allProjects
+                      .slice((currentProjectPage - 1) * projectsPerPage, currentProjectPage * projectsPerPage)
+                      .map((project, index) => {
+                        const globalIndex = (currentProjectPage - 1) * projectsPerPage + index
+                        return (
+                          <div
+                            key={project.id}
+                            className="group flex items-center justify-between p-4 border border-border rounded-lg hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all duration-200 hover:shadow-md"
+                            onClick={() => navigate(`/tremor-preview/projects/${project.id}`)}
+                          >
+                            <div className="flex items-center space-x-4 flex-1">
+                              <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">
+                                  {globalIndex + 1}
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <Text className="font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
+                                  {project.name.replace('-mnt-c-laragon-www-', '').replace('-home-boss-', '')}
+                                </Text>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
+                                  <Text className="text-xs text-text-secondary">
+                                    Updated {formatDistanceToNow(new Date(project.lastModified), { addSuffix: true })}
+                                  </Text>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-6">
+                              <div className="text-center px-3 py-2 bg-primary/5 rounded-lg">
+                                <Text className="text-xs text-primary font-medium">Sessions</Text>
+                                <Metric className="text-base text-primary">{project.sessionCount || 0}</Metric>
+                              </div>
+                              <div className="text-center px-3 py-2 bg-success/10 rounded-lg">
+                                <Text className="text-xs text-success font-medium">Messages</Text>
+                                <Metric className="text-base text-success">{project.messageCount || 0}</Metric>
+                              </div>
+                              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <Text className="font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
-                            {project.name.replace('-mnt-c-laragon-www-', '').replace('-home-boss-', '')}
-                          </Text>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Clock className="w-3 h-3 text-muted-foreground" />
-                            <Text className="text-xs text-text-secondary">
-                              Updated {formatDistanceToNow(new Date(project.lastModified), { addSuffix: true })}
-                            </Text>
-                          </div>
+                        )
+                      })}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {allProjects.length > projectsPerPage && (
+                    <div className="pt-4 border-t border-border mt-4">
+                      <div className="flex items-center justify-between">
+                        <Text className="text-sm text-text-secondary">
+                          Showing {((currentProjectPage - 1) * projectsPerPage) + 1}-{Math.min(currentProjectPage * projectsPerPage, allProjects.length)} of {allProjects.length} projects
+                        </Text>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentProjectPage(Math.max(1, currentProjectPage - 1))}
+                            disabled={currentProjectPage === 1}
+                            className="px-3 py-1 text-sm border border-border rounded hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                            Previous
+                          </button>
+                          <span className="text-sm text-text-secondary">
+                            Page {currentProjectPage} of {Math.ceil(allProjects.length / projectsPerPage)}
+                          </span>
+                          <button
+                            onClick={() => setCurrentProjectPage(Math.min(Math.ceil(allProjects.length / projectsPerPage), currentProjectPage + 1))}
+                            disabled={currentProjectPage >= Math.ceil(allProjects.length / projectsPerPage)}
+                            className="px-3 py-1 text-sm border border-border rounded hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                          >
+                            Next
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center px-3 py-2 bg-primary/5 rounded-lg">
-                          <Text className="text-xs text-primary font-medium">Sessions</Text>
-                          <Metric className="text-base text-primary">{project.sessionCount || 0}</Metric>
-                        </div>
-                        <div className="text-center px-3 py-2 bg-success/10 rounded-lg">
-                          <Text className="text-xs text-success font-medium">Messages</Text>
-                          <Metric className="text-base text-success">{project.messageCount || 0}</Metric>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </div>
-                    </div>
-                  ))}
-                  {allProjects.length > 10 && (
-                    <div className="text-center pt-4 border-t border-border mt-4">
-                      <Text className="text-sm text-text-secondary">
-                        Showing 10 of {allProjects.length} projects
-                      </Text>
                     </div>
                   )}
-                </div>
+                </>
               )}
             </Card>
           </div>
@@ -419,7 +453,7 @@ const TremorProjectView = () => {
                         <Text className="text-xs font-medium truncate">
                           {session.title || `Session ${session.sessionId.slice(0, 8)}...`}
                         </Text>
-                        <Badge size="xs" color={sessionId === session.sessionId ? 'blue' : 'gray'} className="tremor-badge">
+                        <Badge size="xs" className={sessionId === session.sessionId ? 'bg-blue-500/10 text-blue-600 rounded' : 'bg-[hsl(var(--background-secondary))]0/10 text-[hsl(var(--text-secondary))] rounded'}>
                           {session.messageCount}
                         </Badge>
                       </div>
@@ -441,7 +475,7 @@ const TremorProjectView = () => {
                       
                       {sessionId === session.sessionId && (
                         <div className="mt-2 pt-2 border-t border-border">
-                          <Badge size="xs" color="blue" className="tremor-badge blue">
+                          <Badge size="xs" className="bg-blue-500/10 text-blue-600 rounded">
                             ● Active
                           </Badge>
                         </div>
@@ -472,7 +506,7 @@ const TremorProjectView = () => {
                           <Title className="text-2xl font-bold text-text-primary">
                             Project Analytics Dashboard
                           </Title>
-                          <Badge color="blue" size="sm" className="flex-shrink-0 text-white font-semibold">
+                          <Badge size="sm" className="flex-shrink-0 bg-blue-500/10 text-blue-600 rounded">
                             Live
                           </Badge>
                         </div>
@@ -512,7 +546,7 @@ const TremorProjectView = () => {
                           <Metric className="text-3xl font-bold text-success mb-1">
                             {sessions.reduce((acc, s) => acc + s.messageCount, 0).toLocaleString()}
                           </Metric>
-                          <Badge color="emerald" size="xs" className="mt-2 text-white font-medium">Across all sessions</Badge>
+                          <Badge size="xs" className="mt-2 bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Across all sessions</Badge>
                         </div>
                         <div className="p-3 bg-success/10 rounded-xl border border-success/20">
                           <MessageSquare className="w-7 h-7 text-success" />
@@ -527,7 +561,7 @@ const TremorProjectView = () => {
                           <Metric className="text-3xl font-bold text-accent mb-1">
                             {Math.round(sessions.reduce((acc, s) => acc + s.messageCount, 0) / sessions.length || 0)}
                           </Metric>
-                          <Badge color="purple" size="xs" className="mt-2 text-white font-medium">Per Session</Badge>
+                          <Badge size="xs" className="mt-2 bg-purple-500/10 text-purple-600 rounded">Per Session</Badge>
                         </div>
                         <div className="p-3 bg-accent/10 rounded-xl border border-accent/20">
                           <BarChart3 className="w-7 h-7 text-accent" />
@@ -546,7 +580,7 @@ const TremorProjectView = () => {
                                   ? `${(projectTokenStats.tokens.totalTokens / 1000000).toFixed(1)}M`
                                   : projectTokenStats.tokens.totalTokens.toLocaleString()}
                               </Metric>
-                              <Badge color="blue" size="xs" className="mt-2 text-white font-medium">
+                              <Badge size="xs" className="mt-2 bg-blue-500/10 text-blue-600 rounded">
                                 {projectTokenStats.tokens.totalInputTokens.toLocaleString()} in / {projectTokenStats.tokens.totalOutputTokens.toLocaleString()} out
                               </Badge>
                             </div>
@@ -564,7 +598,7 @@ const TremorProjectView = () => {
                                 {projectTokenStats.tokens.cacheHitRate.toFixed(1)}%
                               </Metric>
                               <ProgressBar value={Math.min(projectTokenStats.tokens.cacheHitRate, 100)} className="mt-2" color="emerald" />
-                              <Badge color="emerald" size="xs" className="mt-3 text-white font-medium">
+                              <Badge size="xs" className="mt-3 bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">
                                 {projectTokenStats.tokens.totalCacheReadTokens.toLocaleString()} cache reads
                               </Badge>
                             </div>
@@ -581,7 +615,7 @@ const TremorProjectView = () => {
                               <Metric className="text-3xl font-bold text-warning mb-1">
                                 {projectTokenStats.tokens.sessionsWithUsage}
                               </Metric>
-                              <Badge color="amber" size="xs" className="mt-2 text-white font-medium">
+                              <Badge size="xs" className="mt-2 bg-amber-500/10 text-amber-600 rounded">
                                 {projectTokenStats.tokens.messagesWithUsage.toLocaleString()} messages tracked
                               </Badge>
                             </div>
@@ -599,7 +633,7 @@ const TremorProjectView = () => {
                     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
                       <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                         <Title className="text-xl font-bold text-text-primary">Top Sessions</Title>
-                        <Badge color="blue" size="sm" className="text-white font-semibold">Top 8</Badge>
+                        <Badge size="sm" className="bg-blue-500/10 text-blue-600 rounded">Top 8</Badge>
                       </div>
                       <div className="space-y-3">
                         {sessions
@@ -609,7 +643,7 @@ const TremorProjectView = () => {
                             <div key={session.sessionId}
                                  className="flex justify-between items-center p-3 bg-surface rounded-lg hover:bg-primary/5 transition-colors">
                               <div className="flex items-center space-x-3">
-                                <Badge className="flex-shrink-0" color="blue" size="xs">
+                                <Badge className="flex-shrink-0 bg-blue-500/10 text-blue-600 rounded" size="xs">
                                   #{index + 1}
                                 </Badge>
                                 <div>
@@ -622,7 +656,7 @@ const TremorProjectView = () => {
                                 </div>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <Badge color="emerald" size="sm">{session.messageCount}</Badge>
+                                <Badge size="sm" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">{session.messageCount}</Badge>
                                 <Text className="text-xs text-text-secondary">msgs</Text>
                               </div>
                             </div>
@@ -633,7 +667,7 @@ const TremorProjectView = () => {
                     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
                       <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                         <Title className="text-xl font-bold text-text-primary">Session Activity</Title>
-                        <Badge color="emerald" size="sm" className="text-white font-semibold">Top 10</Badge>
+                        <Badge size="sm" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Top 10</Badge>
                       </div>
                       <BarChart
                         className="h-64"
@@ -705,7 +739,7 @@ const TremorProjectView = () => {
                               <div className="w-3 h-3 bg-primary/50 rounded-full"></div>
                               <Text className="text-xs">User Messages</Text>
                             </div>
-                            <Badge className="tremor-badge blue">{userMessages}</Badge>
+                            <Badge className="bg-blue-500/10 text-blue-600 rounded">{userMessages}</Badge>
                           </div>
                           
                           <div className="flex items-center justify-between">
@@ -713,7 +747,7 @@ const TremorProjectView = () => {
                               <div className="w-3 h-3 bg-success/100 rounded-full"></div>
                               <Text className="text-xs">Assistant Messages</Text>
                             </div>
-                            <Badge className="tremor-badge emerald">{assistantMessages}</Badge>
+                            <Badge className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">{assistantMessages}</Badge>
                           </div>
                           
                           {systemMessages > 0 && (
@@ -722,7 +756,7 @@ const TremorProjectView = () => {
                                 <div className="w-3 h-3 bg-surface0 rounded-full"></div>
                                 <Text className="text-xs">System Messages</Text>
                               </div>
-                              <Badge className="tremor-badge gray">{systemMessages}</Badge>
+                              <Badge className="bg-[hsl(var(--background-secondary))]0/10 text-[hsl(var(--text-secondary))] rounded">{systemMessages}</Badge>
                             </div>
                           )}
                         </div>
@@ -749,7 +783,7 @@ const TremorProjectView = () => {
                       <div className="space-y-3 mt-4">
                         <div className="flex justify-between items-center">
                           <Text className="text-secondary">Template</Text>
-                          <Badge className="tremor-badge blue">
+                          <Badge className="bg-blue-500/10 text-blue-600 rounded">
                             {currentSession?.template || 'unknown'}
                           </Badge>
                         </div>
@@ -802,7 +836,7 @@ const TremorProjectView = () => {
                                 <div className="w-3 h-3 bg-primary/50 rounded-full"></div>
                                 <Text className="text-xs">Input</Text>
                               </div>
-                              <Badge className="tremor-badge blue">{sessionData.stats.tokens.totalInputTokens.toLocaleString()}</Badge>
+                              <Badge className="bg-blue-500/10 text-blue-600 rounded">{sessionData.stats.tokens.totalInputTokens.toLocaleString()}</Badge>
                             </div>
 
                             <div className="flex items-center justify-between">
@@ -810,7 +844,7 @@ const TremorProjectView = () => {
                                 <div className="w-3 h-3 bg-success/100 rounded-full"></div>
                                 <Text className="text-xs">Output</Text>
                               </div>
-                              <Badge className="tremor-badge emerald">{sessionData.stats.tokens.totalOutputTokens.toLocaleString()}</Badge>
+                              <Badge className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">{sessionData.stats.tokens.totalOutputTokens.toLocaleString()}</Badge>
                             </div>
 
                             {sessionData.stats.tokens.totalCacheCreationTokens > 0 && (
@@ -819,7 +853,7 @@ const TremorProjectView = () => {
                                   <div className="w-3 h-3 bg-warning/100 rounded-full"></div>
                                   <Text className="text-xs">Cache Creation</Text>
                                 </div>
-                                <Badge className="tremor-badge amber">{sessionData.stats.tokens.totalCacheCreationTokens.toLocaleString()}</Badge>
+                                <Badge className="bg-amber-500/10 text-amber-600 rounded">{sessionData.stats.tokens.totalCacheCreationTokens.toLocaleString()}</Badge>
                               </div>
                             )}
 
@@ -829,7 +863,7 @@ const TremorProjectView = () => {
                                   <div className="w-3 h-3 bg-accent/100 rounded-full"></div>
                                   <Text className="text-xs">Cache Reads</Text>
                                 </div>
-                                <Badge className="tremor-badge purple">{sessionData.stats.tokens.totalCacheReadTokens.toLocaleString()}</Badge>
+                                <Badge className="bg-purple-500/10 text-purple-600 rounded">{sessionData.stats.tokens.totalCacheReadTokens.toLocaleString()}</Badge>
                               </div>
                             )}
                           </div>

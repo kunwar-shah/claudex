@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
+import { Circle, CircleDot, PencilLine, MessageCircle, Eye, Trash2, RotateCcw } from 'lucide-react'
 import { sessionMetadataApi } from '../services/api'
 
 /**
@@ -118,9 +119,9 @@ const SessionTable = ({
   const someSelected = sortedSessions.some(s => selectedSessions.includes(s.sessionId))
 
   return (
-    <div className="bg-white rounded-lg shadow border border-slate-200">
+    <div className="bg-[hsl(var(--surface))] rounded-lg shadow border border-[hsl(var(--border))]">
       <table className="w-full">
-        <thead className="bg-slate-50 border-b border-slate-200">
+        <thead className="bg-[hsl(var(--background-secondary))] border-b border-[hsl(var(--border))]">
           <tr>
             <th className="w-12 px-4 py-3">
               <input
@@ -130,25 +131,25 @@ const SessionTable = ({
                   if (input) input.indeterminate = !allSelected && someSelected
                 }}
                 onChange={(e) => onSelectAll(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                className="w-4 h-4 text-[hsl(var(--primary))] rounded focus:ring-2 focus:ring-[hsl(var(--primary))]"
               />
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="text-left px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Session Title
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="text-left px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Tags
             </th>
-            <th className="text-center px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="text-center px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Messages
             </th>
-            <th className="text-center px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="text-center px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Status
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="text-left px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Last Updated
             </th>
-            <th className="w-20 px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <th className="w-20 px-4 py-3 text-xs font-semibold text-[hsl(var(--text-primary))] uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -156,7 +157,7 @@ const SessionTable = ({
         <tbody className="divide-y divide-slate-200">
           {sortedSessions.length === 0 ? (
             <tr>
-              <td colSpan="7" className="px-4 py-12 text-center text-slate-500">
+              <td colSpan="7" className="px-4 py-12 text-center text-[hsl(var(--text-tertiary))]">
                 <svg className="w-12 h-12 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -250,14 +251,14 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
   }
 
   return (
-    <tr className={`hover:bg-slate-50 transition-colors ${isHidden ? 'opacity-60' : ''}`}>
+    <tr className={`hover:bg-[hsl(var(--background-secondary))] transition-colors ${isHidden ? 'opacity-60' : ''}`}>
       {/* Checkbox */}
       <td className="px-4 py-3">
         <input
           type="checkbox"
           checked={isSelected}
           onChange={(e) => onSelect(e.target.checked)}
-          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+          className="w-4 h-4 text-[hsl(var(--primary))] rounded focus:ring-2 focus:ring-[hsl(var(--primary))]"
         />
       </td>
 
@@ -270,46 +271,44 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSaveTitle()}
-              className="flex-1 px-2 py-1 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1 text-sm border border-[hsl(var(--border-hover))] rounded focus:ring-2 focus:ring-[hsl(var(--primary))]"
               autoFocus
             />
             <button
               onClick={handleSaveTitle}
               disabled={setTitleMutation.isPending}
-              className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-2 py-1 text-xs bg-[hsl(var(--primary))] text-white rounded hover:bg-[hsl(var(--primary-hover))]"
             >
               {setTitleMutation.isPending ? 'Saving...' : 'Save'}
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="px-2 py-1 text-xs bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
+              className="px-2 py-1 text-xs bg-[hsl(var(--border))] text-[hsl(var(--text-primary))] rounded hover:bg-[hsl(var(--border))]"
             >
               Cancel
             </button>
           </div>
         ) : (
           <div className="flex items-start gap-2">
-            {isHidden && <span className="text-xs flex-shrink-0">👁️‍🗨️</span>}
-            <span className="text-sm font-medium text-slate-900 break-words line-clamp-3">
+            {isHidden && <CircleDot className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />}
+            <span className="text-sm font-medium text-[hsl(var(--text-primary))] break-words line-clamp-3">
               {displayTitle}
             </span>
             {metadata.customTitle && (
-              <span className="text-xs text-blue-600 flex-shrink-0">✏️</span>
+              <PencilLine className="w-3 h-3 text-[hsl(var(--primary))] flex-shrink-0 mt-0.5" />
             )}
             <button
               onClick={() => {
                 setEditTitle(displayTitle)
                 setIsEditing(true)
               }}
-              className="text-xs text-slate-400 hover:text-blue-600"
+              className="text-xs text-slate-400 hover:text-[hsl(var(--primary))]"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
+              <PencilLine className="w-3 h-3" />
             </button>
           </div>
         )}
-        <div className="text-xs text-slate-500 mt-1">
+        <div className="text-xs text-[hsl(var(--text-tertiary))] mt-1">
           {session.sessionId.slice(0, 12)}...
         </div>
       </td>
@@ -321,7 +320,7 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
             {metadata.tags.slice(0, 2).map(tag => (
               <span
                 key={tag}
-                className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs"
+                className="inline-block px-2 py-0.5 bg-[hsl(var(--primary-light))] text-[hsl(var(--primary))] rounded text-xs"
               >
                 {tag}
               </span>
@@ -337,7 +336,7 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
 
       {/* Message Count */}
       <td className="px-4 py-3 text-center">
-        <span className="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-sm font-medium">
+        <span className="inline-block px-2 py-1 bg-[hsl(var(--primary-light))] text-[hsl(var(--primary))] rounded text-sm font-medium">
           {session.messageCount}
         </span>
       </td>
@@ -347,18 +346,28 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
         <button
           onClick={() => toggleVisibilityMutation.mutate()}
           disabled={toggleVisibilityMutation.isPending}
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors ${
             isHidden
-              ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+              ? 'bg-[hsl(var(--border))] text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--border))]'
               : 'bg-green-100 text-green-700 hover:bg-green-200'
           }`}
         >
-          {isHidden ? '👁️‍🗨️ Hidden' : '👁️ Visible'}
+          {isHidden ? (
+            <>
+              <CircleDot className="w-3.5 h-3.5" />
+              <span>Hidden</span>
+            </>
+          ) : (
+            <>
+              <Circle className="w-3.5 h-3.5" />
+              <span>Visible</span>
+            </>
+          )}
         </button>
       </td>
 
       {/* Last Updated */}
-      <td className="px-4 py-3 text-sm text-slate-600">
+      <td className="px-4 py-3 text-sm text-[hsl(var(--text-secondary))]">
         {formatDistanceToNow(new Date(session.lastUpdatedAt), { addSuffix: true })}
       </td>
 
@@ -366,9 +375,9 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
       <td className="px-4 py-3 relative">
         <button
           onClick={() => setShowActions(!showActions)}
-          className="p-1 hover:bg-slate-200 rounded transition-colors"
+          className="p-1 hover:bg-[hsl(var(--border))] rounded transition-colors"
         >
-          <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[hsl(var(--text-secondary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
           </svg>
         </button>
@@ -380,15 +389,15 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
               className="fixed inset-0 z-10"
               onClick={() => setShowActions(false)}
             />
-            <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-20">
+            <div className="absolute right-0 top-full mt-1 w-56 bg-[hsl(var(--surface))] rounded-lg shadow-lg border border-[hsl(var(--border))] py-1 z-20">
               <button
                 onClick={() => {
                   onShowSummary(session)
                   setShowActions(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[hsl(var(--background-secondary))] flex items-center gap-2"
               >
-                <span>👁️</span>
+                <Eye className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
                 View Summary
               </button>
               <button
@@ -396,21 +405,21 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
                   handleViewConversation()
                   setShowActions(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[hsl(var(--background-secondary))] flex items-center gap-2"
               >
-                <span>💬</span>
+                <MessageCircle className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
                 View Full Conversation
               </button>
-              <div className="border-t border-slate-200 my-1" />
+              <div className="border-t border-[hsl(var(--border))] my-1" />
               <button
                 onClick={() => {
                   setEditTitle(displayTitle)
                   setIsEditing(true)
                   setShowActions(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[hsl(var(--background-secondary))] flex items-center gap-2"
               >
-                <span>✏️</span>
+                <PencilLine className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
                 Rename
               </button>
               <button
@@ -418,12 +427,16 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
                   toggleVisibilityMutation.mutate()
                   setShowActions(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[hsl(var(--background-secondary))] flex items-center gap-2"
               >
-                <span>{isHidden ? '👁️' : '👁️‍🗨️'}</span>
+                {isHidden ? (
+                  <Circle className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
+                ) : (
+                  <CircleDot className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
+                )}
                 {isHidden ? 'Show' : 'Hide'}
               </button>
-              <div className="border-t border-slate-200 my-1" />
+              <div className="border-t border-[hsl(var(--border))] my-1" />
               {/* Restore (only show in trash) */}
               {isInTrash && (
                 <button
@@ -432,9 +445,9 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
                     setShowActions(false)
                   }}
                   disabled={restoreSessionMutation.isPending}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-emerald-50 flex items-center gap-2 text-emerald-700"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-[hsl(var(--primary-light))] flex items-center gap-2 text-[hsl(var(--primary))]"
                 >
-                  <span>♻️</span>
+                  <RotateCcw className="w-4 h-4" />
                   {restoreSessionMutation.isPending ? 'Restoring...' : 'Restore Session'}
                 </button>
               )}
@@ -448,7 +461,7 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
                   disabled={deleteSessionMutation.isPending}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 flex items-center gap-2 text-red-700"
                 >
-                  <span>🗑️</span>
+                  <Trash2 className="w-4 h-4" />
                   {deleteSessionMutation.isPending ? 'Deleting...' : 'Delete Session'}
                 </button>
               )}

@@ -80,7 +80,7 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
       {/* Modal Dialog */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col pointer-events-auto"
+          className="bg-[hsl(var(--surface))] rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -118,7 +118,7 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
             ) : (
               <div className="space-y-4">
                 {/* CARD 1: Session Summary */}
-                <div className="border border-primary/20 rounded-lg overflow-hidden bg-white shadow-sm">
+                <div className="border border-primary/20 rounded-lg overflow-hidden bg-[hsl(var(--surface))] shadow-sm">
                   <button
                     onClick={() => setIsSummaryCollapsed(!isSummaryCollapsed)}
                     className="w-full bg-primary/5 px-4 py-3 flex justify-between items-center hover:bg-primary/10 transition-colors"
@@ -239,7 +239,7 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
                 </div>
 
                 {/* CARD 2: Session Management */}
-                <div className="border border-success/20 rounded-lg overflow-hidden bg-white shadow-sm">
+                <div className="border border-success/20 rounded-lg overflow-hidden bg-[hsl(var(--surface))] shadow-sm">
                   <button
                     onClick={() => setIsManagementCollapsed(!isManagementCollapsed)}
                     className="w-full bg-success/5 px-4 py-3 flex justify-between items-center hover:bg-success/10 transition-colors"
@@ -312,7 +312,7 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
                             <button
                               key={i}
                               onClick={() => navigator.clipboard.writeText(title)}
-                              className="block w-full text-left px-3 py-2 text-sm bg-white hover:bg-accent/10 rounded border border-accent/20 transition-colors"
+                              className="block w-full text-left px-3 py-2 text-sm bg-[hsl(var(--surface))] hover:bg-accent/10 rounded border border-accent/20 transition-colors"
                             >
                               {i + 1}. {title}
                             </button>
@@ -346,7 +346,7 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
                           <div key={i} className={`p-3 rounded-lg border ${
                             msg.role === 'user'
                               ? 'bg-primary/5 border-primary/20'
-                              : 'bg-white border-accent/20'
+                              : 'bg-[hsl(var(--surface))] border-accent/20'
                           }`}>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-semibold text-accent">

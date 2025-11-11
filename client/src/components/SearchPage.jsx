@@ -11,9 +11,10 @@ import {
   X,
   Loader2,
   AlertCircle,
-  MessageSquare
+  MessageSquare,
+  Tag
 } from 'lucide-react'
-import { projectsApi, searchApi } from '../services/api'
+import { projectsApi, searchApi, sessionMetadataApi } from '../services/api'
 import ClaudeMessageRenderer from './ClaudeMessageRenderer'
 import RebuildIndexModal from './RebuildIndexModal'
 import IndexStatusCard from './IndexStatusCard'
@@ -36,7 +37,8 @@ const SearchPage = () => {
     role: '',
     from: '',
     to: '',
-    template: ''
+    template: '',
+    tag: ''
   })
   const [showFilters, setShowFilters] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState(null)
@@ -53,6 +55,20 @@ const SearchPage = () => {
   const { data: indexStatus } = useQuery({
     queryKey: ['indexStatus'],
     queryFn: () => searchApi.getIndexStatus().then(res => res.data)
+  })
+
+  // Fetch all tags across all projects or selected project
+  const { data: tagsData } = useQuery({
+    queryKey: ['all-tags', selectedProject?.id],
+    queryFn: () => {
+      if (selectedProject) {
+        return sessionMetadataApi.getAllTags(selectedProject.id).then(res => res.data)
+      }
+      // If no project selected, we could fetch tags from all projects
+      // For now, return empty to avoid errors
+      return Promise.resolve({ tags: [] })
+    },
+    enabled: !!selectedProject
   })
 
   const handleSearch = async (e) => {
@@ -87,7 +103,7 @@ const SearchPage = () => {
     setSearchQuery('')
     setSearchResults([])
     setHasSearched(false)
-    setFilters({ role: '', from: '', to: '', template: '' })
+    setFilters({ role: '', from: '', to: '', template: '', tag: '' })
   }
 
   const handleResultClick = async (result) => {
@@ -151,12 +167,12 @@ const SearchPage = () => {
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Search Header */}
-      <div className="border-b border-border bg-surface p-4">
+      <div className="border-b border-border bg-surface p-3">
         <div className="max-w-6xl mx-auto">
-          <H1 className="text-lg mb-3">Search Conversations</H1>
-          
+          <H1 className="text-lg mb-2">Search Conversations</H1>
+
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="space-y-3">
+          <form onSubmit={handleSearch} className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               {/* Search Input */}
               <div className="flex-1 min-w-64 relative">
@@ -166,7 +182,7 @@ const SearchPage = () => {
                   placeholder="Search across all conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 h-9"
                 />
               </div>
 
@@ -177,7 +193,7 @@ const SearchPage = () => {
                   const project = (projectsData?.projects || []).find(p => p.id === e.target.value)
                   setSelectedProject(project || null)
                 }}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+                className="h-9 rounded-md border border-border bg-background px-3 text-sm"
               >
                 <option value="">All Projects</option>
                 {(projectsData?.projects || []).map(project => (
@@ -230,7 +246,7 @@ const SearchPage = () => {
             {showFilters && (
               <Card className="bg-surface/50">
                 <CardContent className="p-3">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-text-primary mb-1">Role</label>
                       <select
@@ -241,6 +257,25 @@ const SearchPage = () => {
                         <option value="">All Roles</option>
                         <option value="user">User</option>
                         <option value="assistant">Assistant</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-primary mb-1 flex items-center gap-1">
+                        <Tag className="w-3 h-3" />
+                        Tag
+                      </label>
+                      <select
+                        value={filters.tag}
+                        onChange={(e) => handleFilterChange('tag', e.target.value)}
+                        className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                        disabled={!selectedProject}
+                      >
+                        <option value="">All Tags</option>
+                        {(tagsData?.tags || []).map(tag => (
+                          <option key={tag.tag} value={tag.tag}>
+                            {tag.tag} ({tag.count})
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div>
