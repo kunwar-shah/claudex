@@ -23,6 +23,15 @@
 
 ## 🆕 What's New
 
+### Version 1.2.0 (November 11, 2025)
+- **🎨 Comprehensive Theming System**: 10 professional themes (default, emerald, green, blue, purple, orange, red, rose, yellow, classic)
+- **🔤 Advanced Typography**: 29 font families with visual preview (Inter, Geist, Roboto, Poppins, Montserrat, and more)
+- **📏 Granular Font Sizing**: 5 precise font size options (14px-18px with intermediate steps)
+- **🎯 Border Radius Control**: Sharp, rounded, or extra-rounded interface styles
+- **💾 Settings Persistence**: All customizations saved to localStorage
+- **⚡ Real-time Switching**: Instant theme changes with CSS variables
+- **🎭 Visual Font Previews**: See fonts in their actual typeface before selecting
+
 ### Version 1.1.1 (October 31, 2025)
 - **🐛 Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
   - Line-based unique ID generation ensures all messages render correctly
@@ -43,6 +52,31 @@
 ---
 
 ## 📸 Screenshots
+
+### 🎨 NEW in v1.2.0: Theming & Customization
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/01-theme-selector.png" alt="10 Professional Themes" width="100%">
+      <p align="center"><strong>10 Professional Themes</strong><br/>Classic, Emerald, Blue, Purple, Orange, Red, Rose, Yellow, Green, Default</p>
+    </td>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/02-font-family-preview.png" alt="29 Font Families" width="100%">
+      <p align="center"><strong>29 Font Families</strong><br/>Visual preview showing actual typefaces</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/03-font-size-border-radius.png" alt="Font Size & Border Radius" width="100%">
+      <p align="center"><strong>Granular Font Sizing</strong><br/>5 precise options (14px-18px) + border radius control</p>
+    </td>
+    <td width="50%">
+      <img src="screenshots/v1.2.0/04-settings-tabs-soon-badges.png" alt="Settings Modal" width="100%">
+      <p align="center"><strong>Settings Modal</strong><br/>Appearance functional, more settings coming soon</p>
+    </td>
+  </tr>
+</table>
 
 ### Conversation View
 <img src="screenshots/conversation-view.png" alt="Conversation View" width="800">
@@ -577,6 +611,26 @@ Access at: http://localhost:3400
 - [ ] Authentication for multi-user
 - [ ] Plugin system for custom parsers
 - [ ] Diff viewer for file changes
+
+## 💖 Support This Project
+
+Claudex is free and open source. If it saves you time and improves your workflow, please consider:
+
+- ⭐ **Star the repo** - Help others discover Claudex
+- 🐛 **Report bugs** - Your feedback makes us better
+- 💡 **Share ideas** - Request features in [Discussions](https://github.com/kunwar-shah/claudex/discussions)
+- ☕ **Buy me a coffee** - Support continued development
+
+<div align="center">
+
+  [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github&style=for-the-badge)](https://github.com/sponsors/kunwar-shah)
+  [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E5B?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/kunwarshah)
+
+  **Every contribution helps keep this project alive and growing!** 🚀
+
+</div>
+
+---
 
 ## 📄 License
 

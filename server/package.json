@@ -16,7 +16,8 @@
     "dotenv": "^16.3.1",
     "fastify": "^4.24.3",
     "ndjson": "^2.0.0",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "jest": "^29.7.0",

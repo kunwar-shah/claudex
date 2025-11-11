@@ -3,15 +3,18 @@
   "version": "1.1.0",
   "description": "Claudex - Universal conversation viewer for Claude Code with FTS5 search",
   "main": "index.js",
+  "workspaces": [
+    "server",
+    "client"
+  ],
   "bin": {
     "claudex": "./bin/claude-viewer.js"
   },
   "scripts": {
     "start": "node bin/claude-viewer.js",
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "build": "npm run build --prefix client",
-    "install-deps": "npm install --prefix server && npm install --prefix client",
-    "test": "npm test --prefix server && npm test --prefix client",
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "test": "npm test --workspaces --if-present",
     "check": "node scripts/check-system.mjs",
     "check:verbose": "node scripts/check-system.mjs --verbose",
     "check:fix": "node scripts/check-system.mjs --fix",
@@ -30,7 +33,6 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
-    "concurrently": "^8.2.0",
     "cross-spawn": "^7.0.3"
   },
   "repository": {
@@ -42,6 +44,7 @@
   },
   "homepage": "https://kunwar-shah.github.io/claudex/",
   "devDependencies": {
+    "concurrently": "^8.2.0",
     "playwright": "^1.55.1"
   }
 }

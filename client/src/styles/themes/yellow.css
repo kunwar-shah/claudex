@@ -1,0 +1,54 @@
+/**
+ * Yellow Theme - Bright Yellow
+ * Cheerful and optimistic aesthetic
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Yellow */
+  --primary: 45 93% 47%;         /* Yellow-500 (#EAB308) */
+  --primary-hover: 45 93% 40%;   /* Darker yellow */
+  --primary-light: 45 93% 95%;   /* Very light yellow */
+  --primary-dark: 45 93% 30%;    /* Deep yellow */
+
+  /* Secondary Accent - Amber */
+  --secondary: 38 92% 50%;       /* Amber-500 */
+  --secondary-hover: 38 92% 40%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 45 93% 47%;            /* Same as primary */
+
+  /* Background Colors */
+  --background: 0 0% 100%;
+  --background-secondary: 45 100% 99%;
+  --surface: 0 0% 100%;
+  --surface-hover: 45 100% 98%;
+
+  /* Text Colors */
+  --text-primary: 45 10% 10%;
+  --text-secondary: 45 6% 40%;
+  --text-tertiary: 45 5% 60%;
+  --text-on-primary: 45 10% 10%;  /* Dark text on yellow */
+
+  /* Border Colors */
+  --border: 45 20% 91%;
+  --border-hover: 45 25% 84%;
+  --border-focus: 45 93% 47%;
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 45 20% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 45 20% 91%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific */
+  --header-bg: 45 93% 47%;
+  --header-text: 45 10% 10%;     /* Dark text on yellow */
+  --header-border: 45 93% 40%;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

@@ -1,0 +1,49 @@
+/**
+ * Blue Theme - Alternative Theme
+ * Classic professional blue (alternative option)
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors */
+  --primary: 217 91% 60%;        /* Blue-500 */
+  --primary-hover: 217 91% 50%;  /* Blue-600 */
+  --primary-light: 217 91% 95%;  /* Blue-50 */
+  --primary-dark: 217 91% 20%;   /* Blue-900 */
+
+  /* Secondary Accent */
+  --secondary: 199 89% 48%;      /* Light Blue-500 */
+  --secondary-hover: 199 89% 40%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 199 89% 48%;           /* Light Blue-500 */
+
+  /* Background Colors */
+  --background: 0 0% 100%;       /* White */
+  --background-secondary: 217 91% 98%;
+  --surface: 0 0% 100%;
+  --surface-hover: 217 30% 97%;
+
+  /* Text Colors */
+  --text-primary: 222 47% 11%;   /* Slate-900 */
+  --text-secondary: 215 20% 40%; /* Slate-600 */
+  --text-tertiary: 215 16% 60%;  /* Slate-400 */
+  --text-on-primary: 0 0% 100%;
+
+  /* Border Colors */
+  --border: 214 32% 91%;         /* Slate-200 */
+  --border-hover: 217 91% 80%;   /* Blue-200 */
+  --border-focus: 217 91% 60%;   /* Primary */
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 214 32% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 214 32% 91%;
+  --button-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

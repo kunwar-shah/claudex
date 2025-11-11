@@ -1,10 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { projectsApi } from '../services/api'
+import {
+  User,
+  Bot,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  Loader2
+} from 'lucide-react'
+import { projectsApi, sessionMetadataApi } from '../services/api'
 import MessageBubble from './MessageBubble'
+import MessagingBubble from './MessagingBubble'
 import ExportButton from './ExportButton'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
+import { Card, CardContent } from './ui/card'
+import { Muted, Small } from './ui/typography'
+import EmptyState from './layout/EmptyState'
+import { cn } from '@/lib/utils'
+import { useSettings } from '../contexts/SettingsContext'
 
 const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
+  const { settings } = useSettings()
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(50)
   const [showUser, setShowUser] = useState(true)
@@ -16,7 +33,15 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
     enabled: !!(projectId && sessionId)
   })
 
-  const { session, messages = [], stats, pagination } = data || {}
+  // Fetch session metadata for custom title
+  const { data: metadataData } = useQuery({
+    queryKey: ['session-metadata', projectId, sessionId],
+    queryFn: () => sessionMetadataApi.getMetadata(projectId, sessionId).then(res => res.data),
+    enabled: !!(projectId && sessionId)
+  })
+
+  const { session, messages = [], stats, pagination} = data || {}
+  const metadata = metadataData?.metadata || null
 
   // Scroll to highlighted message when data loads
   useEffect(() => {
@@ -64,32 +89,27 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 mb-2">Failed to load conversation</div>
-          <div className="text-sm text-gray-500">{error.message}</div>
-        </div>
-      </div>
+      <EmptyState
+        icon={AlertCircle}
+        title="Failed to load conversation"
+        description={error.message}
+      />
     )
   }
 
   if (!messages.length) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-gray-500 mb-2">No messages found</div>
-          <div className="text-sm text-gray-400">
-            This session appears to be empty
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        title="No messages found"
+        description="This session appears to be empty"
+      />
     )
   }
 
@@ -103,190 +123,204 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
       {/* Session Header */}
-      <div className="p-2 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+      <div className="p-4 border-b border-border bg-surface">
         <div className="flex justify-between items-start mb-3">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">
-              {session?.title || sessionId}
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {pagination ? `${pagination.total} total messages` : `${messages.length} messages`} • Template: {session?.template || 'unknown'}
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            {stats && stats.skippedLines > 0 && (
-              <div className="text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded">
-                {stats.skippedLines} lines skipped
-              </div>
+          <div className="flex-1 min-w-0">
+            <Small className="font-semibold line-clamp-2 mb-1">
+              {metadata?.customTitle || session?.title || sessionId}
+            </Small>
+            {metadata?.customTitle && (
+              <Muted className="text-xs italic mb-1">
+                Original: {session?.title || sessionId}
+              </Muted>
             )}
-            
-            <ExportButton 
-              projectId={projectId} 
-              sessionId={sessionId} 
-              sessionTitle={session?.title}
+            <Muted className="text-xs">
+              {pagination ? `${pagination.total} total messages` : `${messages.length} messages`} • Template: {session?.template || 'unknown'}
+            </Muted>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {stats && stats.skippedLines > 0 && (
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                {stats.skippedLines} lines skipped
+              </Badge>
+            )}
+
+            <ExportButton
+              projectId={projectId}
+              sessionId={sessionId}
+              sessionTitle={metadata?.customTitle || session?.title}
             />
           </div>
         </div>
 
-        {/* Pagination Info & Controls - Prominent Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded p-2 mt-1.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              {pagination && pagination.totalPages > 1 && (
-                <>
-                  <div className="text-xs font-semibold text-blue-900">
-                    Page {pagination.page} of {pagination.totalPages}
-                  </div>
-                  <div className="text-xs text-blue-700">
-                    Showing {((pagination.page - 1) * pagination.pageSize) + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.total)} of {pagination.total} messages
-                  </div>
-                </>
-              )}
-              
-              {/* Message Filter Toggle */}
-              <div className="flex items-center space-x-2 border-l border-blue-300 pl-4">
-                <span className="text-xs font-medium text-blue-900">Show:</span>
-                <button
-                  onClick={() => {
-                    setShowUser(true)
-                    setShowAssistant(false)
-                  }}
-                  className={`flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    showUser && !showAssistant 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
-                  }`}
-                  title="Show only user messages"
-                >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                  <span>User</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setShowUser(false)
-                    setShowAssistant(true)
-                  }}
-                  className={`flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    !showUser && showAssistant 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-white text-green-600 border border-green-300 hover:bg-green-50'
-                  }`}
-                  title="Show only assistant messages"
-                >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Assistant</span>
-                </button>
-                {(!showUser || !showAssistant) && (
-                  <button
+        {/* Pagination Info & Controls */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-4 flex-wrap">
+                {pagination && pagination.totalPages > 1 && (
+                  <>
+                    <Small className="font-semibold">
+                      Page {pagination.page} of {pagination.totalPages}
+                    </Small>
+                    <Muted className="text-xs">
+                      Showing {((pagination.page - 1) * pagination.pageSize) + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.total)} of {pagination.total} messages
+                    </Muted>
+                  </>
+                )}
+
+                {/* Message Filter Toggle */}
+                <div className="flex items-center gap-2 pl-4 border-l border-border">
+                  <Muted className="text-xs font-medium">Show:</Muted>
+                  <Button
+                    variant={showUser && !showAssistant ? "default" : "outline"}
+                    size="sm"
                     onClick={() => {
                       setShowUser(true)
+                      setShowAssistant(false)
+                    }}
+                    className="h-7 gap-1"
+                    title="Show only user messages"
+                  >
+                    <User className="w-3 h-3" />
+                    User
+                  </Button>
+                  <Button
+                    variant={!showUser && showAssistant ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setShowUser(false)
                       setShowAssistant(true)
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-800 underline"
-                    title="Show all messages"
+                    className="h-7 gap-1"
+                    title="Show only assistant messages"
                   >
-                    Show All
-                  </button>
-                )}
-                {/* Filtered count indicator */}
-                {(!showUser || !showAssistant) && (
-                  <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
-                    {messages.filter(message => {
-                      if (message.role === 'user' && !showUser) return false
-                      if (message.role === 'assistant' && !showAssistant) return false
-                      return true
-                    }).length} of {messages.length} visible
-                  </div>
-                )}
+                    <Bot className="w-3 h-3" />
+                    Assistant
+                  </Button>
+                  {(!showUser || !showAssistant) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowUser(true)
+                        setShowAssistant(true)
+                      }}
+                      className="h-7 text-xs"
+                      title="Show all messages"
+                    >
+                      Show All
+                    </Button>
+                  )}
+                  {/* Filtered count indicator */}
+                  {(!showUser || !showAssistant) && (
+                    <Badge variant="secondary">
+                      {messages.filter(message => {
+                        if (message.role === 'user' && !showUser) return false
+                        if (message.role === 'assistant' && !showAssistant) return false
+                        return true
+                      }).length} of {messages.length} visible
+                    </Badge>
+                  )}
+                </div>
               </div>
+
+              {pagination && pagination.totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <Muted className="text-xs font-medium">Per page:</Muted>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                    className="h-7 rounded-md border border-border bg-background px-2 text-xs"
+                  >
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={200}>200</option>
+                  </select>
+                </div>
+              )}
             </div>
-            
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center space-x-2">
-                <label className="text-xs font-medium text-blue-900">
-                  Per page:
-                </label>
-                <select
-                  value={pageSize}
-                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                  className="border border-blue-300 rounded px-1.5 py-0.5 text-xs bg-white"
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                  <option value={200}>200</option>
-                </select>
-              </div>
-            )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2 conversation-scroll-area">
+      <div className={cn(
+        "flex-1 overflow-y-auto overflow-x-hidden conversation-scroll-area",
+        settings.conversationView === 'messaging'
+          ? "p-4 bg-background"
+          : "p-2 space-y-2"
+      )}>
         {messages
           .filter(message => {
             if (message.role === 'user' && !showUser) return false
-            if (message.role === 'assistant' && !showAssistant) return false
+            if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
             return true
           })
-          .map((message, index, filteredMessages) => (
-            <div 
-              key={message.id || index}
-              id={message.id ? `message-${message.id}` : undefined}
-              className="max-w-full"
-            >
-              <MessageBubble
-                message={message}
-                isFirst={index === 0}
-                isLast={index === filteredMessages.length - 1}
-              />
-            </div>
-          ))}
+          .map((message, index, filteredMessages) => {
+            // Use messaging view if enabled
+            if (settings.conversationView === 'messaging') {
+              return (
+                <MessagingBubble
+                  key={message.id || index}
+                  message={message}
+                  showTimestamp={settings.showTimestamps === 'always'}
+                />
+              )
+            }
+
+            // Use detailed view (default)
+            return (
+              <div
+                key={message.id || index}
+                id={message.id ? `message-${message.id}` : undefined}
+                className="max-w-full"
+              >
+                <MessageBubble
+                  message={message}
+                  isFirst={index === 0}
+                  isLast={index === filteredMessages.length - 1}
+                />
+              </div>
+            )
+          })}
         
         {/* No messages after filtering */}
         {messages.filter(message => {
           if (message.role === 'user' && !showUser) return false
-          if (message.role === 'assistant' && !showAssistant) return false
+          if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
           return true
         }).length === 0 && (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-gray-500 mb-2">No messages to display</div>
-              <div className="text-sm text-gray-400">
-                Adjust the message filter to see content
-              </div>
-            </div>
-          </div>
+          <EmptyState
+            title="No messages to display"
+            description="Adjust the message filter to see content"
+          />
         )}
       </div>
 
       {/* Bottom Pagination Controls */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="border-t border-slate-200 bg-gradient-to-r from-white to-slate-50 p-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+        <div className="border-t border-border bg-surface p-3">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
               {/* Previous Button */}
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page <= 1}
-                className="flex items-center px-2 py-1 text-xs font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-7"
               >
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <ChevronLeft className="w-3 h-3 mr-1" />
                 Previous
-              </button>
+              </Button>
 
               {/* Page Numbers */}
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center gap-1">
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   let pageNum;
                   if (pagination.totalPages <= 5) {
@@ -298,51 +332,51 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
                   } else {
                     pageNum = pagination.page - 2 + i;
                   }
-                  
+
                   return (
-                    <button
+                    <Button
                       key={pageNum}
+                      variant={pageNum === pagination.page ? "default" : "outline"}
+                      size="sm"
                       onClick={() => handlePageChange(pageNum)}
-                      className={`px-2 py-1 text-xs font-medium rounded ${
-                        pageNum === pagination.page
-                          ? 'bg-blue-600 text-white'
-                          : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                      }`}
+                      className="h-7 w-7 p-0"
                     >
                       {pageNum}
-                    </button>
+                    </Button>
                   );
                 })}
-                
+
                 {pagination.totalPages > 5 && pagination.page < pagination.totalPages - 2 && (
                   <>
-                    <span className="px-2 text-gray-500">...</span>
-                    <button
+                    <Muted className="px-2 text-xs">...</Muted>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handlePageChange(pagination.totalPages)}
-                      className="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+                      className="h-7 w-7 p-0"
                     >
                       {pagination.totalPages}
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
 
               {/* Next Button */}
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages}
-                className="flex items-center px-2 py-1 text-xs font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-7"
               >
                 Next
-                <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                <ChevronRight className="w-3 h-3 ml-1" />
+              </Button>
             </div>
 
             {/* Quick Jump */}
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-700">Go to page:</span>
+            <div className="flex items-center gap-2">
+              <Muted className="text-xs">Go to page:</Muted>
               <input
                 type="number"
                 min="1"
@@ -354,7 +388,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
                     handlePageChange(page);
                   }
                 }}
-                className="border border-gray-300 rounded px-1.5 py-0.5 text-xs w-12 text-center"
+                className="h-7 w-12 rounded-md border border-border bg-background px-2 text-xs text-center"
               />
             </div>
           </div>

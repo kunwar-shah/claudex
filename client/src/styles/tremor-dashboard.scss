@@ -11,33 +11,33 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Background and layout */
-  background-color: #f9fafb;
+  /* Background and layout - Uses design system variables */
+  background-color: hsl(var(--background-secondary));
   min-height: 100vh;
 
-  /* Typography scale - Tremor style */
+  /* Typography scale - Uses design system font sizes */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    color: #111827;
+    color: hsl(var(--text-primary));
     line-height: 1.25;
   }
 
-  h1 { font-size: 1.875rem; } /* 30px */
-  h2 { font-size: 1.5rem; }   /* 24px */
-  h3 { font-size: 1.25rem; }  /* 20px */
+  h1 { font-size: var(--text-3xl); } /* 30px */
+  h2 { font-size: var(--text-2xl); } /* 24px */
+  h3 { font-size: var(--text-xl); }  /* 20px */
 
-  /* Text colors - match Tremor */
-  .text-primary { color: #111827; }
-  .text-secondary { color: #6b7280; }
-  .text-tertiary { color: #9ca3af; }
+  /* Text colors - Uses design system variables */
+  .text-primary { color: hsl(var(--text-primary)); }
+  .text-secondary { color: hsl(var(--text-secondary)); }
+  .text-tertiary { color: hsl(var(--text-tertiary)); }
 
-  /* Card styling - exact Tremor look */
+  /* Card styling - Uses design system variables */
   .tremor-card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: hsl(var(--card-bg));
+    border: 1px solid hsl(var(--card-border));
     border-radius: 8px;
     padding: 24px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--button-shadow);
     transition: all 0.2s ease-in-out;
 
     &:hover {
@@ -45,18 +45,18 @@
     }
   }
 
-  /* Metrics styling */
+  /* Metrics styling - Uses design system variables */
   .tremor-metric {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
     font-weight: 600;
-    color: #111827;
+    color: hsl(var(--text-primary));
     line-height: 1.2;
   }
 
   .tremor-metric-sm {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
     font-weight: 600;
-    color: #111827;
+    color: hsl(var(--text-primary));
   }
 
   /* Badge styling - Tremor style */
@@ -260,10 +260,10 @@
     }
   }
 
-  /* Sidebar panel styling - Fixed for proper scrolling */
+  /* Sidebar panel styling - Fixed for proper scrolling - Uses design system variables */
   .sidebar-panel {
-    background: #f9fafb;
-    border-right: 1px solid #e5e7eb;
+    background: hsl(var(--background-secondary));
+    border-right: 1px solid hsl(var(--border));
     height: calc(100vh - 120px); /* Account for app header/footer */
     overflow: hidden;
     display: flex;
@@ -271,8 +271,8 @@
 
     .panel-header {
       padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e5e7eb;
-      background: white;
+      border-bottom: 1px solid hsl(var(--border));
+      background: hsl(var(--surface));
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -319,10 +319,10 @@
     }
   }
 
-  /* Session cards styling */
+  /* Session cards styling - Uses design system variables */
   .session-card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 8px;
@@ -340,27 +340,28 @@
     }
   }
 
-  /* Override Tremor component styles for exact match */
+  /* Override Tremor component styles - Uses design system variables */
   .tremor-Card-root {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #e5e7eb !important;
+    box-shadow: var(--button-shadow) !important;
+    border: 1px solid hsl(var(--card-border)) !important;
+    background: hsl(var(--card-bg)) !important;
   }
 
   .tremor-Text-root {
-    color: #6b7280 !important;
-    font-size: 0.875rem !important;
+    color: hsl(var(--text-secondary)) !important;
+    font-size: var(--text-sm) !important;
   }
 
   .tremor-Metric-root {
-    color: #111827 !important;
+    color: hsl(var(--text-primary)) !important;
     font-weight: 600 !important;
-    font-size: 1.875rem !important;
+    font-size: var(--text-3xl) !important;
   }
 
   .tremor-Title-root {
-    color: #111827 !important;
+    color: hsl(var(--text-primary)) !important;
     font-weight: 600 !important;
-    font-size: 1.125rem !important;
+    font-size: var(--text-lg) !important;
   }
 
   .tremor-Badge-root {
@@ -372,5 +373,153 @@
   .tremor-ProgressBar-root {
     height: 8px !important;
     background-color: #e5e7eb !important;
+  }
+
+  /* ========================================
+     DARK MODE SUPPORT - Uses CSS Variables from design-system.css
+     ======================================== */
+  [data-theme="dark"] & {
+    /* Background and layout - Uses design system variables */
+    background-color: hsl(var(--background));
+
+    /* Typography colors - Uses design system variables */
+    h1, h2, h3, h4, h5, h6 {
+      color: hsl(var(--text-primary));
+    }
+
+    .text-primary { color: hsl(var(--text-primary)); }
+    .text-secondary { color: hsl(var(--text-secondary)); }
+    .text-tertiary { color: hsl(var(--text-tertiary)); }
+
+    /* Card styling - Uses design system variables */
+    .tremor-card {
+      background: hsl(var(--surface));
+      border-color: hsl(var(--border));
+      box-shadow: var(--button-shadow);
+    }
+
+    /* Metrics styling - Uses design system variables */
+    .tremor-metric,
+    .tremor-metric-sm {
+      color: hsl(var(--text-primary));
+    }
+
+    /* Badge styling - dark mode variants */
+    .tremor-badge {
+      &.emerald {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+      }
+
+      &.red {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+      }
+
+      &.blue {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+      }
+
+      &.gray {
+        background-color: hsl(217 33% 24%);
+        color: hsl(215 20% 75%);
+      }
+    }
+
+    /* Progress bar styling - Uses design system variables */
+    .tremor-progress-bar {
+      background-color: hsl(var(--border));
+    }
+
+    /* Chart styling - Uses design system variables */
+    .tremor-chart {
+      .recharts-cartesian-axis-tick-value {
+        fill: hsl(var(--text-secondary));
+      }
+
+      .recharts-pie-sector {
+        stroke: hsl(var(--surface));
+        stroke-width: 2px;
+      }
+
+      .recharts-legend-item-text {
+        color: hsl(var(--text-secondary)) !important;
+      }
+    }
+
+    /* Sidebar panel styling - Uses design system variables */
+    .sidebar-panel {
+      background: hsl(var(--background-secondary));
+      border-right-color: hsl(var(--border));
+
+      .panel-header {
+        border-bottom-color: hsl(var(--border));
+        background: hsl(var(--surface));
+      }
+
+      .panel-content {
+        &::-webkit-scrollbar-track {
+          background: hsl(var(--background-secondary));
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: hsl(var(--border-hover));
+
+          &:hover {
+            background: hsl(var(--border-focus));
+          }
+        }
+      }
+    }
+
+    /* Session cards styling - Uses design system variables */
+    .session-card {
+      background: hsl(var(--surface));
+      border-color: hsl(var(--border));
+
+      &.active {
+        border-color: hsl(var(--primary));
+        box-shadow: 0 0 0 1px hsl(var(--primary));
+      }
+    }
+
+    /* Main content scrollbar - Uses design system variables */
+    &.scrollable .main-content {
+      &::-webkit-scrollbar-track {
+        background: hsl(var(--background-secondary));
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: hsl(var(--border-hover));
+
+        &:hover {
+          background: hsl(var(--border-focus));
+        }
+      }
+    }
+
+    /* Override Tremor component styles for dark mode - Uses design system variables */
+    .tremor-Card-root {
+      background: hsl(var(--surface)) !important;
+      border-color: hsl(var(--border)) !important;
+      box-shadow: var(--button-shadow) !important;
+    }
+
+    .tremor-Text-root {
+      color: hsl(var(--text-secondary)) !important;
+    }
+
+    .tremor-Metric-root {
+      color: hsl(var(--text-primary)) !important;
+    }
+
+    .tremor-Title-root {
+      color: hsl(var(--text-primary)) !important;
+    }
+
+    .tremor-ProgressBar-root {
+      background-color: hsl(var(--border)) !important;
+    }
   }
 }

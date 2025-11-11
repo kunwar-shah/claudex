@@ -1,0 +1,54 @@
+/**
+ * Orange Theme - Vibrant Orange
+ * Warm and energetic aesthetic
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Orange */
+  --primary: 24 95% 53%;         /* Orange-500 (#FB923C) */
+  --primary-hover: 24 95% 45%;   /* Darker orange */
+  --primary-light: 24 95% 95%;   /* Very light orange */
+  --primary-dark: 24 95% 35%;    /* Deep orange */
+
+  /* Secondary Accent - Amber */
+  --secondary: 38 92% 60%;       /* Amber-400 */
+  --secondary-hover: 38 92% 50%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 24 95% 53%;            /* Same as primary */
+
+  /* Background Colors */
+  --background: 0 0% 100%;
+  --background-secondary: 24 100% 99%;
+  --surface: 0 0% 100%;
+  --surface-hover: 24 100% 98%;
+
+  /* Text Colors */
+  --text-primary: 24 10% 10%;
+  --text-secondary: 24 6% 40%;
+  --text-tertiary: 24 5% 60%;
+  --text-on-primary: 0 0% 100%;
+
+  /* Border Colors */
+  --border: 24 20% 91%;
+  --border-hover: 24 25% 84%;
+  --border-focus: 24 95% 53%;
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 24 20% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 24 20% 91%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific */
+  --header-bg: 24 95% 53%;
+  --header-text: 0 0% 100%;
+  --header-border: 24 95% 45%;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

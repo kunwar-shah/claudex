@@ -1,67 +1,129 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { ChevronsUpDown, Check, FolderOpen } from 'lucide-react'
 
-const ProjectComboBox = ({ projects, selectedProject, onProjectSelect }) => {
+const ProjectComboBox = ({ projects, selectedProject, onProjectSelect, size = 'small' }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
+  const searchInputRef = useRef(null)
+
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [isOpen])
+
+  // Filter projects based on search query
+  const filteredProjects = projects.filter(project =>
+    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   const handleProjectSelect = (project) => {
     onProjectSelect(project)
     setIsOpen(false)
-    
+    setSearchQuery('')
+
     // Determine navigation path based on current route
     if (location.pathname.startsWith('/tremor-preview')) {
       navigate(`/tremor-preview/projects/${project.id}`)
+    } else if (location.pathname.startsWith('/manage-sessions')) {
+      navigate(`/manage-sessions/${project.id}`)
     } else {
       navigate(`/projects/${project.id}`)
     }
   }
 
+  const handleDropdownToggle = () => {
+    if (isOpen) {
+      setSearchQuery('')
+    }
+    setIsOpen(!isOpen)
+  }
+
+  // Define styles based on size
+  const isLarge = size === 'large'
+
+  // Shadcn-style minimal button (outline variant)
+  const buttonStyles = isLarge
+    ? "w-full flex items-center justify-between px-3 py-2 text-sm border border-border rounded-md bg-[hsl(var(--surface))] hover:bg-surface text-text-primary transition-colors"
+    : "flex items-center justify-between px-3 py-2 text-sm border border-border rounded-md bg-[hsl(var(--surface))] hover:bg-surface text-text-primary transition-colors w-[200px]"
+
+  const iconSize = isLarge ? "w-4 h-4" : "w-4 h-4"
+
   return (
     <div className="relative">
       <button
-        className="flex items-center space-x-1 bg-gray-50 hover:bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-700 border border-gray-300"
-        onClick={() => setIsOpen(!isOpen)}
+        className={buttonStyles}
+        onClick={handleDropdownToggle}
+        role="combobox"
+        aria-expanded={isOpen}
       >
-        <span>
-          {selectedProject ? selectedProject.name : 'Select Project'}
-        </span>
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <FolderOpen className={`${iconSize} flex-shrink-0 ${selectedProject ? 'text-primary' : 'text-muted-foreground'}`} />
+          <span className="truncate" style={{ fontVariant: 'small-caps', letterSpacing: '0.05em' }}>
+            {selectedProject ? selectedProject.name : 'Select project...'}
+          </span>
+        </div>
+        <ChevronsUpDown className={`${iconSize} ml-2 opacity-50 flex-shrink-0`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-1 w-56 bg-white shadow-lg border border-gray-200 rounded z-10">
-          <div className="py-1 max-h-48 overflow-y-auto">
-            {projects.length === 0 ? (
-              <div className="px-2 py-1 text-xs text-gray-500">
-                No projects found
-              </div>
-            ) : (
-              projects.map((project) => (
-                <button
-                  key={project.id}
-                  className="w-full text-left px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 flex justify-between items-center"
-                  onClick={() => handleProjectSelect(project)}
-                >
-                  <div>
-                    <div className="font-medium text-xs">{project.name}</div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(project.lastModified).toLocaleDateString()}
-                    </div>
-                  </div>
-                  {selectedProject?.id === project.id && (
-                    <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              ))
-            )}
+        <>
+          {/* Backdrop overlay to close dropdown when clicking outside */}
+          <div
+            className="fixed inset-0 z-[5]"
+            onClick={() => {
+              setIsOpen(false)
+              setSearchQuery('')
+            }}
+          />
+
+          <div className={isLarge
+            ? "absolute top-full left-0 right-0 mt-2 bg-[hsl(var(--surface))] shadow-md border border-border rounded-md z-20 p-0"
+            : "absolute top-full right-0 w-[200px] mt-1 bg-[hsl(var(--surface))] shadow-md border border-border rounded-md z-20 p-0"
+          }>
+            {/* Search Input - Shadcn minimal style */}
+            <div className="p-1">
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search project..."
+                className="w-full px-3 py-2 text-sm border-0 focus:outline-none h-9"
+              />
+            </div>
+
+            {/* Project List - Shadcn minimal style */}
+            <div className="max-h-60 overflow-y-auto p-1">
+              {filteredProjects.length === 0 ? (
+                <div className="py-6 text-center text-sm text-muted-foreground">
+                  {searchQuery ? 'No project found.' : 'No projects available.'}
+                </div>
+              ) : (
+                filteredProjects.map((project) => (
+                  <button
+                    key={project.id}
+                    className="relative w-full flex items-center justify-between px-2 py-1.5 text-sm rounded-sm hover:bg-surface cursor-pointer transition-colors"
+                    onClick={() => handleProjectSelect(project)}
+                  >
+                    <span className="truncate" style={{ fontVariant: 'small-caps', letterSpacing: '0.05em' }}>
+                      {project.name}
+                    </span>
+                    <Check
+                      className={`w-4 h-4 ml-auto flex-shrink-0 ${
+                        selectedProject?.id === project.id ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  </button>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

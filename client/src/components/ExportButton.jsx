@@ -82,8 +82,8 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
   ]
 
   const buttonClasses = variant === 'footer' 
-    ? "flex items-center space-x-1 text-xs text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    : "inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    ? "flex items-center space-x-1 text-xs text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-light))] px-2 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    : "inline-flex items-center px-3 py-1.5 text-sm text-[hsl(var(--primary))] hover:text-[hsl(var(--primary-hover))] hover:bg-[hsl(var(--primary-light))] rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 
   const iconSize = variant === 'footer' ? 'w-3.5 h-3.5' : 'w-4 h-4'
 
@@ -125,13 +125,13 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
           />
           
           {/* Menu */}
-          <div className={`absolute right-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 ${
+          <div className={`absolute right-0 w-64 bg-[hsl(var(--surface))] rounded-lg shadow-lg border border-[hsl(var(--border))] z-20 ${
             variant === 'footer' 
               ? 'bottom-full mb-1' // Appear above the button for footer
               : 'top-full mt-1'    // Appear below the button for header
           }`}>
             <div className="p-2">
-              <div className="text-xs text-gray-500 px-3 py-2 font-medium">
+              <div className="text-xs text-[hsl(var(--text-tertiary))] px-3 py-2 font-medium">
                 Export "{sessionTitle || 'Conversation'}" as:
               </div>
               
@@ -139,16 +139,16 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
                 <button
                   key={item.format}
                   onClick={() => handleExport(item.format)}
-                  className="w-full flex items-center px-3 py-2 text-left hover:bg-gray-50 rounded-md transition-colors"
+                  className="w-full flex items-center px-3 py-2 text-left hover:bg-[hsl(var(--background-secondary))] rounded-md transition-colors"
                 >
-                  <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded mr-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-[hsl(var(--surface-hover))] rounded mr-3">
                     {item.icon}
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-[hsl(var(--text-primary))]">
                       {item.label}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[hsl(var(--text-tertiary))]">
                       {item.description}
                     </div>
                   </div>
@@ -156,7 +156,7 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
               ))}
             </div>
             
-            <div className="border-t border-gray-200 p-2">
+            <div className="border-t border-[hsl(var(--border))] p-2">
               <div className="text-xs text-gray-400 px-3 py-1">
                 Files will be downloaded to your device
               </div>
