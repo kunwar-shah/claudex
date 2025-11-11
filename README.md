@@ -623,8 +623,9 @@ Claudex is free and open source. If it saves you time and improves your workflow
 
 <div align="center">
 
-  [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github&style=for-the-badge)](https://github.com/sponsors/kunwar-shah)
   [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E5B?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/kunwarshah)
+  [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?logo=paypal&style=for-the-badge)](https://paypal.me/kunwarJhamat)
+  <!-- [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github&style=for-the-badge)](https://github.com/sponsors/kunwar-shah) -->
 
   **Every contribution helps keep this project alive and growing!** 🚀
 

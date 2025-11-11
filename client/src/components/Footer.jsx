@@ -192,7 +192,7 @@ ${technicalMessages
             </a>
 
             <a
-              href="https://github.com/sponsors/kunwar-shah"
+              href="https://ko-fi.com/kunwarshah"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-[hsl(var(--primary))] text-[hsl(var(--text-on-primary))] hover:opacity-90 transition-opacity"
@@ -201,6 +201,19 @@ ${technicalMessages
               <span>☕</span>
               <span className="hidden sm:inline">Support</span>
             </a>
+
+            {/* GitHub Sponsors temporarily hidden - setup in progress
+            <a
+              href="https://github.com/sponsors/kunwar-shah"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-[hsl(var(--primary))] text-[hsl(var(--text-on-primary))] hover:opacity-90 transition-opacity"
+              title="Support development via GitHub Sponsors"
+            >
+              <span>💖</span>
+              <span className="hidden sm:inline">Sponsor</span>
+            </a>
+            */}
           </div>
 
           <div className="h-5 w-px bg-border" />
