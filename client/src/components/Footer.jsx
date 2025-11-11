@@ -166,7 +166,7 @@ ${technicalMessages
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-tertiary font-medium">
-              Claudex v1.1
+              Claudex v1.2
             </span>
 
             <a
@@ -189,6 +189,17 @@ ${technicalMessages
             >
               <BookOpen className="w-3 h-3" />
               <span className="hidden sm:inline">Docs</span>
+            </a>
+
+            <a
+              href="https://github.com/sponsors/kunwar-shah"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-[hsl(var(--primary))] text-[hsl(var(--text-on-primary))] hover:opacity-90 transition-opacity"
+              title="Support development"
+            >
+              <span>☕</span>
+              <span className="hidden sm:inline">Support</span>
             </a>
           </div>
 
