@@ -60,12 +60,12 @@ const SettingsModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   const tabs = [
-    { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'search', label: 'Search & Index', icon: Search },
-    { id: 'sessions', label: 'Sessions', icon: FolderOpen },
-    { id: 'display', label: 'Display', icon: Eye },
-    { id: 'data', label: 'Data & Privacy', icon: Database },
-    { id: 'advanced', label: 'Advanced', icon: SettingsIcon }
+    { id: 'appearance', label: 'Appearance', icon: Palette, available: true },
+    { id: 'search', label: 'Search & Index', icon: Search, available: false },
+    { id: 'sessions', label: 'Sessions', icon: FolderOpen, available: false },
+    { id: 'display', label: 'Display', icon: Eye, available: false },
+    { id: 'data', label: 'Data & Privacy', icon: Database, available: false },
+    { id: 'advanced', label: 'Advanced', icon: SettingsIcon, available: false }
   ]
 
   return (
@@ -92,15 +92,23 @@ const SettingsModal = ({ isOpen, onClose }) => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-1 ${
+                  onClick={() => tab.available && setActiveTab(tab.id)}
+                  disabled={!tab.available}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-1 relative ${
                     activeTab === tab.id
                       ? 'bg-primary text-white'
-                      : 'text-text-secondary hover:bg-background hover:text-text-primary'
+                      : tab.available
+                      ? 'text-text-secondary hover:bg-background hover:text-text-primary'
+                      : 'text-text-tertiary opacity-50 cursor-not-allowed'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {tab.label}
+                  <span className="flex-1 text-left">{tab.label}</span>
+                  {!tab.available && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[hsl(var(--border))] text-text-tertiary">
+                      Soon
+                    </span>
+                  )}
                 </button>
               )
             })}
