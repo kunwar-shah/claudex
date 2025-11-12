@@ -101,12 +101,23 @@ const start = async () => {
 
     await fastify.listen({ port: parseInt(port), host });
 
-    console.log(`🚀 Claude Viewer Server running on http://${host}:${port}`);
+    console.log(`\n🚀 Claude Viewer Server running on http://localhost:${port}`);
     console.log(`📁 Projects root: ${projectRoot}`);
     console.log(`🔍 Search: SQLite FTS5 with persistent indexing`);
-    
+    console.log(`\n✨ Open http://localhost:${port} in your browser\n`);
+
   } catch (error) {
-    fastify.log.error(error);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`\n❌ Port ${process.env.PORT || 3400} is already in use!`);
+      console.error(`\n💡 Try one of these solutions:`);
+      console.error(`   1. Use a different port: claudex --port 3500`);
+      console.error(`   2. Kill the process using port ${process.env.PORT || 3400}:`);
+      console.error(`      lsof -ti :${process.env.PORT || 3400} | xargs kill -9`);
+      console.error(`   3. Use environment variable: PORT=3500 claudex\n`);
+    } else {
+      fastify.log.error(error);
+      console.error(`\n❌ Server failed to start: ${error.message}\n`);
+    }
     process.exit(1);
   }
 };

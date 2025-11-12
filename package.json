@@ -1,19 +1,35 @@
 {
-  "name": "claudex",
-  "version": "1.1.0",
-  "description": "Claudex - Universal conversation viewer for Claude Code with FTS5 search",
+  "name": "@kunwarshah/claudex",
+  "version": "1.2.1",
+  "description": "Professional conversation viewer and analysis tool for Claude Code. Search, analyze, and export your AI conversations with enterprise-grade full-text search and multi-platform support.",
   "main": "index.js",
+  "bin": {
+    "claudex": "./bin/claude-viewer.js"
+  },
   "workspaces": [
     "server",
     "client"
   ],
-  "bin": {
-    "claudex": "./bin/claude-viewer.js"
-  },
+  "files": [
+    "bin/",
+    "server/src/",
+    "server/package.json",
+    "server/.env.example",
+    "client/dist/",
+    "client/index.html",
+    "client/package.json",
+    "client/vite.config.js",
+    "scripts/check-system.mjs",
+    "LICENSE",
+    "README.md",
+    "quick-start.sh"
+  ],
+  "preferGlobal": true,
   "scripts": {
     "start": "node bin/claude-viewer.js",
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
+    "prepublishOnly": "npm run build",
     "test": "npm test --workspaces --if-present",
     "check": "node scripts/check-system.mjs",
     "check:verbose": "node scripts/check-system.mjs --verbose",
@@ -23,13 +39,21 @@
   },
   "keywords": [
     "claude",
-    "code",
-    "conversation",
-    "viewer",
+    "claude-code",
+    "conversation-viewer",
+    "ai-tools",
+    "anthropic",
     "jsonl",
-    "ai"
+    "full-text-search",
+    "react",
+    "fastify",
+    "sqlite",
+    "fts5",
+    "developer-tools",
+    "conversation-analysis",
+    "usage-monitoring"
   ],
-  "author": "Claude Code Viewer Team",
+  "author": "Kunwar Shah <kunwar@example.com>",
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",

@@ -127,6 +127,37 @@ Claudex is free and open source. If it saves you time and improves your workflow
 
 ### Installation
 
+#### Option 1: npm (Recommended)
+
+```bash
+# Global installation
+npm install -g @kunwarshah/claudex
+
+# Then run anywhere:
+claudex
+
+# Custom port (if 3400 is in use):
+claudex --port 3500
+
+# Custom project directory:
+claudex --project-root ~/my-claude-projects
+
+# Or use without installing (npx):
+npx @kunwarshah/claudex
+```
+
+**CLI Options**:
+- `--help, -h`: Show help message
+- `--version, -v`: Show version
+- `--port, -p <port>`: Custom server port (default: 3400)
+- `--project-root <path>`: Custom Claude projects directory
+
+**Environment Variables**:
+- `PORT`: Server port (default: 3400)
+- `PROJECT_ROOT`: Claude projects directory (default: ~/.claude/projects)
+
+#### Option 2: From Source
+
 1. **Clone the repository**:
 ```bash
 git clone https://github.com/kunwar-shah/claudex.git

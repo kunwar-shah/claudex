@@ -20,22 +20,65 @@ Detailed installation instructions for Claudex.
 
 ## Installation Methods
 
-### Method 1: npm (Recommended)
+### Method 1: npm Global Package (Recommended) ⭐
+
+Install Claudex globally from npm registry and run from anywhere:
 
 ```bash
-git clone https://github.com/kunwar-shah/claudex.git
-cd claudex
-npm install
-cd server && npm install && cd ../client && npm install && cd ..
+# Install globally
+npm install -g @kunwarshah/claudex
+
+# Run from anywhere
+claudex
+
+# Custom port (if 3400 is in use)
+claudex --port 3500
+
+# Custom project directory
+claudex --project-root ~/my-claude-projects
 ```
 
-### Method 2: Global CLI
+**CLI Options:**
+- `--help, -h` - Show help message
+- `--version, -v` - Show version
+- `--port, -p <port>` - Server port (default: 3400)
+- `--project-root <path>` - Claude projects directory
+
+**Environment Variables:**
+- `PORT` - Server port (default: 3400)
+- `PROJECT_ROOT` - Claude projects directory (default: ~/.claude/projects)
+
+**Features:**
+- ✅ Zero configuration - works out of the box
+- ✅ Automatic dependency installation on first run
+- ✅ Production-optimized (pre-built files)
+- ✅ Cross-platform (Linux, macOS, WSL2)
+- ✅ Flexible port configuration (no conflicts)
+
+### Method 2: npx (No Installation)
+
+Run Claudex without installing:
 
 ```bash
+npx @kunwarshah/claudex
+```
+
+### Method 3: From Source (Development)
+
+For development or contributing:
+
+```bash
+# Clone repository
+git clone https://github.com/kunwar-shah/claudex.git
 cd claudex
-./install.sh
-# Then run from anywhere:
-claudex
+
+# Install dependencies
+npm install
+cd server && npm install && cd ..
+cd client && npm install && cd ..
+
+# Run development mode
+npm run dev
 ```
 
 ## Configuration
