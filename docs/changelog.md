@@ -2,6 +2,52 @@
 
 All notable changes to Claudex.
 
+## [1.2.2] - 2025-11-12 (Coming Soon)
+
+### Added
+- 🚀 **npm Package Distribution** - Available on npm as `@kunwarshah/claudex`
+- 🎛️ **CLI Flags** - `--port` and `--project-root` for flexible configuration
+- 🔧 **Better Error Messages** - Helpful troubleshooting for port conflicts
+- 📝 **Comprehensive Help** - Enhanced `--help` with examples and tips
+
+### Improved
+- ⚙️ **Production Mode Detection** - Auto-detects built files vs dev mode
+- 🐳 **Port Flexibility** - No need to kill processes, just use different port
+- 📚 **Documentation** - Complete npm package management guide
+- 🛠️ **Developer Experience** - Clear CLI interface with multiple config options
+
+### Features
+- Install globally: `npm install -g @kunwarshah/claudex`
+- Run anywhere: `claudex` or `claudex --port 3500`
+- Zero configuration with sensible defaults
+- On-demand dependency installation
+- Cross-platform support (Linux, macOS, WSL2)
+
+---
+
+## [1.2.1] - 2025-11-12
+
+### Fixed
+- 🐛 Fixed production mode detection in bin script
+- 🔧 Server now correctly serves pre-built files from client/dist
+- ✅ Eliminated Vite dev server errors in global installations
+
+---
+
+## [1.2.0] - 2025-11-12
+
+### Added
+- 🎨 **Theming System** - Complete dark/light mode support (Phase 2)
+- 💾 **Session Favorites** - Bookmark important conversations
+- 🎭 **Theme Toggle** - User preference persistence
+- 🌓 **Dark Mode Variants** - All UI components support theming
+
+### Technical
+- Initial npm package structure (workspaces, no postinstall)
+- Scoped package: `@kunwarshah/claudex`
+
+---
+
 ## [1.1.1] - 2025-10-31
 
 ### Fixed

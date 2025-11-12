@@ -1,6 +1,6 @@
 # Getting Started
 
-Get Claudex up and running in less than 5 minutes.
+Get Claudex up and running in less than 2 minutes.
 
 ## Prerequisites
 
@@ -10,7 +10,42 @@ Before you begin, ensure you have:
 - **npm 9+** - Comes with Node.js
 - **Claude Code** - With conversation history in `~/.claude/projects`
 
-## Installation
+## Quick Install (Recommended) ⭐
+
+Install and run Claudex globally via npm:
+
+```bash
+# Install from npm
+npm install -g @kunwarshah/claudex
+
+# Run it
+claudex
+```
+
+That's it! 🎉 Open **http://localhost:3400** in your browser.
+
+The application will:
+- ✅ Auto-install dependencies on first run
+- ✅ Detect your Claude projects at `~/.claude/projects`
+- ✅ Build search index automatically
+- ✅ Start in production mode (optimized)
+
+### Custom Configuration
+
+```bash
+# Use different port
+claudex --port 3500
+
+# Use custom projects directory
+claudex --project-root ~/my-claude-projects
+
+# Both
+claudex --port 8080 --project-root ~/my-chats
+```
+
+## Alternative: Install from Source
+
+For development or contributing:
 
 ### 1. Clone the Repository
 
