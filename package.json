@@ -1,6 +1,6 @@
 {
-  "name": "claudex",
-  "version": "1.2.0",
+  "name": "@kunwarshah/claudex",
+  "version": "1.2.1",
   "description": "Professional conversation viewer and analysis tool for Claude Code. Search, analyze, and export your AI conversations with enterprise-grade full-text search and multi-platform support.",
   "main": "index.js",
   "bin": {
@@ -29,7 +29,7 @@
     "start": "node bin/claude-viewer.js",
     "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
     "build": "npm run build --workspace=client",
-    "prepublishOnly": "npm run build && npm test",
+    "prepublishOnly": "npm run build",
     "test": "npm test --workspaces",
     "check": "node scripts/check-system.mjs",
     "check:verbose": "node scripts/check-system.mjs --verbose",

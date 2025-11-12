@@ -17,15 +17,15 @@ NC='\033[0m'
 
 # Step 1: Clean previous install
 echo -e "${BLUE}1. Cleaning previous installation...${NC}"
-npm uninstall -g claudex 2>/dev/null || true
-rm -f claudex-*.tgz
+npm uninstall -g @kunwarshah/claudex 2>/dev/null || true
+rm -f kunwarshah-claudex-*.tgz
 echo -e "${GREEN}✓ Cleaned${NC}"
 echo ""
 
 # Step 2: Build tarball
 echo -e "${BLUE}2. Building package tarball...${NC}"
 npm pack
-TARBALL=$(ls claudex-*.tgz)
+TARBALL=$(ls kunwarshah-claudex-*.tgz)
 SIZE=$(ls -lh $TARBALL | awk '{print $5}')
 echo -e "${GREEN}✓ Built: $TARBALL ($SIZE)${NC}"
 echo ""
@@ -68,13 +68,13 @@ echo ""
 # Step 8: Check dependencies installed
 echo -e "${BLUE}8. Checking dependencies...${NC}"
 NPM_ROOT=$(npm root -g)
-if [ -d "$NPM_ROOT/claudex/server/node_modules" ]; then
+if [ -d "$NPM_ROOT/@kunwarshah/claudex/server/node_modules" ]; then
     echo -e "${GREEN}✓ Server dependencies installed${NC}"
 else
     echo -e "${YELLOW}⚠ Server dependencies missing (postinstall may have failed)${NC}"
 fi
 
-if [ -d "$NPM_ROOT/claudex/client/node_modules" ]; then
+if [ -d "$NPM_ROOT/@kunwarshah/claudex/client/node_modules" ]; then
     echo -e "${GREEN}✓ Client dependencies installed${NC}"
 else
     echo -e "${YELLOW}⚠ Client dependencies missing${NC}"
@@ -98,7 +98,7 @@ echo -e "${GREEN}✅ Test completed successfully!${NC}"
 echo ""
 echo "Next steps:"
 echo "  - Run 'claudex' to start the app (Ctrl+C to stop)"
-echo "  - Run 'npm uninstall -g claudex' to clean up"
+echo "  - Run 'npm uninstall -g @kunwarshah/claudex' to clean up"
 echo "  - Make changes and run this script again"
 echo ""
 echo "To test on Windows:"

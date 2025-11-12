@@ -15,10 +15,10 @@ This simulates the exact npm install experience without actually publishing.
 cd /path/to/claude-viewer
 npm pack
 
-# Output: claudex-1.1.1.tgz (473KB)
+# Output: kunwarshah-claudex-1.2.0.tgz (469KB)
 
 # 2. Install globally from tarball
-npm install -g ./claudex-1.1.1.tgz
+npm install -g ./kunwarshah-claudex-1.2.0.tgz
 
 # 3. Test the command
 claudex --help
@@ -29,7 +29,7 @@ claudex
 # (Ctrl+C to stop)
 
 # 5. Uninstall after testing
-npm uninstall -g claudex
+npm uninstall -g @kunwarshah/claudex
 
 # 6. Make changes, rebuild, test again
 # Repeat steps 1-5 as many times as needed
@@ -54,7 +54,7 @@ claudex --help
 # Changes are immediately available
 
 # 4. Unlink when done testing
-npm unlink -g claudex
+npm unlink -g @kunwarshah/claudex
 ```
 
 **Note**: This doesn't test the postinstall script or package contents - use Method 1 for final validation.
@@ -66,7 +66,7 @@ npm unlink -g claudex
 ### WSL (Linux) - Primary Testing
 
 **What to Test**:
-- ✅ `npm install -g ./claudex-1.1.1.tgz` works
+- ✅ `npm install -g ./kunwarshah-claudex-1.2.0.tgz` works
 - ✅ `claudex` command available in PATH
 - ✅ postinstall script runs successfully
 - ✅ Server dependencies install
@@ -83,11 +83,11 @@ npm unlink -g claudex
 echo "🧪 Testing Claudex npm package on WSL..."
 
 # Clean previous install
-npm uninstall -g claudex 2>/dev/null
+npm uninstall -g @kunwarshah/claudex 2>/dev/null
 
 # Install from tarball
 echo "📦 Installing from tarball..."
-npm install -g ./claudex-1.1.1.tgz
+npm install -g ./kunwarshah-claudex-1.2.0.tgz
 
 # Check command exists
 if command -v claudex &> /dev/null; then
@@ -107,7 +107,7 @@ claudex --help
 
 # Check system checker
 echo "🔧 Running system check:"
-cd $(npm root -g)/claudex
+cd $(npm root -g)/@kunwarshah/claudex
 npm run check
 
 echo "✅ All tests passed!"
@@ -137,11 +137,11 @@ echo "✅ All tests passed!"
 Write-Host "🧪 Testing Claudex npm package on Windows..." -ForegroundColor Cyan
 
 # Clean previous install
-npm uninstall -g claudex 2>$null
+npm uninstall -g @kunwarshah/claudex 2>$null
 
 # Install from tarball
 Write-Host "📦 Installing from tarball..." -ForegroundColor Blue
-npm install -g .\claudex-1.1.1.tgz
+npm install -g .\kunwarshah-claudex-1.2.0.tgz
 
 # Check command exists
 if (Get-Command claudex -ErrorAction SilentlyContinue) {

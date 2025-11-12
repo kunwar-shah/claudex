@@ -52,64 +52,114 @@ function checkDependencies() {
 
 function startApplication() {
   console.log(chalk.cyan('🚀 Starting Claude Code Conversations Viewer...'))
-  console.log(chalk.blue('🔧 Starting development servers...'))
-  
-  // Start both server and client concurrently
-  const concurrently = spawn('npx', [
-    'concurrently',
-    '--kill-others',
-    '--prefix', 'name',
-    '--names', 'SERVER,CLIENT',
-    '--prefix-colors', 'blue,green',
-    '"npm run dev --prefix server"',
-    '"npm run dev --prefix client"'
-  ], {
-    cwd: PROJECT_ROOT,
-    stdio: 'inherit'
-  })
-  
-  concurrently.on('close', (code) => {
-    if (code !== 0) {
-      console.log(chalk.red('❌ Application failed to start'))
-      process.exit(1)
-    }
-  })
-  
-  // Handle process termination gracefully
-  process.on('SIGINT', () => {
-    console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
-    concurrently.kill('SIGINT')
-    process.exit(0)
-  })
-  
-  process.on('SIGTERM', () => {
-    console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
-    concurrently.kill('SIGTERM')
-    process.exit(0)
-  })
+
+  // Check if client/dist exists (production build)
+  const clientDist = path.join(CLIENT_DIR, 'dist')
+  const hasProductionBuild = fs.existsSync(clientDist)
+
+  if (hasProductionBuild) {
+    // Production mode: serve pre-built files
+    console.log(chalk.blue('📦 Running in production mode...'))
+
+    // Set environment for production
+    process.env.NODE_ENV = 'production'
+    process.env.CLIENT_DIST_PATH = clientDist
+
+    // Start server only (it will serve static files from client/dist)
+    const server = spawn('node', ['src/server.js'], {
+      cwd: SERVER_DIR,
+      stdio: 'inherit',
+      env: process.env
+    })
+
+    server.on('close', (code) => {
+      if (code !== 0) {
+        console.log(chalk.red('❌ Server failed to start'))
+        process.exit(1)
+      }
+    })
+
+    // Handle process termination gracefully
+    process.on('SIGINT', () => {
+      console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
+      server.kill('SIGINT')
+      process.exit(0)
+    })
+
+    process.on('SIGTERM', () => {
+      console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
+      server.kill('SIGTERM')
+      process.exit(0)
+    })
+  } else {
+    // Development mode: use vite dev server
+    console.log(chalk.blue('🔧 Starting development servers...'))
+
+    // Start both server and client concurrently
+    const concurrently = spawn('npx', [
+      'concurrently',
+      '--kill-others',
+      '--prefix', 'name',
+      '--names', 'SERVER,CLIENT',
+      '--prefix-colors', 'blue,green',
+      '"npm run dev --prefix server"',
+      '"npm run dev --prefix client"'
+    ], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit'
+    })
+
+    concurrently.on('close', (code) => {
+      if (code !== 0) {
+        console.log(chalk.red('❌ Application failed to start'))
+        process.exit(1)
+      }
+    })
+
+    // Handle process termination gracefully
+    process.on('SIGINT', () => {
+      console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
+      concurrently.kill('SIGINT')
+      process.exit(0)
+    })
+
+    process.on('SIGTERM', () => {
+      console.log(chalk.yellow('\n👋 Shutting down Claude Viewer...'))
+      concurrently.kill('SIGTERM')
+      process.exit(0)
+    })
+  }
 }
 
 function showHelp() {
   console.log(chalk.cyan('Claude Code Conversations Viewer CLI'))
   console.log('')
   console.log(chalk.white('Usage:'))
-  console.log('  claude-viewer [options]')
+  console.log('  claudex [options]')
   console.log('')
   console.log(chalk.white('Options:'))
-  console.log('  --help, -h     Show this help message')
-  console.log('  --version, -v  Show version')
+  console.log('  --help, -h              Show this help message')
+  console.log('  --version, -v           Show version')
+  console.log('  --port, -p <port>       Server port (default: 3400)')
+  console.log('  --project-root <path>   Path to Claude projects directory')
   console.log('')
   console.log(chalk.white('Environment Variables:'))
   console.log('  PROJECT_ROOT   Path to Claude projects directory (default: ~/.claude/projects)')
-  console.log('  PORT          Server port (default: 3001)')
+  console.log('  PORT           Server port (default: 3400)')
   console.log('')
   console.log(chalk.white('Examples:'))
-  console.log('  claude-viewer                    Start the application')
-  console.log('  PROJECT_ROOT=/custom/path claude-viewer')
+  console.log('  claudex                              Start on default port (3400)')
+  console.log('  claudex --port 3500                  Start on custom port')
+  console.log('  claudex -p 8080                      Short form')
+  console.log('  claudex --project-root ~/my-chats    Custom projects directory')
+  console.log('  PORT=3500 claudex                    Using environment variable')
   console.log('')
   console.log(chalk.green('The application will be available at:'))
-  console.log(chalk.blue('  Frontend: http://localhost:3000'))
-  console.log(chalk.blue('  Backend:  http://localhost:3001'))
+  console.log(chalk.blue('  http://localhost:<port>'))
+  console.log('')
+  console.log(chalk.yellow('Troubleshooting:'))
+  console.log('  Port already in use? Try: claudex --port 3500')
+  console.log('  Projects not found? Try: claudex --project-root /custom/path')
 }
 
 function showVersion() {
@@ -119,6 +169,42 @@ function showVersion() {
 
 // Parse command line arguments
 const args = process.argv.slice(2)
+
+// Parse port flag
+let customPort = null
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--port' || args[i] === '-p') {
+    customPort = args[i + 1]
+    if (!customPort || isNaN(parseInt(customPort))) {
+      console.log(chalk.red('❌ Invalid port number'))
+      console.log(chalk.yellow('Usage: claudex --port 3500'))
+      process.exit(1)
+    }
+    break
+  }
+}
+
+// Parse project root flag
+let customProjectRoot = null
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--project-root') {
+    customProjectRoot = args[i + 1]
+    if (!customProjectRoot) {
+      console.log(chalk.red('❌ Invalid project root path'))
+      console.log(chalk.yellow('Usage: claudex --project-root /path/to/projects'))
+      process.exit(1)
+    }
+    break
+  }
+}
+
+// Set environment variables from CLI flags
+if (customPort) {
+  process.env.PORT = customPort
+}
+if (customProjectRoot) {
+  process.env.PROJECT_ROOT = customProjectRoot
+}
 
 if (args.includes('--help') || args.includes('-h')) {
   showHelp()
@@ -131,8 +217,10 @@ if (args.includes('--version') || args.includes('-v')) {
 }
 
 // Welcome message
+const port = process.env.PORT || 3400
 console.log(chalk.cyan.bold('🔍 Claude Code Conversations Viewer'))
 console.log(chalk.gray('   A professional UI for Claude Code conversation files'))
+console.log(chalk.gray(`   Port: ${port}`))
 console.log('')
 
 // Check dependencies and start

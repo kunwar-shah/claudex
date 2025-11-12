@@ -69,20 +69,34 @@
 
 ### Installation
 
-#### Option 1: npm (Recommended - Coming Soon)
-
-> **Note**: npm package will be available after Phase B.2 completion
+#### Option 1: npm (Recommended)
 
 ```bash
 # Global installation
-npm install -g claudex
+npm install -g @kunwarshah/claudex
 
 # Then run anywhere:
 claudex
 
+# Custom port (if 3400 is in use):
+claudex --port 3500
+
+# Custom project directory:
+claudex --project-root ~/my-claude-projects
+
 # Or use without installing (npx):
-npx claudex
+npx @kunwarshah/claudex
 ```
+
+**CLI Options**:
+- `--help, -h`: Show help message
+- `--version, -v`: Show version
+- `--port, -p <port>`: Custom server port (default: 3400)
+- `--project-root <path>`: Custom Claude projects directory
+
+**Environment Variables**:
+- `PORT`: Server port (default: 3400)
+- `PROJECT_ROOT`: Claude projects directory (default: ~/.claude/projects)
 
 #### Option 2: From Source
 
