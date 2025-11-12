@@ -1,11 +1,13 @@
 import { FileScanner } from '../services/fileScanner.js';
 import { SessionParser } from '../services/sessionParser.js';
+import { ProjectExporter } from '../services/projectExporter.js';
 import { formatDistanceToNow } from 'date-fns';
 import { getProjectRoot } from '../utils/pathHelper.js';
 
 export async function exportRoutes(fastify, options) {
   const fileScanner = new FileScanner(getProjectRoot());
   const sessionParser = new SessionParser();
+  const projectExporter = new ProjectExporter(getProjectRoot());
 
   // GET /api/export/session/:projectId/:sessionId?format=json|html|txt
   fastify.get('/export/session/:projectId/:sessionId', async (request, reply) => {
@@ -61,9 +63,44 @@ export async function exportRoutes(fastify, options) {
 
     } catch (error) {
       console.error('Export failed:', error);
-      reply.code(500).send({ 
+      reply.code(500).send({
         error: 'Failed to export session',
-        message: error.message 
+        message: error.message
+      });
+    }
+  });
+
+  // GET /api/export/project/:projectId - Export complete project
+  fastify.get('/export/project/:projectId', async (request, reply) => {
+    try {
+      const { projectId } = request.params;
+      
+      // Validate projectId format
+      if (!/^[a-zA-Z0-9\-_/]+$/.test(projectId)) {
+        return reply.code(400).send({ error: 'Invalid project ID format' });
+      }
+
+      // Export the entire project
+      const exportData = await projectExporter.exportProject(projectId);
+
+      // Set appropriate headers
+      const timestamp = new Date().toISOString().split('T')[0];
+      reply.header('Content-Type', 'application/json');
+
+      // Sanitize filename to prevent special characters
+      const safeName = exportData.project.name
+        .replace(/[^a-zA-Z0-9-_]/g, '-')  // Replace special chars with dashes
+        .slice(0, 50);                     // Limit length
+      const filename = `${safeName}-complete-${timestamp}.json`;
+      reply.header('Content-Disposition', `attachment; filename="${filename}"`);
+
+      return exportData;
+
+    } catch (error) {
+      console.error('Project export failed:', error);
+      reply.code(500).send({
+        error: 'Failed to export project',
+        message: error.message
       });
     }
   });
@@ -181,9 +218,21 @@ export async function exportRoutes(fastify, options) {
     <div class="stats">
         <h3>Session Statistics</h3>
         ${data.stats ? `
-            <p><strong>Messages Parsed:</strong> ${data.stats.totalMessages || 0}</p>
+            <p><strong>Messages Parsed:</strong> ${data.stats.parsedMessages || 0}</p>
             <p><strong>Lines Processed:</strong> ${data.stats.totalLines || 0}</p>
             ${data.stats.skippedLines ? `<p><strong>Lines Skipped:</strong> ${data.stats.skippedLines}</p>` : ''}
+
+            ${data.stats.tokens && data.stats.tokens.messagesWithUsage > 0 ? `
+                <h4 style="margin-top: 20px; margin-bottom: 10px;">Token Usage</h4>
+                <p><strong>Total Tokens:</strong> ${data.stats.tokens.totalTokens.toLocaleString()}</p>
+                <p><strong>Input Tokens:</strong> ${data.stats.tokens.totalInputTokens.toLocaleString()}</p>
+                <p><strong>Output Tokens:</strong> ${data.stats.tokens.totalOutputTokens.toLocaleString()}</p>
+                ${data.stats.tokens.totalCacheCreationTokens > 0 ? `<p><strong>Cache Creation Tokens:</strong> ${data.stats.tokens.totalCacheCreationTokens.toLocaleString()}</p>` : ''}
+                ${data.stats.tokens.totalCacheReadTokens > 0 ? `<p><strong>Cache Read Tokens:</strong> ${data.stats.tokens.totalCacheReadTokens.toLocaleString()}</p>` : ''}
+                ${(data.stats.tokens.totalCacheCreationTokens > 0 || data.stats.tokens.totalCacheReadTokens > 0) ? `<p><strong>Cache Hit Rate:</strong> ${data.stats.tokens.cacheHitRate.toFixed(2)}%</p>` : ''}
+                ${data.stats.tokens.ephemeral5mTokens > 0 ? `<p style="margin-left: 20px;"><em>5m TTL:</em> ${data.stats.tokens.ephemeral5mTokens.toLocaleString()}</p>` : ''}
+                ${data.stats.tokens.ephemeral1hTokens > 0 ? `<p style="margin-left: 20px;"><em>1h TTL:</em> ${data.stats.tokens.ephemeral1hTokens.toLocaleString()}</p>` : ''}
+            ` : ''}
         ` : ''}
     </div>
 </body>
@@ -225,9 +274,22 @@ ${separator}
 SESSION STATISTICS
 ${separator}
 ${data.stats ? `
-Messages Parsed: ${data.stats.totalMessages || 0}
+Messages Parsed: ${data.stats.parsedMessages || 0}
 Lines Processed: ${data.stats.totalLines || 0}
 ${data.stats.skippedLines ? `Lines Skipped: ${data.stats.skippedLines}` : ''}
+
+${data.stats.tokens && data.stats.tokens.messagesWithUsage > 0 ? `
+TOKEN USAGE
+${'-'.repeat(40)}
+Total Tokens: ${data.stats.tokens.totalTokens.toLocaleString()}
+Input Tokens: ${data.stats.tokens.totalInputTokens.toLocaleString()}
+Output Tokens: ${data.stats.tokens.totalOutputTokens.toLocaleString()}
+${data.stats.tokens.totalCacheCreationTokens > 0 ? `Cache Creation Tokens: ${data.stats.tokens.totalCacheCreationTokens.toLocaleString()}` : ''}
+${data.stats.tokens.totalCacheReadTokens > 0 ? `Cache Read Tokens: ${data.stats.tokens.totalCacheReadTokens.toLocaleString()}` : ''}
+${(data.stats.tokens.totalCacheCreationTokens > 0 || data.stats.tokens.totalCacheReadTokens > 0) ? `Cache Hit Rate: ${data.stats.tokens.cacheHitRate.toFixed(2)}%` : ''}
+${data.stats.tokens.ephemeral5mTokens > 0 ? `  5m TTL: ${data.stats.tokens.ephemeral5mTokens.toLocaleString()}` : ''}
+${data.stats.tokens.ephemeral1hTokens > 0 ? `  1h TTL: ${data.stats.tokens.ephemeral1hTokens.toLocaleString()}` : ''}
+` : ''}
 ` : 'No statistics available'}
 
 Generated by Claude Code Conversations Viewer

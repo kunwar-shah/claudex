@@ -1,8 +1,27 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Highlight, themes } from 'prism-react-renderer'
+import { useSettings } from '../contexts/SettingsContext'
 
 const MessageRenderer = ({ content, contentKind = 'text' }) => {
+  const { settings } = useSettings()
+
+  // Map settings.codeTheme to prism themes
+  const getTheme = () => {
+    switch (settings.codeTheme) {
+      case 'github-dark':
+        return themes.vsDark
+      case 'monokai':
+        return themes.nightOwl
+      case 'solarized-light':
+        return themes.github
+      default:
+        return themes.vsDark
+    }
+  }
+
+  const selectedTheme = getTheme()
+
   // Robust content validation and normalization
   if (!content && content !== 0) {
     return <div className="text-gray-400 italic">No content</div>
@@ -29,7 +48,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
               const match = /language-(\w+)/.exec(className || '')
               return !inline && match ? (
                 <Highlight
-                  theme={themes.github}
+                  theme={selectedTheme}
                   code={String(children).replace(/\n$/, '')}
                   language={match[1]}
                 >
@@ -50,7 +69,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
                   )}
                 </Highlight>
               ) : (
-                <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+                <code className="bg-[hsl(var(--surface-hover))] px-1 py-0.5 rounded text-sm font-mono" {...props}>
                   {children}
                 </code>
               )
@@ -60,7 +79,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
             },
             blockquote({ children }) {
               return (
-                <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-700">
+                <blockquote className="border-l-4 border-[hsl(var(--border-hover))] pl-4 italic">
                   {children}
                 </blockquote>
               )
@@ -102,8 +121,8 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
       } catch (error) {
         // Fall back to raw text if JSON parsing fails
         return (
-          <div className="bg-gray-100 p-4 rounded-lg overflow-hidden">
-            <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
+          <div className="bg-[hsl(var(--surface-hover))] p-4 rounded-lg overflow-hidden">
+            <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
               {safeContent}
             </pre>
           </div>
@@ -125,7 +144,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
           <div className="text-xs text-yellow-800 mb-2 font-medium">
             Raw/Unknown Format
           </div>
-          <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
+          <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
             {safeContent}
           </pre>
         </div>
@@ -142,7 +161,7 @@ const MessageRenderer = ({ content, contentKind = 'text' }) => {
         ))
 
       return (
-        <div className="whitespace-pre-wrap text-gray-800">
+        <div className="whitespace-pre-wrap">
           {formattedContent}
         </div>
       )

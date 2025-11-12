@@ -27,10 +27,10 @@
   "preferGlobal": true,
   "scripts": {
     "start": "node bin/claude-viewer.js",
-    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
-    "build": "npm run build --workspace=client",
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
     "prepublishOnly": "npm run build",
-    "test": "npm test --workspaces",
+    "test": "npm test --workspaces --if-present",
     "check": "node scripts/check-system.mjs",
     "check:verbose": "node scripts/check-system.mjs --verbose",
     "check:fix": "node scripts/check-system.mjs --fix",
@@ -57,7 +57,6 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
-    "concurrently": "^8.2.0",
     "cross-spawn": "^7.0.3"
   },
   "repository": {
@@ -69,6 +68,7 @@
   },
   "homepage": "https://kunwar-shah.github.io/claudex/",
   "devDependencies": {
+    "concurrently": "^8.2.0",
     "playwright": "^1.55.1"
   }
 }
