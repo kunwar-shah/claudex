@@ -1,6 +1,6 @@
 {
   "name": "@kunwarshah/claudex",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Professional conversation viewer and analysis tool for Claude Code. Search, analyze, and export your AI conversations with enterprise-grade full-text search and multi-platform support.",
   "main": "index.js",
   "bin": {
