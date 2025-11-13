@@ -53,11 +53,19 @@ function checkDependencies() {
 function startApplication() {
   console.log(chalk.cyan('🚀 Starting Claude Code Conversations Viewer...'))
 
-  // Check if client/dist exists (production build)
+  // Check if we should run in production or development mode
+  // Priority: NODE_ENV > dist folder existence
   const clientDist = path.join(CLIENT_DIR, 'dist')
   const hasProductionBuild = fs.existsSync(clientDist)
+  const isExplicitDev = process.env.NODE_ENV === 'development'
+  const isExplicitProd = process.env.NODE_ENV === 'production'
 
-  if (hasProductionBuild) {
+  // Run in production mode if:
+  // 1. NODE_ENV=production is explicitly set, OR
+  // 2. dist folder exists AND NODE_ENV is not explicitly set to development
+  const useProductionMode = isExplicitProd || (hasProductionBuild && !isExplicitDev)
+
+  if (useProductionMode && hasProductionBuild) {
     // Production mode: serve pre-built files
     console.log(chalk.blue('📦 Running in production mode...'))
 
