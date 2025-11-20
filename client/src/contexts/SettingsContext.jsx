@@ -86,7 +86,7 @@ export const SettingsProvider = ({ children }) => {
     const link = document.createElement('link')
     link.id = 'theme-stylesheet'
     link.rel = 'stylesheet'
-    link.href = `/src/styles/themes/${settings.colorTheme}.css`
+    link.href = `/themes/${settings.colorTheme}.css`
     console.log('[Theme] Loading color theme:', link.href)
 
     // CRITICAL FIX: Wait for color theme to load before applying dark mode
@@ -102,7 +102,7 @@ export const SettingsProvider = ({ children }) => {
         const darkStylesheet = document.createElement('link')
         darkStylesheet.id = 'dark-theme-stylesheet'
         darkStylesheet.rel = 'stylesheet'
-        darkStylesheet.href = '/src/styles/themes/dark.css'
+        darkStylesheet.href = '/themes/dark.css'
 
         darkStylesheet.onload = () => {
           console.log('[Theme] Dark theme CSS loaded successfully')

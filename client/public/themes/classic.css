@@ -1,0 +1,99 @@
+/**
+ * Classic Theme - Original Claudex Design
+ * Professional bluish-gray aesthetic with muted tones
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Muted Royal Blue */
+  --primary: 217 60% 58%;        /* Medium royal blue (#5B8DEF) - Classic search button */
+  --primary-hover: 217 60% 50%;  /* Darker blue on hover */
+  --primary-light: 217 60% 95%;  /* Very light blue background */
+  --primary-dark: 217 60% 25%;   /* Deep blue */
+
+  /* Secondary Accent - Mint/Teal Green */
+  --secondary: 158 60% 55%;      /* Medium mint green for badges (more visible) */
+  --secondary-hover: 158 60% 45%;
+
+  /* Semantic Colors */
+  --success: 158 65% 55%;        /* Mint/teal green - Assistant indicator (#4FD1C5) */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 217 60% 58%;           /* Same as primary */
+
+  /* Background Colors - Almost White with Subtle Blue Hint */
+  --background: 214 8% 99%;      /* Almost white with tiny blue hint (#FCFCFD) */
+  --background-secondary: 214 10% 97%;
+  --surface: 0 0% 100%;          /* Pure white cards/surfaces */
+  --surface-hover: 214 12% 98%;
+
+  /* Text Colors - Charcoal/Slate */
+  --text-primary: 215 25% 27%;   /* Dark charcoal (#3B4451) */
+  --text-secondary: 215 18% 45%; /* Medium gray (#697280) */
+  --text-tertiary: 215 14% 65%;  /* Light gray (#9BA3AF) */
+  --text-on-primary: 0 0% 100%;  /* White text on blue */
+
+  /* Border Colors - Very Subtle Gray */
+  --border: 214 12% 93%;         /* Very light gray border (#EEEFF1) */
+  --border-hover: 214 15% 88%;   /* Slightly darker on hover */
+  --border-focus: 217 60% 58%;   /* Primary blue */
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 214 12% 93%;
+  --input-bg: 0 0% 100%;
+  --input-border: 214 12% 93%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific - Light header with subtle bluish texture */
+  --header-bg: 214 8% 99%;        /* Almost white with tiny blue hint */
+  --header-text: 215 25% 27%;     /* Dark charcoal text */
+  --header-border: 214 12% 93%;   /* Very subtle gray border */
+}
+
+/* Header overrides for classic theme - light header with dark text */
+.bg-primary-header {
+  background-color: hsl(var(--header-bg)) !important;
+}
+
+header .text-white {
+  color: hsl(var(--header-text)) !important;
+}
+
+header .border-primary-light {
+  border-color: hsl(var(--header-border)) !important;
+}
+
+/* Header button hover states */
+header button:hover,
+header a:hover {
+  background-color: hsl(214 20% 95%) !important;
+}
+
+/* Header text for links and buttons */
+header .text-primary-light {
+  color: hsl(var(--text-secondary)) !important;
+}
+
+/* Mobile menu background */
+header .bg-\\[hsl\\(var\\(--primary-hover\\)\\)\\] {
+  background-color: hsl(214 15% 97%) !important;
+}
+
+/* Badges - Make them visible and colorful */
+.inline-flex.items-center.rounded-full,
+.inline-flex.items-center.rounded-md {
+  opacity: 1 !important;
+  filter: saturate(1.15) brightness(1.05) !important;
+}
+
+/* Ensure badge text is white on colored backgrounds */
+.bg-primary,
+.bg-secondary,
+.bg-success,
+.bg-warning,
+.bg-error {
+  color: white !important;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

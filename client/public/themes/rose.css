@@ -1,0 +1,54 @@
+/**
+ * Rose Theme - Elegant Rose Pink
+ * Sophisticated and warm aesthetic
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Rose */
+  --primary: 350 89% 60%;        /* Rose-400 (#FB7185) */
+  --primary-hover: 350 89% 50%;  /* Darker rose */
+  --primary-light: 350 89% 95%;  /* Very light rose */
+  --primary-dark: 350 89% 40%;   /* Deep rose */
+
+  /* Secondary Accent - Pink */
+  --secondary: 330 81% 60%;      /* Pink-400 */
+  --secondary-hover: 330 81% 50%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 350 89% 60%;           /* Same as primary */
+
+  /* Background Colors */
+  --background: 0 0% 100%;
+  --background-secondary: 350 100% 99%;
+  --surface: 0 0% 100%;
+  --surface-hover: 350 100% 98%;
+
+  /* Text Colors */
+  --text-primary: 350 10% 10%;
+  --text-secondary: 350 6% 40%;
+  --text-tertiary: 350 5% 60%;
+  --text-on-primary: 0 0% 100%;
+
+  /* Border Colors */
+  --border: 350 20% 91%;
+  --border-hover: 350 25% 84%;
+  --border-focus: 350 89% 60%;
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 350 20% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 350 20% 91%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific */
+  --header-bg: 350 89% 60%;
+  --header-text: 0 0% 100%;
+  --header-border: 350 89% 50%;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

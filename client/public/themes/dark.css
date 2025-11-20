@@ -1,0 +1,34 @@
+/**
+ * Dark Theme - Dark Mode Support
+ * Professional dark color scheme for all base themes
+ * Usage: Import after design-system.css, applied via [data-theme="dark"]
+ */
+
+[data-theme="dark"] {
+  /* Background Colors */
+  --background: 222 47% 11%;         /* Slate-900 */
+  --background-secondary: 217 33% 14%;
+  --surface: 217 33% 17%;            /* Slate-800 */
+  --surface-hover: 217 33% 20%;
+
+  /* Text Colors */
+  --text-primary: 210 40% 98%;       /* Slate-50 */
+  --text-secondary: 215 20% 75%;     /* Slate-300 */
+  --text-tertiary: 215 16% 60%;      /* Slate-400 */
+  --text-on-primary: 0 0% 100%;
+
+  /* Border Colors */
+  --border: 217 33% 24%;             /* Slate-700 */
+  --border-hover: 217 33% 30%;
+  --border-focus: var(--primary);
+
+  /* Component-Specific */
+  --card-bg: 217 33% 17%;
+  --card-border: 217 33% 24%;
+  --input-bg: 217 33% 14%;
+  --input-border: 217 33% 24%;
+  --button-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+
+  /* Keep primary colors from selected theme */
+  /* Primary colors are inherited from emerald/blue/purple theme */
+}
