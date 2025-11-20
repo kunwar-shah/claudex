@@ -61,11 +61,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   const tabs = [
     { id: 'appearance', label: 'Appearance', icon: Palette, available: true },
-    { id: 'search', label: 'Search & Index', icon: Search, available: false },
-    { id: 'sessions', label: 'Sessions', icon: FolderOpen, available: false },
-    { id: 'display', label: 'Display', icon: Eye, available: false },
-    { id: 'data', label: 'Data & Privacy', icon: Database, available: false },
-    { id: 'advanced', label: 'Advanced', icon: SettingsIcon, available: false }
+    { id: 'search', label: 'Search & Index', icon: Search, available: true },
+    { id: 'sessions', label: 'Sessions', icon: FolderOpen, available: true },
+    { id: 'display', label: 'Display', icon: Eye, available: true },
+    { id: 'data', label: 'Data & Privacy', icon: Database, available: true },
+    { id: 'advanced', label: 'Advanced', icon: SettingsIcon, available: true }
   ]
 
   return (
