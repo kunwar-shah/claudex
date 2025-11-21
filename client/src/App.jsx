@@ -29,15 +29,27 @@ function App() {
 
         console.log('[Auto-Index] Current index status:', indexStatus)
 
+        // Check if index is outdated (older than 7 days)
+        const lastUpdated = indexStatus.stats?.last_updated
+        const daysSinceUpdate = lastUpdated
+          ? Math.floor((Date.now() - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
+          : Infinity
+
+        const isOutdated = daysSinceUpdate > 7
+
         // Trigger rebuild if:
-        // 1. No index exists (total_messages = 0)
-        // 2. Index is not currently building
+        // 1. No index exists (total_messages = 0), OR
+        // 2. Index is outdated (> 7 days old)
+        // 3. AND index is not currently building
         const shouldBuild =
-          indexStatus.stats?.total_messages === 0 &&
+          (indexStatus.stats?.total_messages === 0 || isOutdated) &&
           !indexStatus.rebuild?.isBuilding
 
         if (shouldBuild) {
-          console.log('[Auto-Index] Triggering index build on startup...')
+          const reason = indexStatus.stats?.total_messages === 0
+            ? 'no index exists'
+            : `index is ${daysSinceUpdate} days old`
+          console.log(`[Auto-Index] Triggering index build on startup (${reason})...`)
           await searchApi.rebuildIndex()
 
           // Show start notification
@@ -87,11 +99,11 @@ function App() {
             }
           }, 3000)
         } else {
-          // Index already exists - show info toast
-          console.log('[Auto-Index] Index already exists, skipping rebuild')
+          // Index is recent - show info toast
+          console.log(`[Auto-Index] Index is recent (${daysSinceUpdate} days old), skipping rebuild`)
           const infoToast = document.createElement('div')
           infoToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
-          infoToast.textContent = `ℹ️ Search index already exists (${indexStatus.stats?.total_messages || 0} messages indexed)`
+          infoToast.textContent = `ℹ️ Search index is up to date (${indexStatus.stats?.total_messages || 0} messages, ${daysSinceUpdate} days old)`
           document.body.appendChild(infoToast)
 
           setTimeout(() => {
