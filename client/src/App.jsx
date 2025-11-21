@@ -5,6 +5,7 @@ import ProjectView from './components/ProjectView'
 import TremorProjectView from './components/TremorProjectView'
 import SearchPage from './components/SearchPage'
 import SessionManagementPage from './pages/SessionManagementPage'
+import Toast from './components/Toast'
 import { useSettings } from './contexts/SettingsContext'
 import { searchApi } from './services/api'
 import './App.css'
@@ -12,6 +13,7 @@ import './App.css'
 function App() {
   const { settings } = useSettings()
   const [autoIndexTriggered, setAutoIndexTriggered] = useState(false)
+  const [toast, setToast] = useState(null) // { type, message }
 
   // Auto-index on startup
   useEffect(() => {
@@ -56,18 +58,7 @@ function App() {
 
           // Show start notification
           console.log('[Auto-Index] Creating start notification toast...')
-          const startToast = document.createElement('div')
-          startToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
-          startToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
-          startToast.textContent = '🔄 Search index is building in the background...'
-          document.body.appendChild(startToast)
-          console.log('[Auto-Index] Start toast added to DOM')
-
-          setTimeout(() => {
-            if (document.body.contains(startToast)) {
-              document.body.removeChild(startToast)
-            }
-          }, 4000)
+          setToast({ type: 'info', message: 'Search index is building in the background...' })
 
           // Poll for completion (check every 3 seconds, max 10 minutes)
           let pollCount = 0
@@ -83,18 +74,11 @@ function App() {
 
                 // Show success notification
                 console.log('[Auto-Index] Index build complete! Creating success toast...')
-                const successToast = document.createElement('div')
-                successToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
-                successToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #16a34a; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
-                successToast.textContent = `✅ Search index built successfully! (${status.data.stats?.total_messages || 0} messages indexed)`
-                document.body.appendChild(successToast)
-                console.log('[Auto-Index] Success toast added to DOM')
-
-                setTimeout(() => {
-                  if (document.body.contains(successToast)) {
-                    document.body.removeChild(successToast)
-                  }
-                }, 5000)
+                const messageCount = status.data.stats?.total_messages || 0
+                setToast({
+                  type: 'success',
+                  message: `Search index built successfully! (${messageCount} messages indexed)`
+                })
               }
 
               // Stop polling after max attempts
@@ -111,18 +95,11 @@ function App() {
           const ageText = daysSinceUpdate === Infinity ? 'unknown age' : `${daysSinceUpdate} days old`
           console.log(`[Auto-Index] Index is recent (${ageText}), skipping rebuild`)
           console.log('[Auto-Index] Creating info toast...')
-          const infoToast = document.createElement('div')
-          infoToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
-          infoToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
-          infoToast.textContent = `ℹ️ Search index is up to date (${indexStatus.stats?.total_messages || 0} messages, ${ageText})`
-          document.body.appendChild(infoToast)
-          console.log('[Auto-Index] Info toast added to DOM')
-
-          setTimeout(() => {
-            if (document.body.contains(infoToast)) {
-              document.body.removeChild(infoToast)
-            }
-          }, 4000)
+          const messageCount = indexStatus.stats?.total_messages || 0
+          setToast({
+            type: 'info',
+            message: `Search index is up to date (${messageCount} messages, ${ageText})`
+          })
         }
 
         setAutoIndexTriggered(true)
@@ -152,6 +129,15 @@ function App() {
           <Route path="tremor-preview/projects/:projectId/sessions/:sessionId" element={<TremorProjectView />} />
         </Route>
       </Routes>
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }
