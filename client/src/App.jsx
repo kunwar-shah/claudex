@@ -38,17 +38,52 @@ function App() {
           console.log('[Auto-Index] Triggering index build on startup...')
           await searchApi.rebuildIndex()
 
-          // Show subtle toast notification
-          const toast = document.createElement('div')
-          toast.className = 'fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
-          toast.textContent = '🔄 Search index is building in the background...'
-          document.body.appendChild(toast)
+          // Show start notification
+          const startToast = document.createElement('div')
+          startToast.className = 'fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
+          startToast.textContent = '🔄 Search index is building in the background...'
+          document.body.appendChild(startToast)
 
           setTimeout(() => {
-            if (document.body.contains(toast)) {
-              document.body.removeChild(toast)
+            if (document.body.contains(startToast)) {
+              document.body.removeChild(startToast)
             }
           }, 4000)
+
+          // Poll for completion (check every 3 seconds, max 10 minutes)
+          let pollCount = 0
+          const maxPolls = 200 // 10 minutes
+          const pollInterval = setInterval(async () => {
+            pollCount++
+            try {
+              const status = await searchApi.getIndexStatus()
+
+              // Check if build is complete
+              if (!status.data.rebuild?.isBuilding) {
+                clearInterval(pollInterval)
+
+                // Show success notification
+                const successToast = document.createElement('div')
+                successToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
+                successToast.textContent = `✅ Search index built successfully! (${status.data.stats?.total_messages || 0} messages indexed)`
+                document.body.appendChild(successToast)
+
+                setTimeout(() => {
+                  if (document.body.contains(successToast)) {
+                    document.body.removeChild(successToast)
+                  }
+                }, 5000)
+              }
+
+              // Stop polling after max attempts
+              if (pollCount >= maxPolls) {
+                clearInterval(pollInterval)
+              }
+            } catch (error) {
+              console.error('[Auto-Index] Polling error:', error)
+              clearInterval(pollInterval)
+            }
+          }, 3000)
         }
 
         setAutoIndexTriggered(true)
