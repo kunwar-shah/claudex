@@ -27,6 +27,8 @@ function App() {
         const response = await searchApi.getIndexStatus()
         const indexStatus = response.data
 
+        console.log('[Auto-Index] Current index status:', indexStatus)
+
         // Trigger rebuild if:
         // 1. No index exists (total_messages = 0)
         // 2. Index is not currently building
@@ -84,6 +86,19 @@ function App() {
               clearInterval(pollInterval)
             }
           }, 3000)
+        } else {
+          // Index already exists - show info toast
+          console.log('[Auto-Index] Index already exists, skipping rebuild')
+          const infoToast = document.createElement('div')
+          infoToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
+          infoToast.textContent = `ℹ️ Search index already exists (${indexStatus.stats?.total_messages || 0} messages indexed)`
+          document.body.appendChild(infoToast)
+
+          setTimeout(() => {
+            if (document.body.contains(infoToast)) {
+              document.body.removeChild(infoToast)
+            }
+          }, 4000)
         }
 
         setAutoIndexTriggered(true)
