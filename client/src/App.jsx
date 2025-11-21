@@ -48,15 +48,20 @@ function App() {
         if (shouldBuild) {
           const reason = indexStatus.stats?.total_messages === 0
             ? 'no index exists'
+            : daysSinceUpdate === Infinity
+            ? 'index has no timestamp'
             : `index is ${daysSinceUpdate} days old`
           console.log(`[Auto-Index] Triggering index build on startup (${reason})...`)
           await searchApi.rebuildIndex()
 
           // Show start notification
+          console.log('[Auto-Index] Creating start notification toast...')
           const startToast = document.createElement('div')
-          startToast.className = 'fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
+          startToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
+          startToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
           startToast.textContent = '🔄 Search index is building in the background...'
           document.body.appendChild(startToast)
+          console.log('[Auto-Index] Start toast added to DOM')
 
           setTimeout(() => {
             if (document.body.contains(startToast)) {
@@ -77,10 +82,13 @@ function App() {
                 clearInterval(pollInterval)
 
                 // Show success notification
+                console.log('[Auto-Index] Index build complete! Creating success toast...')
                 const successToast = document.createElement('div')
-                successToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
+                successToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
+                successToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #16a34a; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
                 successToast.textContent = `✅ Search index built successfully! (${status.data.stats?.total_messages || 0} messages indexed)`
                 document.body.appendChild(successToast)
+                console.log('[Auto-Index] Success toast added to DOM')
 
                 setTimeout(() => {
                   if (document.body.contains(successToast)) {
@@ -100,11 +108,15 @@ function App() {
           }, 3000)
         } else {
           // Index is recent - show info toast
-          console.log(`[Auto-Index] Index is recent (${daysSinceUpdate} days old), skipping rebuild`)
+          const ageText = daysSinceUpdate === Infinity ? 'unknown age' : `${daysSinceUpdate} days old`
+          console.log(`[Auto-Index] Index is recent (${ageText}), skipping rebuild`)
+          console.log('[Auto-Index] Creating info toast...')
           const infoToast = document.createElement('div')
-          infoToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
-          infoToast.textContent = `ℹ️ Search index is up to date (${indexStatus.stats?.total_messages || 0} messages, ${daysSinceUpdate} days old)`
+          infoToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
+          infoToast.style.cssText = 'position: fixed; top: 1rem; right: 1rem; background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999;'
+          infoToast.textContent = `ℹ️ Search index is up to date (${indexStatus.stats?.total_messages || 0} messages, ${ageText})`
           document.body.appendChild(infoToast)
+          console.log('[Auto-Index] Info toast added to DOM')
 
           setTimeout(() => {
             if (document.body.contains(infoToast)) {
