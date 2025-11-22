@@ -12,14 +12,17 @@ import './App.css'
 
 function App() {
   const { settings } = useSettings()
-  const [autoIndexTriggered, setAutoIndexTriggered] = useState(false)
   const [toast, setToast] = useState(null) // { type, message }
 
   // Auto-index on startup
   useEffect(() => {
     const triggerAutoIndex = async () => {
-      // Only run once per session
-      if (autoIndexTriggered) return
+      // Only run once per browser session (persists across refreshes)
+      const sessionKey = 'claudex-auto-index-triggered'
+      if (sessionStorage.getItem(sessionKey)) {
+        console.log('[Auto-Index] Already triggered this session, skipping')
+        return
+      }
 
       // Check if auto-index is enabled in settings
       if (!settings.autoIndexOnStartup) return
@@ -102,17 +105,19 @@ function App() {
           })
         }
 
-        setAutoIndexTriggered(true)
+        // Mark as triggered for this session
+        sessionStorage.setItem('claudex-auto-index-triggered', 'true')
       } catch (error) {
         console.error('[Auto-Index] Failed to trigger auto-index:', error)
-        setAutoIndexTriggered(true)
+        // Mark as triggered even on error to avoid retry loops
+        sessionStorage.setItem('claudex-auto-index-triggered', 'true')
       }
     }
 
     // Small delay to let the app render first
     const timer = setTimeout(triggerAutoIndex, 1000)
     return () => clearTimeout(timer)
-  }, [settings.autoIndexOnStartup, autoIndexTriggered])
+  }, [settings.autoIndexOnStartup])
 
   return (
     <div className="App">
