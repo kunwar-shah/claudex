@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
 
   // Search & Index (Priority 2)
   autoIndexOnStartup: false,
+  autoIndexDays: 7, // Days before index is considered outdated (1-30)
   resultsPerPage: 25, // 10 | 25 | 50 | 100
   searchHistory: true,
   highlightColor: 'yellow', // 'yellow' | 'blue' | 'green'

@@ -31,17 +31,17 @@ function App() {
 
         console.log('[Auto-Index] Current index status:', indexStatus)
 
-        // Check if index is outdated (older than 7 days)
+        // Check if index is outdated (based on user setting)
         const lastUpdated = indexStatus.stats?.last_updated
         const daysSinceUpdate = lastUpdated
           ? Math.floor((Date.now() - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
           : Infinity
 
-        const isOutdated = daysSinceUpdate > 7
+        const isOutdated = daysSinceUpdate > settings.autoIndexDays
 
         // Trigger rebuild if:
         // 1. No index exists (total_messages = 0), OR
-        // 2. Index is outdated (> 7 days old)
+        // 2. Index is outdated (> autoIndexDays threshold)
         // 3. AND index is not currently building
         const shouldBuild =
           (indexStatus.stats?.total_messages === 0 || isOutdated) &&
