@@ -12,7 +12,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  const { data: projectsData } = useQuery({
+  const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getProjects().then(res => res.data)
   })
@@ -64,6 +64,7 @@ const Header = () => {
             projects={projectsData?.projects || []}
             selectedProject={selectedProject}
             onProjectSelect={setSelectedProject}
+            isLoading={projectsLoading}
           />
 
           <Button

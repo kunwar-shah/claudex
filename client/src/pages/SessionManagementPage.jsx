@@ -42,7 +42,7 @@ const SessionManagementPage = () => {
   const [selectedProject, setSelectedProject] = useState(null)
 
   // Fetch all projects
-  const { data: projectsData } = useQuery({
+  const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getProjects().then(res => res.data)
   })
@@ -121,6 +121,7 @@ const SessionManagementPage = () => {
                     selectedProject={selectedProject}
                     onProjectSelect={handleProjectChange}
                     size="large"
+                    isLoading={projectsLoading}
                   />
                 </div>
 
@@ -163,6 +164,7 @@ const SessionManagementPage = () => {
                 projects={projects}
                 selectedProject={selectedProject}
                 onProjectSelect={handleProjectChange}
+                isLoading={projectsLoading}
               />
             </div>
           </div>
