@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { Circle, CircleDot, PencilLine, MessageCircle, Eye, Trash2, RotateCcw } from 'lucide-react'
+import { Circle, CircleDot, PencilLine, MessageCircle, Eye, Trash2, RotateCcw, Star } from 'lucide-react'
 import { sessionMetadataApi } from '../services/api'
 
 /**
@@ -45,8 +45,16 @@ const SessionTable = ({
     enabled: !!projectId
   })
 
+  // Fetch favorited sessions
+  const { data: favoritedData } = useQuery({
+    queryKey: ['favorited-sessions', projectId],
+    queryFn: () => sessionMetadataApi.getFavoritedSessions(projectId).then(res => res.data),
+    enabled: !!projectId
+  })
+
   const hiddenSessions = hiddenData?.hiddenSessions || []
   const deletedSessions = deletedData?.deletedSessions || []
+  const favoritedSessions = favoritedData?.favoritedSessions || []
 
   // Fetch all metadata for tag filtering (only when tag filter is active)
   const { data: allMetadataData } = useQuery({
@@ -83,6 +91,7 @@ const SessionTable = ({
     // Show filter (for non-deleted sessions)
     if (showFilter === 'visible' && isHidden) return false
     if (showFilter === 'hidden' && !isHidden) return false
+    if (showFilter === 'favorites' && !favoritedSessions.includes(session.sessionId)) return false
 
     // Tag filter (only runs if tagFilter is set and metadata is loaded)
     if (tagFilter && metadataBySession[session.sessionId]) {
@@ -173,6 +182,7 @@ const SessionTable = ({
                 projectId={projectId}
                 isSelected={selectedSessions.includes(session.sessionId)}
                 isHidden={hiddenSessions.includes(session.sessionId)}
+                isFavorited={favoritedSessions.includes(session.sessionId)}
                 onSelect={(checked) => onSelectSession(session.sessionId, checked)}
                 onShowSummary={onShowSummary}
                 navigate={navigate}
@@ -187,7 +197,7 @@ const SessionTable = ({
 }
 
 // Individual table row component
-const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, onShowSummary, navigate, showFilter }) => {
+const SessionTableRow = ({ session, projectId, isSelected, isHidden, isFavorited, onSelect, onShowSummary, navigate, showFilter }) => {
   const queryClient = useQueryClient()
   const [showActions, setShowActions] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -237,6 +247,14 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
       queryClient.invalidateQueries(['session-metadata', projectId, session.sessionId])
       queryClient.invalidateQueries(['sessions', projectId])
       queryClient.invalidateQueries(['deleted-sessions', projectId])
+    }
+  })
+
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: () => sessionMetadataApi.toggleFavorite(projectId, session.sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['session-metadata', projectId, session.sessionId])
+      queryClient.invalidateQueries(['favorited-sessions', projectId])
     }
   })
 
@@ -290,6 +308,14 @@ const SessionTableRow = ({ session, projectId, isSelected, isHidden, onSelect, o
           </div>
         ) : (
           <div className="flex items-start gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleFavoriteMutation.mutate() }}
+              disabled={toggleFavoriteMutation.isPending}
+              className="flex-shrink-0 mt-0.5 hover:scale-110 transition-transform"
+              title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+            >
+              <Star className={`w-4 h-4 ${isFavorited ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300 hover:text-yellow-400'}`} />
+            </button>
             {isHidden && <CircleDot className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />}
             <span className="text-sm font-medium text-[hsl(var(--text-primary))] break-words line-clamp-3">
               {displayTitle}

@@ -38,6 +38,7 @@ export class SessionMetadataService {
       originalTitle: row.original_title,
       isHidden: Boolean(row.is_hidden),
       isDeleted: Boolean(row.is_deleted),
+      isFavorited: Boolean(row.is_favorited),
       tags: row.tags ? JSON.parse(row.tags) : [],
       notes: row.notes,
       createdAt: row.created_at,
@@ -330,6 +331,55 @@ export class SessionMetadataService {
         is_deleted = excluded.is_deleted,
         updated_at = CURRENT_TIMESTAMP
     `, sessionIds.flatMap(sid => [projectId, sid, isDeleted ? 1 : 0]))
+
+    return { success: true, count: sessionIds.length }
+  }
+
+  /**
+   * Toggle session favorite status
+   */
+  async toggleFavorite(projectId, sessionId) {
+    const existing = await this.getMetadata(projectId, sessionId)
+    const newFavoritedState = existing ? !existing.isFavorited : true
+
+    if (existing) {
+      await this.searchDb.db.run(`
+        UPDATE session_metadata
+        SET is_favorited = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE project_id = ? AND session_id = ?
+      `, [newFavoritedState ? 1 : 0, projectId, sessionId])
+    } else {
+      await this.searchDb.db.run(`
+        INSERT INTO session_metadata (project_id, session_id, is_favorited)
+        VALUES (?, ?, ?)
+      `, [projectId, sessionId, newFavoritedState ? 1 : 0])
+    }
+
+    return await this.getMetadata(projectId, sessionId)
+  }
+
+  /**
+   * Get all favorited sessions for a project
+   */
+  async getFavoritedSessions(projectId) {
+    const rows = await this.searchDb.db.all(
+      'SELECT session_id FROM session_metadata WHERE project_id = ? AND is_favorited = 1',
+      [projectId]
+    )
+    return rows.map(row => row.session_id)
+  }
+
+  /**
+   * Batch favorite/unfavorite sessions
+   */
+  async batchSetFavorited(projectId, sessionIds, isFavorited) {
+    await this.searchDb.db.run(`
+      INSERT INTO session_metadata (project_id, session_id, is_favorited)
+      VALUES ${sessionIds.map(() => '(?, ?, ?)').join(', ')}
+      ON CONFLICT(session_id, project_id) DO UPDATE SET
+        is_favorited = excluded.is_favorited,
+        updated_at = CURRENT_TIMESTAMP
+    `, sessionIds.flatMap(sid => [projectId, sid, isFavorited ? 1 : 0]))
 
     return { success: true, count: sessionIds.length }
   }

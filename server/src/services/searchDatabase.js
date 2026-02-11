@@ -100,11 +100,22 @@ export class SearchDatabase {
       }
     }
 
+    // Migration: Add is_favorited column if it doesn't exist (for existing databases)
+    try {
+      await this.db.run('ALTER TABLE session_metadata ADD COLUMN is_favorited INTEGER DEFAULT 0')
+      console.log('Migration: Added is_favorited column to session_metadata table')
+    } catch (error) {
+      if (!error.message.includes('duplicate column name')) {
+        console.error('Migration error:', error)
+      }
+    }
+
     // Create indexes for session_metadata table
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_project ON session_metadata(project_id)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_hidden ON session_metadata(is_hidden)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_deleted ON session_metadata(is_deleted)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_tags ON session_metadata(tags)')
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_favorited ON session_metadata(is_favorited)')
   }
 
   async indexMessage({
