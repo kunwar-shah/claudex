@@ -22,6 +22,12 @@ export function extractTitleFromMessages(messages, fallback = 'Untitled Session'
   // Extract and clean content
   let title = targetMessage.content;
 
+  // Remove XML-like tags with their content (Claude Code IDE tags, system reminders, etc.)
+  title = title.replace(/<(ide_opened_file|ide_selection|system-reminder|environment_details|attached_files|tool_call|tool_result|user-prompt-submit-hook)[^>]*>[\s\S]*?<\/\1>/g, '');
+
+  // Remove any remaining HTML/XML tags (opening, closing, self-closing)
+  title = title.replace(/<\/?[a-zA-Z_][a-zA-Z0-9_-]*[^>]*>/g, '');
+
   // Remove markdown code blocks (```...```)
   title = title.replace(/```[\s\S]*?```/g, '[code]');
 
