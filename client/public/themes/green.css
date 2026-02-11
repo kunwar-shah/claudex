@@ -1,0 +1,54 @@
+/**
+ * Green Theme - Fresh Green
+ * Natural and calming aesthetic
+ * Usage: Import after design-system.css
+ */
+
+:root {
+  /* Primary Brand Colors - Green */
+  --primary: 142 71% 45%;        /* Green-600 (#16A34A) */
+  --primary-hover: 142 76% 36%;  /* Darker green */
+  --primary-light: 142 71% 95%;  /* Very light green */
+  --primary-dark: 142 76% 30%;   /* Deep green */
+
+  /* Secondary Accent - Lime */
+  --secondary: 84 81% 44%;       /* Lime-600 */
+  --secondary-hover: 84 85% 35%;
+
+  /* Semantic Colors */
+  --success: 142 71% 45%;        /* Green-600 */
+  --warning: 38 92% 50%;         /* Amber-500 */
+  --error: 0 84% 60%;            /* Red-500 */
+  --info: 142 71% 45%;           /* Same as primary */
+
+  /* Background Colors */
+  --background: 0 0% 100%;
+  --background-secondary: 142 100% 99%;
+  --surface: 0 0% 100%;
+  --surface-hover: 142 100% 98%;
+
+  /* Text Colors */
+  --text-primary: 142 10% 10%;
+  --text-secondary: 142 6% 40%;
+  --text-tertiary: 142 5% 60%;
+  --text-on-primary: 0 0% 100%;
+
+  /* Border Colors */
+  --border: 142 20% 91%;
+  --border-hover: 142 25% 84%;
+  --border-focus: 142 71% 45%;
+
+  /* Component-Specific */
+  --card-bg: 0 0% 100%;
+  --card-border: 142 20% 91%;
+  --input-bg: 0 0% 100%;
+  --input-border: 142 20% 91%;
+  --button-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Header-Specific */
+  --header-bg: 142 71% 45%;
+  --header-text: 0 0% 100%;
+  --header-border: 142 76% 36%;
+}
+
+/* Dark mode handled by dark.css with [data-theme="dark"] selector */

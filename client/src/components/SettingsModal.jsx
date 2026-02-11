@@ -61,11 +61,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   const tabs = [
     { id: 'appearance', label: 'Appearance', icon: Palette, available: true },
-    { id: 'search', label: 'Search & Index', icon: Search, available: false },
-    { id: 'sessions', label: 'Sessions', icon: FolderOpen, available: false },
-    { id: 'display', label: 'Display', icon: Eye, available: false },
-    { id: 'data', label: 'Data & Privacy', icon: Database, available: false },
-    { id: 'advanced', label: 'Advanced', icon: SettingsIcon, available: false }
+    { id: 'search', label: 'Search & Index', icon: Search, available: true },
+    { id: 'sessions', label: 'Sessions', icon: FolderOpen, available: true },
+    { id: 'display', label: 'Display', icon: Eye, available: true },
+    { id: 'data', label: 'Data & Privacy', icon: Database, available: true },
+    { id: 'advanced', label: 'Advanced', icon: SettingsIcon, available: true }
   ]
 
   return (
@@ -834,6 +834,37 @@ const SettingsModal = ({ isOpen, onClose }) => {
                         <div className="w-11 h-6 bg-[hsl(var(--border))] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[hsl(var(--surface))] after:border-[hsl(var(--border-hover))] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </label>
                     </div>
+                  </div>
+
+                  {/* Auto-Index Days Threshold */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      Auto-Index Age Threshold
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="1"
+                        max="30"
+                        value={getValue("autoIndexDays")}
+                        onChange={(e) => handleChange('autoIndexDays', parseInt(e.target.value))}
+                        className="flex-1 h-2 bg-[hsl(var(--border))] rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <input
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={getValue("autoIndexDays")}
+                          onChange={(e) => handleChange('autoIndexDays', Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
+                          className="w-16 px-2 py-1 text-sm border border-[hsl(var(--border))] rounded focus:outline-none focus:ring-2 focus:ring-primary bg-[hsl(var(--input-bg))] text-[hsl(var(--text-primary))]"
+                        />
+                        <span className="text-sm text-text-secondary">days</span>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-xs text-text-tertiary">
+                      Rebuild search index automatically if older than {getValue("autoIndexDays")} {getValue("autoIndexDays") === 1 ? 'day' : 'days'}
+                    </p>
                   </div>
 
                   {/* Results Per Page */}
