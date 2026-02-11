@@ -137,6 +137,8 @@ const cleanTitle = (title) => {
   let cleaned = title.replace(/<ide_selection>.*?<\/ide_selection>/gs, '')
   cleaned = cleaned.replace(/<ide_opened_file>.*?<\/ide_opened_file>/gs, '')
   cleaned = cleaned.replace(/<system-reminder>.*?<\/system-reminder>/gs, '')
+  // Generic catch-all for any remaining XML/HTML tags
+  cleaned = cleaned.replace(/<\/?[a-zA-Z_][a-zA-Z0-9_-]*[^>]*>/g, '')
   cleaned = cleaned.trim()
   return cleaned.length > 0 ? cleaned : title
 }
