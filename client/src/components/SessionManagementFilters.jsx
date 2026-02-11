@@ -70,6 +70,7 @@ const SessionManagementFilters = ({
         >
           <option value="all">All Sessions</option>
           <option value="visible">Visible Only</option>
+          <option value="favorites">Favorites</option>
           <option value="hidden">Hidden Only</option>
           <option value="trash">Trash</option>
         </select>

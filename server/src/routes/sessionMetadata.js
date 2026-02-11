@@ -373,4 +373,65 @@ export async function sessionMetadataRoutes(fastify, options) {
       })
     }
   })
+
+  // PATCH /api/session-metadata/:projectId/:sessionId/favorite
+  // Toggle session favorite status
+  fastify.patch('/session-metadata/:projectId/:sessionId/favorite', async (request, reply) => {
+    try {
+      const { projectId, sessionId } = request.params
+      const metadata = await metadataService.toggleFavorite(projectId, sessionId)
+      return { metadata }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to toggle session favorite',
+        message: error.message
+      })
+    }
+  })
+
+  // GET /api/session-metadata/:projectId/favorites
+  // Get all favorited sessions in a project
+  fastify.get('/session-metadata/:projectId/favorites', async (request, reply) => {
+    try {
+      const { projectId } = request.params
+      const favoritedSessions = await metadataService.getFavoritedSessions(projectId)
+      return { projectId, favoritedSessions, count: favoritedSessions.length }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to get favorited sessions',
+        message: error.message
+      })
+    }
+  })
+
+  // POST /api/session-metadata/:projectId/batch/favorite
+  // Batch favorite/unfavorite sessions
+  fastify.post('/session-metadata/:projectId/batch/favorite', async (request, reply) => {
+    try {
+      const { projectId } = request.params
+      const { sessionIds, isFavorited } = request.body
+
+      if (!Array.isArray(sessionIds)) {
+        return reply.code(400).send({
+          error: 'Invalid sessionIds',
+          message: 'sessionIds must be an array'
+        })
+      }
+
+      if (typeof isFavorited !== 'boolean') {
+        return reply.code(400).send({
+          error: 'Invalid isFavorited',
+          message: 'isFavorited must be a boolean'
+        })
+      }
+
+      const result = await metadataService.batchSetFavorited(projectId, sessionIds, isFavorited)
+      return result
+    } catch (error) {
+      reply.code(500).send({
+        error: 'Failed to batch update favorite status',
+        message: error.message
+      })
+    }
+  })
 }

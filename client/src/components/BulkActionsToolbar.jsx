@@ -73,6 +73,30 @@ const BulkActionsToolbar = ({ selectedCount, selectedSessions, projectId, onClea
     }
   })
 
+  // Bulk favorite mutation
+  const bulkFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      await sessionMetadataApi.batchSetFavorited(projectId, selectedSessions, true)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['favorited-sessions', projectId])
+      queryClient.invalidateQueries(['sessions', projectId])
+      onClearSelection()
+    }
+  })
+
+  // Bulk unfavorite mutation
+  const bulkUnfavoriteMutation = useMutation({
+    mutationFn: async () => {
+      await sessionMetadataApi.batchSetFavorited(projectId, selectedSessions, false)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['favorited-sessions', projectId])
+      queryClient.invalidateQueries(['sessions', projectId])
+      onClearSelection()
+    }
+  })
+
   const handleAddTag = () => {
     if (newTag.trim()) {
       addTagMutation.mutate(newTag.trim())
@@ -165,6 +189,30 @@ const BulkActionsToolbar = ({ selectedCount, selectedSessions, projectId, onClea
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             {bulkShowMutation.isPending ? 'Showing...' : 'Show All'}
+          </button>
+
+          {/* Favorite */}
+          <button
+            onClick={() => bulkFavoriteMutation.mutate()}
+            disabled={bulkFavoriteMutation.isPending}
+            className="px-3 py-1.5 text-sm bg-[hsl(var(--surface))] border border-yellow-300 text-yellow-700 rounded-lg hover:bg-yellow-50 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            {bulkFavoriteMutation.isPending ? 'Favoriting...' : 'Favorite'}
+          </button>
+
+          {/* Unfavorite */}
+          <button
+            onClick={() => bulkUnfavoriteMutation.mutate()}
+            disabled={bulkUnfavoriteMutation.isPending}
+            className="px-3 py-1.5 text-sm bg-[hsl(var(--surface))] border border-[hsl(var(--border-hover))] text-[hsl(var(--text-primary))] rounded-lg hover:bg-[hsl(var(--background-secondary))] flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            {bulkUnfavoriteMutation.isPending ? 'Removing...' : 'Unfavorite'}
           </button>
 
           {/* Delete Metadata */}

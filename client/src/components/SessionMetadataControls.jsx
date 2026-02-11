@@ -70,6 +70,15 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
     }
   })
 
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: () => sessionMetadataApi.toggleFavorite(projectId, sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['session-metadata', projectId, sessionId])
+      queryClient.invalidateQueries(['favorited-sessions', projectId])
+      queryClient.invalidateQueries(['sessions', projectId])
+    }
+  })
+
   const deleteMetadataMutation = useMutation({
     mutationFn: () => sessionMetadataApi.deleteMetadata(projectId, sessionId),
     onSuccess: () => {
@@ -106,6 +115,9 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
   if (compact) {
     return (
       <div className="flex items-center gap-1 text-xs">
+        {metadata.isFavorited && (
+          <span className="text-yellow-500" title="Favorited">★</span>
+        )}
         {metadata.isHidden && (
           <span className="text-xs text-slate-400" title="Hidden">👁️‍🗨️</span>
         )}
@@ -185,6 +197,24 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
             }`}
           >
             {metadata.isHidden ? '👁️‍🗨️ Hidden' : '👁️ Visible'}
+          </button>
+        </div>
+      </div>
+
+      {/* Favorite Toggle */}
+      <div>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-semibold text-[hsl(var(--text-primary))]">Favorite</label>
+          <button
+            onClick={() => toggleFavoriteMutation.mutate()}
+            disabled={toggleFavoriteMutation.isPending}
+            className={`px-3 py-1.5 rounded text-xs font-medium ${
+              metadata.isFavorited
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                : 'bg-[hsl(var(--border))] text-[hsl(var(--text-primary))] hover:opacity-80'
+            }`}
+          >
+            {metadata.isFavorited ? '★ Favorited' : '☆ Not Favorited'}
           </button>
         </div>
       </div>

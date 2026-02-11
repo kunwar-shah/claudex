@@ -122,6 +122,16 @@ export const sessionMetadataApi = {
 
   batchSetDeleted: (projectId, sessionIds, isDeleted) =>
     api.post(`/session-metadata/${projectId}/batch/deleted`, { sessionIds, isDeleted }),
+
+  // Favorite operations
+  toggleFavorite: (projectId, sessionId) =>
+    api.patch(`/session-metadata/${projectId}/${sessionId}/favorite`),
+
+  getFavoritedSessions: (projectId) =>
+    api.get(`/session-metadata/${projectId}/favorites`),
+
+  batchSetFavorited: (projectId, sessionIds, isFavorited) =>
+    api.post(`/session-metadata/${projectId}/batch/favorite`, { sessionIds, isFavorited }),
 };
 
 export const healthApi = {
