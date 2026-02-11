@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ChevronsUpDown, Check, FolderOpen } from 'lucide-react'
+import { ChevronsUpDown, Check, FolderOpen, Loader2 } from 'lucide-react'
 
-const ProjectComboBox = ({ projects, selectedProject, onProjectSelect, size = 'small' }) => {
+const ProjectComboBox = ({ projects, selectedProject, onProjectSelect, size = 'small', isLoading = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
@@ -62,9 +62,13 @@ const ProjectComboBox = ({ projects, selectedProject, onProjectSelect, size = 's
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <FolderOpen className={`${iconSize} flex-shrink-0 ${selectedProject ? 'text-primary' : 'text-muted-foreground'}`} />
+          {isLoading ? (
+            <Loader2 className={`${iconSize} flex-shrink-0 text-muted-foreground animate-spin`} />
+          ) : (
+            <FolderOpen className={`${iconSize} flex-shrink-0 ${selectedProject ? 'text-primary' : 'text-muted-foreground'}`} />
+          )}
           <span className="truncate" style={{ fontVariant: 'small-caps', letterSpacing: '0.05em' }}>
-            {selectedProject ? selectedProject.name : 'Select project...'}
+            {isLoading ? 'Loading projects...' : selectedProject ? selectedProject.name : 'Select project...'}
           </span>
         </div>
         <ChevronsUpDown className={`${iconSize} ml-2 opacity-50 flex-shrink-0`} />
@@ -99,7 +103,12 @@ const ProjectComboBox = ({ projects, selectedProject, onProjectSelect, size = 's
 
             {/* Project List - Shadcn minimal style */}
             <div className="max-h-60 overflow-y-auto p-1">
-              {filteredProjects.length === 0 ? (
+              {isLoading ? (
+                <div className="py-6 flex flex-col items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Loading projects...</span>
+                </div>
+              ) : filteredProjects.length === 0 ? (
                 <div className="py-6 text-center text-sm text-muted-foreground">
                   {searchQuery ? 'No project found.' : 'No projects available.'}
                 </div>
