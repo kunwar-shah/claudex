@@ -27,6 +27,24 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
   const [showUser, setShowUser] = useState(true)
   const [showAssistant, setShowAssistant] = useState(true)
 
+  // Check if a message is purely a tool result container (role='user' but not real user input)
+  const isToolResultMessage = (message) => {
+    if (message.role !== 'user') return false
+    const hasToolResults = message.toolsUsed?.some(t => t.type === 'tool_result' || t.name === 'tool_result')
+    const hasToolResultAction = message.actions?.includes('Tool results provided')
+    const hasUserMessageAction = message.actions?.includes('User message')
+    // It's a tool message if it has tool results AND is not also a real user message
+    return (hasToolResults || hasToolResultAction) && !hasUserMessageAction
+  }
+
+  // Shared filter: tool results follow assistant filter, real user messages follow user filter
+  const filterMessages = (msgs) => msgs.filter(message => {
+    if (isToolResultMessage(message)) return showAssistant
+    if (message.role === 'user' && !showUser) return false
+    if (message.role === 'assistant' && !showAssistant) return false
+    return true
+  })
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['session', projectId, sessionId, currentPage, pageSize],
     queryFn: () => projectsApi.getSession(projectId, sessionId, { page: currentPage, pageSize }).then(res => res.data),
@@ -218,11 +236,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
                   {/* Filtered count indicator */}
                   {(!showUser || !showAssistant) && (
                     <Badge variant="secondary">
-                      {messages.filter(message => {
-                        if (message.role === 'user' && !showUser) return false
-                        if (message.role === 'assistant' && !showAssistant) return false
-                        return true
-                      }).length} of {messages.length} visible
+                      {filterMessages(messages).length} of {messages.length} visible
                     </Badge>
                   )}
                 </div>
@@ -255,12 +269,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
           ? "p-4 bg-background"
           : "p-2 space-y-2"
       )}>
-        {messages
-          .filter(message => {
-            if (message.role === 'user' && !showUser) return false
-            if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
-            return true
-          })
+        {filterMessages(messages)
           .map((message, index, filteredMessages) => {
             // Use messaging view if enabled
             if (settings.conversationView === 'messaging') {
@@ -290,11 +299,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
           })}
         
         {/* No messages after filtering */}
-        {messages.filter(message => {
-          if (message.role === 'user' && !showUser) return false
-          if ((message.role === 'assistant' || message.role === 'tool_results') && !showAssistant) return false
-          return true
-        }).length === 0 && (
+        {filterMessages(messages).length === 0 && (
           <EmptyState
             title="No messages to display"
             description="Adjust the message filter to see content"
