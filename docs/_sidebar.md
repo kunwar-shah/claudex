@@ -9,6 +9,7 @@
 * User Guide
   * [UI Guide](ui-guide.md)
   * [Features](features.md)
+  * [MCP Server](mcp.md)
   * [Search System](search.md)
   * [Templates](templates.md)
   * [Export](export.md)

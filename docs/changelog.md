@@ -2,6 +2,27 @@
 
 All notable changes to Claudex.
 
+## [1.3.0] - 2026-02-12
+
+### Added
+- **MCP Server** - Model Context Protocol server for Claude Code integration
+- **10 MCP Tools** - `get_project_context`, `list_projects`, `list_sessions`, `search_conversations`, `get_session`, `get_session_summary`, `store_memory`, `recall_memory`, `list_memories`, `delete_memory`
+- **Structured Memory System** - Store coding knowledge (conventions, architecture, decisions, error patterns) in SQLite with priority, confidence, and TTL
+- **3 MCP Prompts** - `/recall`, `/catchup`, `/history` for quick access to past sessions
+- **MCP Resources** - `claudex://projects` and `claudex://projects/{id}/recent`
+- **Token Budgeting** - Three detail levels (minimal/standard/full) for context management
+- **Server Instructions** - Proactive tool usage guidance for Claude
+
+### How to Use
+```bash
+npm install -g @kunwarshah/claudex
+claude mcp add --transport stdio claudex -- claudex-mcp
+```
+
+See [MCP Server Guide](mcp.md) for full documentation.
+
+---
+
 ## [1.2.2] - 2025-11-12 (Coming Soon)
 
 ### Added

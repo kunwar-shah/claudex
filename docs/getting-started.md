@@ -121,8 +121,19 @@ After setup, verify everything works:
 - [ ] Search index builds successfully
 - [ ] Search returns results
 
+## Add MCP Server (Optional)
+
+Give Claude Code persistent memory by registering the MCP server:
+
+```bash
+claude mcp add --transport stdio claudex -- claudex-mcp
+```
+
+Claude will now have access to your conversation history, structured memory, and project context across sessions. See the [MCP Server Guide](mcp.md) for details.
+
 ## Next Steps
 
+- [MCP Server](mcp.md) — Persistent memory for Claude Code
 - [Learn about Search](search.md)
 - [Understand Templates](templates.md)
 - [Explore the API](api.md)

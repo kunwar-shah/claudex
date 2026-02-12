@@ -81,6 +81,20 @@ cd client && npm install && cd ..
 npm run dev
 ```
 
+## MCP Server Registration
+
+After installing Claudex, register the MCP server to give Claude Code persistent memory:
+
+```bash
+# If installed globally
+claude mcp add --transport stdio claudex -- claudex-mcp
+
+# If using npx (no global install)
+claude mcp add --transport stdio claudex -- npx @kunwarshah/claudex mcp
+```
+
+See the [MCP Server Guide](mcp.md) for full documentation.
+
 ## Configuration
 
 See [Configuration Guide](configuration.md) for detailed setup options.
