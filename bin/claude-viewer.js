@@ -144,6 +144,7 @@ function showHelp() {
   console.log('')
   console.log(chalk.white('Usage:'))
   console.log('  claudex [options]')
+  console.log('  claudex mcp              Start MCP server for Claude Code integration')
   console.log('')
   console.log(chalk.white('Options:'))
   console.log('  --help, -h              Show this help message')
@@ -161,6 +162,11 @@ function showHelp() {
   console.log('  claudex -p 8080                      Short form')
   console.log('  claudex --project-root ~/my-chats    Custom projects directory')
   console.log('  PORT=3500 claudex                    Using environment variable')
+  console.log('')
+  console.log(chalk.white('MCP (Claude Code Integration):'))
+  console.log('  claudex mcp                          Start MCP server (stdio)')
+  console.log('  claudex mcp --help                   Show MCP server help')
+  console.log('  claude mcp add claudex -- claudex-mcp   Register with Claude Code')
   console.log('')
   console.log(chalk.green('The application will be available at:'))
   console.log(chalk.blue('  http://localhost:<port>'))
@@ -222,6 +228,26 @@ if (args.includes('--help') || args.includes('-h')) {
 if (args.includes('--version') || args.includes('-v')) {
   showVersion()
   process.exit(0)
+}
+
+// MCP subcommand — launch MCP server directly
+if (args[0] === 'mcp') {
+  const mcpArgs = args.slice(1)
+  // Handle --help for MCP
+  if (mcpArgs.includes('--help') || mcpArgs.includes('-h')) {
+    const mcpScript = path.join(__dirname, 'claudex-mcp.js')
+    const child = spawn('node', [mcpScript, '--help'], { stdio: 'inherit' })
+    child.on('exit', (code) => process.exit(code || 0))
+    return
+  }
+  // Launch MCP server with stdio inherited (Claude Code pipes through here)
+  const mcpEntry = path.join(__dirname, '..', 'server', 'src', 'mcp', 'index.js')
+  const child = spawn('node', [mcpEntry], {
+    stdio: 'inherit',
+    env: process.env
+  })
+  child.on('exit', (code) => process.exit(code || 0))
+  return
 }
 
 // Welcome message

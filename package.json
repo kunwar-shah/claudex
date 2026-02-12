@@ -4,7 +4,8 @@
   "description": "Professional conversation viewer and analysis tool for Claude Code. Search, analyze, and export your AI conversations with enterprise-grade full-text search and multi-platform support.",
   "main": "index.js",
   "bin": {
-    "claudex": "./bin/claude-viewer.js"
+    "claudex": "./bin/claude-viewer.js",
+    "claudex-mcp": "./bin/claudex-mcp.js"
   },
   "workspaces": [
     "server",
