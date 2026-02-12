@@ -23,29 +23,30 @@
 
 ## 🆕 What's New
 
+### Version 1.3.0 (February 12, 2026) — MCP Server
+- **🧠 MCP Server**: Model Context Protocol server gives Claude Code persistent memory across sessions
+- **🔧 10 MCP Tools**: Project context, session search, conversation retrieval, structured memory CRUD
+- **💾 Structured Memory System**: Store coding knowledge (conventions, architecture, decisions, error patterns) with priority, confidence, and TTL
+- **📋 3 MCP Prompts**: `/recall`, `/catchup`, `/history` for quick access to past sessions
+- **🎯 Token Budgeting**: Three detail levels (minimal/standard/full) for context management
+- **📖 One-Command Setup**: `claude mcp add --transport stdio claudex -- claudex-mcp`
+
+<details>
+<summary>Previous releases</summary>
+
 ### Version 1.2.0 (November 11, 2025)
 - **🎨 Comprehensive Theming System**: 10 professional themes (default, emerald, green, blue, purple, orange, red, rose, yellow, classic)
-- **🔤 Advanced Typography**: 29 font families with visual preview (Inter, Geist, Roboto, Poppins, Montserrat, and more)
-- **📏 Granular Font Sizing**: 5 precise font size options (14px-18px with intermediate steps)
-- **🎯 Border Radius Control**: Sharp, rounded, or extra-rounded interface styles
+- **🔤 Advanced Typography**: 29 font families with visual preview
+- **📏 Granular Font Sizing**: 5 precise font size options (14px-18px)
 - **💾 Settings Persistence**: All customizations saved to localStorage
-- **⚡ Real-time Switching**: Instant theme changes with CSS variables
-- **🎭 Visual Font Previews**: See fonts in their actual typeface before selecting
-
-### Version 1.1.1 (October 31, 2025)
-- **🐛 Fixed Critical Bug**: Resolved duplicate message IDs causing intermittent empty session displays ([PR #7](https://github.com/kunwar-shah/claudex/pull/7))
-  - Line-based unique ID generation ensures all messages render correctly
-  - Eliminates React duplicate key warnings
-  - Handles Claude Code's multi-part message format seamlessly
-- **📄 Added LICENSE**: MIT License file for improved GitHub API discoverability ([PR #8](https://github.com/kunwar-shah/claudex/pull/8))
-- **🚀 Quick Start Script**: One-command installation leveraging existing system checker
 
 ### Version 1.1.0 (October 27, 2025)
-- **🎯 Smart Title Extraction**: Automatically extracts meaningful session titles from conversation content
-- **📊 Tremor Analytics Dashboard**: Re-enabled with proper Tailwind-based color system and multi-scale visualizations
-- **🐳 Docker Multi-Platform**: Support for amd64 and arm64 with optimized ~200MB images
+- **🎯 Smart Title Extraction**: Meaningful session titles from conversation content
+- **📊 Tremor Analytics Dashboard**: Tailwind-based charts and multi-scale visualizations
+- **🐳 Docker Multi-Platform**: amd64 and arm64 with optimized ~200MB images
 - **⚡ Performance**: 121x faster async search index rebuild
-- **🔧 System Checker**: Auto-fix capabilities for common setup issues (`npm run check:fix`)
+
+</details>
 
 [View full changelog](https://kunwar-shah.github.io/claudex/#/changelog) | [Troubleshooting guide](https://kunwar-shah.github.io/claudex/#/troubleshooting)
 
@@ -86,14 +87,15 @@
 
 ## ✨ Features
 
-- **Auto Project Discovery**: Automatically scans `~/.claude/projects` directory to discover all available conversations across multiple projects
+- **MCP Server**: Give Claude Code persistent memory — conventions, architecture, decisions, and error patterns survive across sessions
+- **Structured Memory**: Store and recall coding knowledge with priority (1-10), confidence, and TTL-based expiration
+- **Auto Project Discovery**: Automatically scans `~/.claude/projects` directory to discover all conversations across multiple projects
 - **Full-Text Search**: Enterprise-grade SQLite FTS5 search engine with advanced filtering by project, session, role, date range, and content highlighting
 - **Universal Template Support**: Intelligent template detection and parsing for all Claude Code versions (V1.x, V2-mixed, V2.0+) with automatic format detection
 - **Smart Content Rendering**: Syntax-highlighted code blocks, markdown rendering, diff visualization, JSON formatting, and tool usage tracking
 - **Session Analytics**: Comprehensive analytics dashboard with message distribution charts, file operation tracking, and conversation statistics using Tremor React
 - **Export Options**: Export conversations to JSON (structured data), HTML (readable format), or plain TXT for archival and sharing
-- **Modern UI**: Responsive React interface with fixed header/footer navigation, infinite scroll, and optimized for developer workflows
-- **Hot Reload**: Development mode with automatic restart on code changes for rapid iteration
+- **Modern UI**: Responsive React interface with 10 themes, 29 fonts, session favorites, and optimized for developer workflows
 
 ---
 
@@ -145,6 +147,14 @@ claudex --project-root ~/my-claude-projects
 # Or use without installing (npx):
 npx @kunwarshah/claudex
 ```
+
+**Add MCP Server** (gives Claude Code persistent memory):
+
+```bash
+claude mcp add --transport stdio claudex -- claudex-mcp
+```
+
+See the [MCP Server Guide](https://kunwar-shah.github.io/claudex/#/mcp) for details.
 
 **CLI Options**:
 - `--help, -h`: Show help message
@@ -273,7 +283,13 @@ claudex/
 │   │   │   ├── fileScanner.js        # Project/session discovery
 │   │   │   ├── sessionParser.js      # Full session parsing
 │   │   │   ├── searchDatabase.js     # SQLite FTS5 search
-│   │   │   └── searchIndexer.js      # Search index builder
+│   │   │   ├── searchIndexer.js      # Search index builder
+│   │   │   └── memoryService.js      # Structured memory CRUD
+│   │   ├── mcp/              # MCP server (Claude Code integration)
+│   │   │   ├── index.js              # MCP entry point + stdio transport
+│   │   │   ├── tools.js              # 10 MCP tool handlers
+│   │   │   ├── resources.js          # MCP resources
+│   │   │   └── prompts.js            # 3 MCP prompts
 │   │   ├── routes/           # API endpoints
 │   │   │   ├── projects.js           # Project/session routes
 │   │   │   ├── search.js             # Search routes
@@ -657,14 +673,15 @@ Access at: http://localhost:3400
 - [x] SQLite FTS5 full-text search
 - [x] Universal template support (V1/V2/V3)
 - [x] Export to JSON/HTML/TXT
-- [x] Path portability with `~/` support
-- [x] Hot reload development mode
 - [x] Docker deployment (v1.1.0)
 - [x] Conversation analytics dashboard (v1.1.0)
+- [x] Theming system — 10 themes, 29 fonts (v1.2.0)
+- [x] Session favorites/bookmarking (v1.2.4)
+- [x] MCP server for Claude Code (v1.3.0)
+- [x] Structured memory system (v1.3.0)
+- [ ] Token cost calculator
 - [ ] WebSocket live updates
-- [ ] Authentication for multi-user
 - [ ] Plugin system for custom parsers
-- [ ] Diff viewer for file changes
 
 ---
 
