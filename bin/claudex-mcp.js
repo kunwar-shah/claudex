@@ -31,11 +31,21 @@ Or with npx (zero-install):
   claude mcp add --transport stdio claudex -- npx @kunwarshah/claudex mcp
 
 Available Tools:
+  get_project_context      Get condensed project snapshot (call this first!)
   list_projects            List all Claude Code projects
   list_sessions            List sessions for a project
   search_conversations     Full-text search across conversations
   get_session              Get full conversation from a session
   get_session_summary      Get session metadata and stats
+  store_memory             Store structured coding knowledge (maps, conventions, decisions)
+  recall_memory            Recall stored memories by namespace/type
+  list_memories            List all stored memories with stats
+  delete_memory            Delete outdated or incorrect memories
+
+Available Prompts:
+  /mcp__claudex__recall    Search conversation history for a topic
+  /mcp__claudex__catchup   Get summary of recent project work
+  /mcp__claudex__history   Browse recent sessions with titles
 
 Available Resources:
   claudex://projects                          All projects
