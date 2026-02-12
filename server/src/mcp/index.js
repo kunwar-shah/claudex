@@ -24,6 +24,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 const pkg = require(path.resolve(__dirname, '../../../package.json'))
 
+// ─── Auto-detect current project from CWD ─────────────────────────
+// Claude Code spawns the MCP server from the project's working directory.
+// We derive the project ID from CWD so tools default to the current project.
+function detectCurrentProjectId() {
+  const cwd = process.cwd()
+  // Claude Code stores projects as dirs in ~/.claude/projects/
+  // Dir name = CWD with / replaced by - (e.g. /home/boss/claude-chats → -home-boss-claude-chats)
+  return cwd.replace(/\//g, '-')
+}
+
+const currentProjectId = detectCurrentProjectId()
+
 // ─── Lazy service initialization ───────────────────────────────────
 let services = null
 
@@ -48,8 +60,8 @@ async function getServices() {
   const fileScanner = new FileScanner(projectRoot)
   const sessionParser = new SessionParser()
 
-  services = { searchDb, metadataService, fileScanner, sessionParser }
-  console.error(`[claudex-mcp] Services initialized (projects: ${projectRoot}, db: ${dbPath})`)
+  services = { searchDb, metadataService, fileScanner, sessionParser, currentProjectId }
+  console.error(`[claudex-mcp] Services initialized (project: ${currentProjectId}, projects: ${projectRoot})`)
   return services
 }
 

@@ -1,20 +1,44 @@
 import { z } from 'zod'
 
 /**
+ * Resolve the target project. Falls back to currentProjectId if not specified.
+ * Returns { project, projectId } or throws.
+ */
+async function resolveProject(fileScanner, projectId, currentProjectId) {
+  const targetId = projectId || currentProjectId
+  const projects = await fileScanner.scanProjects()
+  const project = projects.find(p => p.id === targetId)
+
+  if (!project) {
+    // Try partial match (user might pass just the short name)
+    const partial = projects.find(p =>
+      p.name === targetId || p.id.endsWith(`-${targetId}`)
+    )
+    if (partial) return { project: partial, projectId: partial.id }
+
+    const available = projects.slice(0, 10).map(p => `  ${p.id} (${p.name})`).join('\n')
+    throw new Error(
+      `Project not found: "${targetId}"\n\nAvailable projects:\n${available}${projects.length > 10 ? `\n  ... and ${projects.length - 10} more` : ''}`
+    )
+  }
+
+  return { project, projectId: targetId }
+}
+
+/**
  * Register all MCP tools on the server instance.
- * @param {import('@modelcontextprotocol/sdk/server/mcp.js').McpServer} server
- * @param {() => Promise<{fileScanner: import('../services/fileScanner.js').FileScanner, searchDb: import('../services/searchDatabase.js').SearchDatabase, metadataService: import('../services/sessionMetadataService.js').SessionMetadataService, sessionParser: import('../services/sessionParser.js').SessionParser}>} getServices
+ * Tools default to the current project (auto-detected from CWD).
  */
 export function registerTools(server, getServices) {
 
   // ─── list_projects ───────────────────────────────────────────────
   server.tool(
     'list_projects',
-    'List all Claude Code projects available on this machine with session counts.',
+    'List all Claude Code projects on this machine. Shows which project is currently active.',
     {},
     async () => {
       try {
-        const { fileScanner } = await getServices()
+        const { fileScanner, currentProjectId } = await getServices()
         const projects = await fileScanner.scanProjects()
 
         const results = []
@@ -25,8 +49,12 @@ export function registerTools(server, getServices) {
             name: project.name,
             sessionCount: sessions.length,
             lastModified: project.lastModified,
+            isCurrent: project.id === currentProjectId,
           })
         }
+
+        // Put current project first
+        results.sort((a, b) => (b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0))
 
         return {
           content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
@@ -43,31 +71,23 @@ export function registerTools(server, getServices) {
   // ─── list_sessions ───────────────────────────────────────────────
   server.tool(
     'list_sessions',
-    'List all sessions for a project with titles, message counts, and dates.',
+    'List sessions for a project. Defaults to the current project. Pass projectId to target a different project.',
     {
-      projectId: z.string().describe('The project ID (directory name)'),
-      limit: z.number().min(1).max(100).default(20).optional().describe('Max sessions to return (default 20)'),
+      projectId: z.string().optional().describe('Project ID (defaults to current project)'),
+      limit: z.number().min(1).max(100).default(20).optional().describe('Max sessions (default 20)'),
       sortBy: z.enum(['updated', 'title', 'messages']).default('updated').optional().describe('Sort order'),
     },
     async ({ projectId, limit = 20, sortBy = 'updated' }) => {
       try {
-        const { fileScanner, metadataService } = await getServices()
-        const projects = await fileScanner.scanProjects()
-        const project = projects.find(p => p.id === projectId)
-
-        if (!project) {
-          return {
-            content: [{ type: 'text', text: `Project not found: ${projectId}` }],
-            isError: true,
-          }
-        }
+        const { fileScanner, metadataService, currentProjectId } = await getServices()
+        const { project, projectId: resolvedId } = await resolveProject(fileScanner, projectId, currentProjectId)
 
         let sessions = await fileScanner.scanSessions(project.path)
 
         // Enrich with metadata
         const enriched = await Promise.all(
           sessions.map(async (s) => {
-            const meta = await metadataService.getMetadata(projectId, s.sessionId)
+            const meta = await metadataService.getMetadata(resolvedId, s.sessionId)
             return {
               sessionId: s.sessionId,
               title: meta?.customTitle || s.title || s.sessionId,
@@ -93,7 +113,10 @@ export function registerTools(server, getServices) {
         const result = enriched.slice(0, limit)
 
         return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          content: [{
+            type: 'text',
+            text: `Sessions for "${project.name}" (${sessions.length} total, showing ${result.length}):\n\n${JSON.stringify(result, null, 2)}`,
+          }],
         }
       } catch (error) {
         return {
@@ -107,20 +130,36 @@ export function registerTools(server, getServices) {
   // ─── search_conversations ────────────────────────────────────────
   server.tool(
     'search_conversations',
-    'Search across all Claude Code conversations using full-text search. Returns matching messages with surrounding context. The search index must be built first via the Search page in Claudex web UI.',
+    'Search conversations using full-text search. Defaults to the current project. Set allProjects=true to search across all projects, or pass a specific projectId.',
     {
-      query: z.string().describe('Search query (supports FTS5 syntax: AND, OR, NOT, "exact phrases")'),
-      projectId: z.string().optional().describe('Filter to a specific project ID'),
-      limit: z.number().min(1).max(50).default(10).optional().describe('Max results to return (default 10)'),
+      query: z.string().describe('Search query (supports FTS5: AND, OR, NOT, "exact phrases")'),
+      projectId: z.string().optional().describe('Search a specific project (defaults to current)'),
+      allProjects: z.boolean().default(false).optional().describe('Search across ALL projects instead of just the current one'),
+      limit: z.number().min(1).max(50).default(10).optional().describe('Max results (default 10)'),
     },
-    async ({ query, projectId, limit = 10 }) => {
+    async ({ query, projectId, allProjects = false, limit = 10 }) => {
       try {
-        const { searchDb } = await getServices()
-        const results = await searchDb.search({ query, projectId, limit, offset: 0 })
+        const { searchDb, currentProjectId } = await getServices()
+
+        // Determine search scope
+        const searchProjectId = allProjects ? undefined : (projectId || currentProjectId)
+        const scopeLabel = allProjects
+          ? 'all projects'
+          : `project "${searchProjectId}"`
+
+        const results = await searchDb.search({
+          query,
+          projectId: searchProjectId,
+          limit,
+          offset: 0,
+        })
 
         if (!results.hits || results.hits.length === 0) {
           return {
-            content: [{ type: 'text', text: `No results found for: "${query}"` }],
+            content: [{
+              type: 'text',
+              text: `No results found for "${query}" in ${scopeLabel}. ${!allProjects ? 'Try allProjects=true to search everywhere.' : ''}`,
+            }],
           }
         }
 
@@ -128,6 +167,7 @@ export function registerTools(server, getServices) {
           project: hit.projectName,
           session: hit.sessionTitle || hit.sessionId,
           sessionId: hit.sessionId,
+          projectId: hit.projectId,
           role: hit.role,
           snippet: hit.snippet,
           timestamp: hit.timestamp,
@@ -137,7 +177,7 @@ export function registerTools(server, getServices) {
         return {
           content: [{
             type: 'text',
-            text: `Found ${results.total} results for "${query}" (showing ${formatted.length}):\n\n${JSON.stringify(formatted, null, 2)}`,
+            text: `Found ${results.total} results for "${query}" in ${scopeLabel} (showing ${formatted.length}):\n\n${JSON.stringify(formatted, null, 2)}`,
           }],
         }
       } catch (error) {
@@ -152,31 +192,23 @@ export function registerTools(server, getServices) {
   // ─── get_session ─────────────────────────────────────────────────
   server.tool(
     'get_session',
-    'Get the full conversation from a specific Claude Code session. Returns messages in order.',
+    'Get the full conversation from a session. Defaults to the current project.',
     {
       sessionId: z.string().describe('The session UUID'),
-      projectId: z.string().describe('The project ID'),
-      maxMessages: z.number().min(1).max(200).default(50).optional().describe('Max messages to return, most recent first (default 50)'),
+      projectId: z.string().optional().describe('Project ID (defaults to current project)'),
+      maxMessages: z.number().min(1).max(200).default(50).optional().describe('Max messages, most recent first (default 50)'),
     },
     async ({ sessionId, projectId, maxMessages = 50 }) => {
       try {
-        const { fileScanner, sessionParser } = await getServices()
-        const projects = await fileScanner.scanProjects()
-        const project = projects.find(p => p.id === projectId)
-
-        if (!project) {
-          return {
-            content: [{ type: 'text', text: `Project not found: ${projectId}` }],
-            isError: true,
-          }
-        }
+        const { fileScanner, sessionParser, currentProjectId } = await getServices()
+        const { project, projectId: resolvedId } = await resolveProject(fileScanner, projectId, currentProjectId)
 
         const sessions = await fileScanner.scanSessions(project.path)
         const session = sessions.find(s => s.sessionId === sessionId)
 
         if (!session) {
           return {
-            content: [{ type: 'text', text: `Session not found: ${sessionId}` }],
+            content: [{ type: 'text', text: `Session not found: ${sessionId} in project "${project.name}"` }],
             isError: true,
           }
         }
@@ -196,7 +228,8 @@ export function registerTools(server, getServices) {
             type: 'text',
             text: JSON.stringify({
               sessionId,
-              projectId,
+              projectId: resolvedId,
+              projectName: project.name,
               template: parsed.template,
               totalMessages: parsed.messages.length,
               returned: messages.length,
@@ -216,35 +249,27 @@ export function registerTools(server, getServices) {
   // ─── get_session_summary ─────────────────────────────────────────
   server.tool(
     'get_session_summary',
-    'Get a quick summary of a session — title, message count, dates, tags, favorite status, and token stats.',
+    'Get a quick summary of a session — title, message count, dates, tags, favorites, and token stats. Defaults to the current project.',
     {
       sessionId: z.string().describe('The session UUID'),
-      projectId: z.string().describe('The project ID'),
+      projectId: z.string().optional().describe('Project ID (defaults to current project)'),
     },
     async ({ sessionId, projectId }) => {
       try {
-        const { fileScanner, sessionParser, metadataService } = await getServices()
-        const projects = await fileScanner.scanProjects()
-        const project = projects.find(p => p.id === projectId)
-
-        if (!project) {
-          return {
-            content: [{ type: 'text', text: `Project not found: ${projectId}` }],
-            isError: true,
-          }
-        }
+        const { fileScanner, sessionParser, metadataService, currentProjectId } = await getServices()
+        const { project, projectId: resolvedId } = await resolveProject(fileScanner, projectId, currentProjectId)
 
         const sessions = await fileScanner.scanSessions(project.path)
         const session = sessions.find(s => s.sessionId === sessionId)
 
         if (!session) {
           return {
-            content: [{ type: 'text', text: `Session not found: ${sessionId}` }],
+            content: [{ type: 'text', text: `Session not found: ${sessionId} in project "${project.name}"` }],
             isError: true,
           }
         }
 
-        const meta = await metadataService.getMetadata(projectId, sessionId)
+        const meta = await metadataService.getMetadata(resolvedId, sessionId)
         const parsed = await sessionParser.parseSession(session.filePath)
 
         const userMessages = parsed.messages.filter(m => m.role === 'user').length
@@ -252,7 +277,7 @@ export function registerTools(server, getServices) {
 
         const summary = {
           sessionId,
-          projectId,
+          projectId: resolvedId,
           projectName: project.name,
           title: meta?.customTitle || session.title || sessionId,
           messageCount: parsed.messages.length,

@@ -7,21 +7,30 @@ import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
  */
 export function registerResources(server, getServices) {
 
-  // ─── Static: all projects ────────────────────────────────────────
+  // ─── Static: all projects (highlights current) ──────────────────
   server.resource(
     'projects',
     'claudex://projects',
-    { description: 'List of all Claude Code projects on this machine', mimeType: 'application/json' },
+    { description: 'All Claude Code projects on this machine (current project highlighted)', mimeType: 'application/json' },
     async (uri) => {
-      const { fileScanner } = await getServices()
+      const { fileScanner, currentProjectId } = await getServices()
       const projects = await fileScanner.scanProjects()
 
       const result = await Promise.all(
         projects.map(async (p) => {
           const sessions = await fileScanner.scanSessions(p.path)
-          return { id: p.id, name: p.name, sessionCount: sessions.length, lastModified: p.lastModified }
+          return {
+            id: p.id,
+            name: p.name,
+            sessionCount: sessions.length,
+            lastModified: p.lastModified,
+            isCurrent: p.id === currentProjectId,
+          }
         })
       )
+
+      // Current project first
+      result.sort((a, b) => (b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0))
 
       return {
         contents: [{
