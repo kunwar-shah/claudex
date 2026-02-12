@@ -15,9 +15,11 @@ import { SearchDatabase } from '../services/searchDatabase.js'
 import { SessionMetadataService } from '../services/sessionMetadataService.js'
 import { FileScanner } from '../services/fileScanner.js'
 import { SessionParser } from '../services/sessionParser.js'
+import { MemoryService } from '../services/memoryService.js'
 import { getProjectRoot } from '../utils/pathHelper.js'
 import { registerTools } from './tools.js'
 import { registerResources } from './resources.js'
+import { registerPrompts } from './prompts.js'
 
 // Resolve version from package.json
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -57,23 +59,53 @@ async function getServices() {
   const metadataService = new SessionMetadataService(searchDb)
   await metadataService.init()
 
+  const memoryService = new MemoryService(searchDb)
+  await memoryService.init()
+
   const fileScanner = new FileScanner(projectRoot)
   const sessionParser = new SessionParser()
 
-  services = { searchDb, metadataService, fileScanner, sessionParser, currentProjectId }
+  services = { searchDb, metadataService, memoryService, fileScanner, sessionParser, currentProjectId }
   console.error(`[claudex-mcp] Services initialized (project: ${currentProjectId}, projects: ${projectRoot})`)
   return services
 }
 
 // ─── Create MCP server ─────────────────────────────────────────────
-const server = new McpServer({
-  name: 'claudex',
-  version: pkg.version,
-})
+const server = new McpServer(
+  {
+    name: 'claudex',
+    version: pkg.version,
+  },
+  {
+    instructions: [
+      'Claudex gives you persistent memory across Claude Code sessions.',
+      'You have access to conversation history, session summaries, and project context from previous sessions.',
+      '',
+      'USE THESE TOOLS PROACTIVELY:',
+      '- At session start: call get_project_context to load project memory (focus, recent work, conventions)',
+      '- When you discover important patterns, decisions, or codebase structure: call store_memory to save it',
+      '- When you need context about the project: call recall_memory to retrieve stored knowledge',
+      '- When the user references past work: call search_conversations to find relevant sessions',
+      '- When you need context about what was done before: call get_session_summary or get_session',
+      '',
+      'MEMORY TYPES (for store_memory/recall_memory):',
+      '- namespace "codebase" + type "map": file tree, key paths, entry points, architecture',
+      '- namespace "codebase" + type "convention": naming rules, patterns, coding style, preferences',
+      '- namespace "codebase" + type "decision": technical decisions with rationale (ADR-style)',
+      '- namespace "codebase" + type "snapshot": current focus, blockers, recent work (use ttlHours=24)',
+      '- namespace "codebase" + type "dependency": key packages, versions, why chosen',
+      '- namespace "codebase" + type "error_pattern": recurring errors and their fixes',
+      '',
+      'All tools default to the CURRENT project (auto-detected from CWD). You rarely need to specify projectId.',
+      'IMPORTANT: Prefer get_project_context as your first call — it returns a condensed snapshot optimized for context injection.',
+    ].join('\n'),
+  }
+)
 
-// Register tools and resources
+// Register tools, resources, and prompts
 registerTools(server, getServices)
 registerResources(server, getServices)
+registerPrompts(server)
 
 // ─── Connect stdio transport ───────────────────────────────────────
 async function main() {
