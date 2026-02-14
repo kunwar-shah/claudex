@@ -133,7 +133,7 @@ Claudex is free and open source. If it saves you time and improves your workflow
 
 ```bash
 # Global installation
-npm install -g @kunwarshah/claudex
+npm install -g @kunwarshah/claudex [https://www.npmjs.com/package/@kunwarshah/claudex]
 
 # Then run anywhere:
 claudex
