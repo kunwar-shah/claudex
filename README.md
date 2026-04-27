@@ -17,6 +17,8 @@
 
   **📚 [Documentation](https://kunwar-shah.github.io/claudex/)** | **💬 [Discussions](https://github.com/kunwar-shah/claudex/discussions)** | **🐛 [Issues](https://github.com/kunwar-shah/claudex/issues)**
 
+  ![Claudex — browse, search, and give Claude Code persistent memory. SQLite FTS5 full-text search across all sessions, MCP server with 10 tools, universal V1/V2/V3 template support.](screenshots/hero.gif)
+
 </div>
 
 ---
