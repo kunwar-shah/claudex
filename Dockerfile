@@ -1,4 +1,12 @@
-# Multi-stage Dockerfile for Claudex
+# Multi-stage Dockerfile for Claudex — WEB VIEWER (Fastify + React on port 3400)
+#
+# This Dockerfile builds the full web app: Fastify server + React SPA + REST API.
+# It does NOT run the MCP server (which uses stdio, not HTTP).
+#
+# For MCP-only deployments (Glama validation, headless agents), use Dockerfile.mcp:
+#   docker build -f Dockerfile.mcp -t claudex-mcp .
+#   docker run -i --rm claudex-mcp
+#
 # Stage 1: Build React client with Vite
 # Stage 2: Production server with built client
 
