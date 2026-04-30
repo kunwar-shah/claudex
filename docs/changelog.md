@@ -2,6 +2,24 @@
 
 All notable changes to Claudex.
 
+## [1.3.1] - 2026-04-30
+
+### Added
+- **Hero GIF in README** — animated 18-second walkthrough showing browse, search, and MCP memory tools (PR #39, contributed by @livlign via [Anthropic repo-visuals](https://github.com/anthropics/skills/tree/main/repo-visuals))
+- **GitHub Sponsors** enabled — `Sponsor` button now visible on the repo
+- **Expanded npm keywords** — added `mcp`, `mcp-server`, `model-context-protocol`, `ai-memory`, `agent-memory`, `persistent-memory`, `cursor`, `codex`, `windsurf`, and more for better discoverability
+- **Updated package description** — emphasizes MCP-powered persistent memory and cross-agent compatibility
+
+### Changed
+- Refreshed `ROADMAP.md` with v1.4.0 / v2.0 / v3.0 milestones (Pro tier, cross-project intelligence, Claudex Cloud)
+- Updated package metadata to reflect MCP-first positioning
+
+### Notes
+- This is a metadata + documentation release. No functional changes from v1.3.0; safe upgrade.
+- Pinned `v2.0 Roadmap — Cross-Project Intelligence` discussion for community feedback.
+
+---
+
 ## [1.3.0] - 2026-02-12
 
 ### Added
