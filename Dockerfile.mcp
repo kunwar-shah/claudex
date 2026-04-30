@@ -1,0 +1,47 @@
+# Dockerfile.mcp — Claudex MCP Server (stdio)
+#
+# Purpose: Lightweight image that runs ONLY the MCP server.
+# Used for:
+#   1. Glama validation (https://glama.ai/mcp/servers)
+#   2. Anyone who wants to run claudex-mcp in a container
+#
+# Notes:
+#   - The MCP server uses stdio transport (no port exposure)
+#   - Glama tests by spawning this container and sending JSON-RPC over stdin
+#   - For introspection (tools/list, prompts/list, resources/list), no real
+#     ~/.claude/projects/ data is required — the server starts and responds
+#   - For full functionality, mount ~/.claude/projects/ at /root/.claude/projects/
+#
+# Usage:
+#   docker build -f Dockerfile.mcp -t claudex-mcp .
+#   docker run -i --rm claudex-mcp                    # introspection only
+#   docker run -i --rm -v ~/.claude:/root/.claude:ro claudex-mcp   # with data
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only the files the MCP server needs (skip client/, docs/, screenshots/)
+COPY package.json package-lock.json* ./
+COPY server/package.json server/package-lock.json* ./server/
+COPY bin ./bin
+COPY server/src ./server/src
+
+# Install root deps (chalk, cross-spawn) — skip prepublishOnly which builds the client
+# --ignore-scripts: prevents the client build (we don't need it for MCP)
+# --omit=dev: skip devDependencies (vite, etc.)
+RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
+
+# Install server deps (fastify, sqlite3, @modelcontextprotocol/sdk, zod)
+WORKDIR /app/server
+RUN npm install --omit=dev --no-audit --no-fund
+
+WORKDIR /app
+
+# Default project root is /root/.claude/projects (override via PROJECT_ROOT env)
+ENV PROJECT_ROOT=/root/.claude/projects
+
+# stdio transport: no EXPOSE, no HEALTHCHECK
+# Glama validates by piping JSON-RPC to stdin and reading the response
+
+ENTRYPOINT ["node", "bin/claudex-mcp.js"]
