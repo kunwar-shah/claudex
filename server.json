@@ -6,12 +6,12 @@
     "url": "https://github.com/kunwar-shah/claudex",
     "source": "github"
   },
-  "version": "1.3.3",
+  "version": "1.3.4",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@kunwarshah/claudex",
-      "version": "1.3.3",
+      "version": "1.3.4",
       "transport": {
         "type": "stdio"
       },
