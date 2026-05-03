@@ -1,6 +1,6 @@
 {
   "name": "@kunwarshah/claudex",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "mcpName": "io.github.kunwar-shah/claudex",
   "description": "Persistent memory + FTS5 search for Claude Code conversations. MCP server exposes your ~/.claude/projects/ history as queryable memory for any MCP-compatible AI agent.",
   "main": "index.js",

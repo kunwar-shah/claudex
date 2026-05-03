@@ -2,6 +2,13 @@
 
 All notable changes to Claudex.
 
+## [1.3.4] - 2026-05-03
+
+### Fixed
+- **sqlite3 native bindings on Node 22** — bumped `sqlite3` from `^5.1.6` to `^6.0.1`. The 5.x line lacks prebuilts for Node 22's ABI (NODE_MODULE_VERSION 127); v6.0.1 ships them. Fixes Glama validation failure and any `npm install -g @kunwarshah/claudex` on Node 22+.
+
+---
+
 ## [1.3.3] - 2026-05-01
 
 ### Added
