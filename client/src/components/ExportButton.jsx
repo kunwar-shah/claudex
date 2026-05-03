@@ -94,6 +94,9 @@ const ExportButton = ({ projectId, sessionId, sessionTitle, variant = 'default' 
         disabled={isExporting}
         className={buttonClasses}
         title="Export conversation"
+        aria-label="Export conversation"
+        aria-haspopup="menu"
+        aria-expanded={showDropdown}
       >
         {isExporting ? (
           <>

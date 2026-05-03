@@ -58,6 +58,11 @@ export const searchApi = {
   getIndexStatus: () => api.get('/search/index/status'),
 };
 
+export const statsApi = {
+  // Get real role distribution (user/assistant/system/tool) from FTS5 index
+  getMessageRoles: () => api.get('/stats/message-roles'),
+};
+
 export const sessionMetadataApi = {
   // Get session metadata (custom title, tags, notes, visibility)
   getMetadata: (projectId, sessionId) =>

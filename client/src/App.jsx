@@ -1,43 +1,74 @@
-import React, { useState } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
-import ProjectView from './components/ProjectView'
-import TremorProjectView from './components/TremorProjectView'
-import SearchPage from './components/SearchPage'
-import SessionManagementPage from './pages/SessionManagementPage'
-import Toast from './components/Toast'
+import { TopProgressBar, LoadingScreen } from './components/ui/loading'
 import './App.css'
 
+// Code-split routes into separate chunks — loaded only when navigated to.
+// Initial bundle drops to just Layout + Header + Footer + LoadingScreen.
+const ProjectView           = lazy(() => import('./components/ProjectView'))
+const TremorProjectView     = lazy(() => import('./components/TremorProjectView'))
+const SearchPage            = lazy(() => import('./components/SearchPage'))
+const SessionManagementPage = lazy(() => import('./pages/SessionManagementPage'))
+
+// Global toasts now live in <ToastProvider> (mounted in main.jsx).
+// Use `useToast()` from any component to fire a notification.
+
 function App() {
-  const [toast, setToast] = useState(null) // { type, message }
-
-  // Auto-index disabled — users can manually rebuild from Search page.
-  // TODO: Re-enable with smarter triggering (not on every page load)
-
   return (
     <div className="App">
+      {/* Global indeterminate progress bar — activates whenever ANY query/mutation is fetching */}
+      <TopProgressBar />
+
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<ProjectView />} />
-          <Route path="projects/:projectId" element={<ProjectView />} />
-          <Route path="projects/:projectId/sessions/:sessionId" element={<ProjectView />} />
-          <Route path="search" element={<SearchPage />} />
-          <Route path="manage-sessions" element={<SessionManagementPage />} />
-          <Route path="manage-sessions/:projectId" element={<SessionManagementPage />} />
-          <Route path="tremor-preview" element={<TremorProjectView />} />
-          <Route path="tremor-preview/projects/:projectId" element={<TremorProjectView />} />
-          <Route path="tremor-preview/projects/:projectId/sessions/:sessionId" element={<TremorProjectView />} />
+          <Route index element={
+            <Suspense fallback={<LoadingScreen label="Loading workspace…" />}>
+              <ProjectView />
+            </Suspense>
+          } />
+          <Route path="projects/:projectId" element={
+            <Suspense fallback={<LoadingScreen label="Loading workspace…" />}>
+              <ProjectView />
+            </Suspense>
+          } />
+          <Route path="projects/:projectId/sessions/:sessionId" element={
+            <Suspense fallback={<LoadingScreen label="Loading workspace…" />}>
+              <ProjectView />
+            </Suspense>
+          } />
+          <Route path="search" element={
+            <Suspense fallback={<LoadingScreen label="Loading search…" />}>
+              <SearchPage />
+            </Suspense>
+          } />
+          <Route path="manage-sessions" element={
+            <Suspense fallback={<LoadingScreen label="Loading session manager…" />}>
+              <SessionManagementPage />
+            </Suspense>
+          } />
+          <Route path="manage-sessions/:projectId" element={
+            <Suspense fallback={<LoadingScreen label="Loading session manager…" />}>
+              <SessionManagementPage />
+            </Suspense>
+          } />
+          <Route path="tremor-preview" element={
+            <Suspense fallback={<LoadingScreen label="Loading analytics dashboard…" />}>
+              <TremorProjectView />
+            </Suspense>
+          } />
+          <Route path="tremor-preview/projects/:projectId" element={
+            <Suspense fallback={<LoadingScreen label="Loading analytics…" />}>
+              <TremorProjectView />
+            </Suspense>
+          } />
+          <Route path="tremor-preview/projects/:projectId/sessions/:sessionId" element={
+            <Suspense fallback={<LoadingScreen label="Loading analytics…" />}>
+              <TremorProjectView />
+            </Suspense>
+          } />
         </Route>
       </Routes>
-
-      {/* Toast Notification */}
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
     </div>
   )
 }

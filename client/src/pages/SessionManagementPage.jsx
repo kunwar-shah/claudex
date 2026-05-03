@@ -11,6 +11,7 @@ import SessionSummaryModal from '../components/SessionSummaryModal'
 import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { H1, H2, P, Muted } from '../components/ui/typography'
+import { TableLoadingRows, LoadingScreen } from '../components/ui/loading'
 
 /**
  * SessionManagementPage - Dedicated page for managing sessions
@@ -205,10 +206,26 @@ const SessionManagementPage = () => {
       {/* Session Table */}
       <div className="flex-1 overflow-auto px-6 py-4">
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-              <Muted>Loading sessions...</Muted>
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border bg-surface text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-3 text-left w-10"></th>
+                  <th className="px-4 py-3 text-left">Session Title</th>
+                  <th className="px-4 py-3 text-left">Tags</th>
+                  <th className="px-4 py-3 text-left">Messages</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">Last Updated</th>
+                  <th className="px-4 py-3 text-left w-12">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <TableLoadingRows count={8} columns={7} />
+              </tbody>
+            </table>
+            <div className="px-4 py-3 border-t border-border flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Loading sessions...</span>
             </div>
           </div>
         ) : (

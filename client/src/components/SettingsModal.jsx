@@ -1,8 +1,87 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { X, Palette, Search, Eye, Settings as SettingsIcon, FolderOpen, Database } from 'lucide-react'
 import { useSettings } from '../contexts/SettingsContext'
 import { Button } from './ui/button'
 import ConfirmationModal from './ConfirmationModal'
+
+// All available themes with rich color metadata for the preview block.
+// Each theme includes: primary, primaryDark, surface, text, textMuted, badge.
+const THEMES = [
+  { id: 'default', name: 'Default', primary: '#475569', primaryDark: '#334155', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#f1f5f9' },
+  { id: 'emerald', name: 'Emerald', primary: '#10b981', primaryDark: '#059669', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#ecfdf5' },
+  { id: 'green',   name: 'Green',   primary: '#16a34a', primaryDark: '#15803d', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#f0fdf4' },
+  { id: 'blue',    name: 'Blue',    primary: '#2563eb', primaryDark: '#1d4ed8', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#eff6ff' },
+  { id: 'purple',  name: 'Purple',  primary: '#9333ea', primaryDark: '#7e22ce', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#faf5ff' },
+  { id: 'orange',  name: 'Orange',  primary: '#f97316', primaryDark: '#ea580c', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#fff7ed' },
+  { id: 'red',     name: 'Red',     primary: '#ef4444', primaryDark: '#dc2626', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#fef2f2' },
+  { id: 'rose',    name: 'Rose',    primary: '#fb7185', primaryDark: '#e11d48', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#fff1f2' },
+  { id: 'yellow',  name: 'Yellow',  primary: '#eab308', primaryDark: '#ca8a04', surface: '#ffffff', text: '#0f172a', textMuted: '#64748b', badgeBg: '#fefce8' },
+  { id: 'classic', name: 'Classic', primary: '#5B8DEF', primaryDark: '#3b6cd6', surface: '#FCFCFD', text: '#0f172a', textMuted: '#64748b', badgeBg: '#f0f5ff' },
+]
+
+// All visual settings that can be randomized
+const RANDOMIZABLE_OPTIONS = {
+  colorTheme:       THEMES.map(t => t.id),
+  fontFamily:       ['inter', 'geist', 'roboto', 'poppins', 'montserrat', 'open-sans', 'lato', 'raleway', 'nunito', 'ubuntu', 'rubik', 'dm-sans', 'work-sans', 'space-grotesk', 'quicksand', 'karla', 'outfit', 'jakarta', 'manrope', 'lexend', 'archivo', 'system'],
+  fontSize:         ['small', 'small-medium', 'medium', 'medium-large', 'large'],
+  density:          ['compact', 'comfortable', 'spacious'],
+  borderRadius:     ['sharp', 'rounded', 'extra-rounded'],
+  conversationView: ['detailed', 'messaging'],
+}
+
+// Mini theme preview block — renders a small mock UI in the theme's colors.
+// Replaces the global CSS swap on hover. Pure inline styles, no theme-context.
+function ThemePreviewCard({ theme, isActive, isHovered, onClick, onHover, onLeave }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      aria-pressed={isActive}
+      aria-label={`Theme: ${theme.name}${isActive ? ' (currently selected)' : ''}`}
+      className={`group relative p-2 rounded-lg border-2 transition-all duration-200 text-left ${
+        isActive
+          ? 'border-primary ring-2 ring-primary/20 shadow-md'
+          : 'border-border hover:border-primary/40 hover:shadow-sm'
+      } ${isHovered ? 'scale-[1.03]' : ''}`}
+    >
+      {/* Mini mockup of the theme — rendered with inline styles */}
+      <div
+        className="w-full h-14 rounded-md overflow-hidden flex flex-col mb-1.5 ring-1 ring-black/5"
+        style={{ background: theme.surface }}
+      >
+        {/* Mock header bar with primary color */}
+        <div
+          className="h-3 flex items-center px-1.5 gap-0.5"
+          style={{ background: theme.primary }}
+        >
+          <div className="w-1 h-1 rounded-full bg-white/70" />
+          <div className="w-1 h-1 rounded-full bg-white/70" />
+          <div className="w-1 h-1 rounded-full bg-white/70" />
+        </div>
+        {/* Mock body — text + button + badge */}
+        <div className="flex-1 px-1.5 py-1 flex items-center gap-1">
+          <div className="flex-1 space-y-0.5">
+            <div className="h-1 rounded-full" style={{ background: theme.text, opacity: 0.7, width: '70%' }} />
+            <div className="h-1 rounded-full" style={{ background: theme.textMuted, opacity: 0.5, width: '50%' }} />
+          </div>
+          <div
+            className="rounded text-[5px] font-bold px-1 py-0.5 flex-shrink-0"
+            style={{ background: theme.primary, color: '#fff' }}
+          >
+            BTN
+          </div>
+        </div>
+      </div>
+      {/* Theme name + active checkmark */}
+      <div className="text-xs font-medium flex items-center justify-between gap-1">
+        <span className="truncate">{theme.name}</span>
+        {isActive && <span className="text-primary text-sm leading-none">✓</span>}
+      </div>
+    </button>
+  )
+}
 
 const SettingsModal = ({ isOpen, onClose }) => {
   const { settings, updateSettings, resetSettings, exportSettings } = useSettings()
@@ -20,18 +99,81 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // Update pending changes for a specific setting
+  // Visual/cosmetic settings auto-apply instantly for live feedback (matches
+  // modern apps like Linear, Notion). Data/operational settings still require
+  // explicit Save & Apply because they trigger backend work or affect cost.
+  const AUTO_APPLY_KEYS = new Set([
+    'colorTheme',
+    'themeMode',
+    'fontFamily',
+    'fontSize',
+    'density',
+    'borderRadius',
+    'enableAnimations',
+    'codeTheme',
+    'conversationView',
+    'showTimestamps',
+    'showToolIcons',
+    'messageGrouping',
+    'markdownPreview',
+    'highlightColor',
+  ])
+
+  // Update value:
+  //   - Visual key → apply instantly via updateSettings (no Save button needed)
+  //   - Data key   → stash in pendingChanges, require explicit Save & Apply
   const handleChange = (key, value) => {
-    setPendingChanges(prev => ({
-      ...prev,
-      [key]: value
-    }))
-    setHasUnsavedChanges(true)
+    if (AUTO_APPLY_KEYS.has(key)) {
+      updateSettings({ [key]: value })
+      // Clean any stale pending entry for this key (in case it was set earlier
+      // when the key wasn't in AUTO_APPLY_KEYS)
+      if (pendingChanges.hasOwnProperty(key)) {
+        setPendingChanges(prev => {
+          const next = { ...prev }
+          delete next[key]
+          return next
+        })
+        if (Object.keys(pendingChanges).length === 1) setHasUnsavedChanges(false)
+      }
+    } else {
+      setPendingChanges(prev => ({ ...prev, [key]: value }))
+      setHasUnsavedChanges(true)
+    }
   }
 
   // Get current value (pending or saved)
   const getValue = (key) => {
     return pendingChanges.hasOwnProperty(key) ? pendingChanges[key] : settings[key]
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Theme hover state — local only, drives the preview block animation
+  // (no global CSS swap; the preview lives entirely inside each card).
+  // ─────────────────────────────────────────────────────────────────
+  const [hoveredTheme, setHoveredTheme] = useState(null)
+
+  // ─────────────────────────────────────────────────────────────────
+  // Randomize ALL visual settings at once.
+  // Picks a different value than current for each randomizable key.
+  // ─────────────────────────────────────────────────────────────────
+  const pickDifferent = (current, options) => {
+    if (!options || options.length <= 1) return current
+    let pick = current
+    let attempts = 0
+    while (pick === current && attempts < 20) {
+      pick = options[Math.floor(Math.random() * options.length)]
+      attempts++
+    }
+    return pick
+  }
+
+  const handleRandomize = () => {
+    const changes = {}
+    for (const [key, options] of Object.entries(RANDOMIZABLE_OPTIONS)) {
+      changes[key] = pickDifferent(getValue(key), options)
+    }
+    // All RANDOMIZABLE_OPTIONS keys are visual → apply instantly
+    updateSettings(changes)
   }
 
   // Save changes for current section
@@ -70,23 +212,25 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Settings Modal */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-[hsl(var(--surface))] rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+      {/* Settings Modal — full-screen on mobile, dialog on desktop */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 sm:p-4">
+        <div className="bg-[hsl(var(--surface))] sm:rounded-lg rounded-t-lg shadow-xl w-full max-w-3xl h-[95vh] sm:max-h-[90vh] sm:h-auto overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
           <h2 className="text-xl font-bold text-[hsl(var(--text-primary))]">Settings</h2>
           <button
             onClick={onClose}
-            className="text-text-tertiary hover:text-text-primary transition-colors"
+            aria-label="Close settings"
+            title="Close settings"
+            className="text-text-tertiary hover:text-text-primary transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar Tabs */}
-          <div className="w-48 border-r border-border bg-surface p-2">
+        <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
+          {/* Sidebar Tabs — horizontal scroll on mobile, vertical sidebar on desktop */}
+          <div className="w-full sm:w-48 border-b sm:border-b-0 sm:border-r border-border bg-surface p-2 flex sm:block overflow-x-auto sm:overflow-x-visible flex-shrink-0">
             {tabs.map(tab => {
               const Icon = tab.icon
               return (
@@ -94,7 +238,9 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   key={tab.id}
                   onClick={() => tab.available && setActiveTab(tab.id)}
                   disabled={!tab.available}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-1 relative ${
+                  aria-label={`${tab.label} settings${!tab.available ? ' (coming soon)' : ''}`}
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
+                  className={`flex-shrink-0 sm:w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-0 sm:mb-1 mr-1 sm:mr-0 relative whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'bg-primary text-white'
                       : tab.available
@@ -102,8 +248,8 @@ const SettingsModal = ({ isOpen, onClose }) => {
                       : 'text-text-tertiary opacity-50 cursor-not-allowed'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span className="flex-1 text-left">{tab.label}</span>
+                  <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  <span className="text-left">{tab.label}</span>
                   {!tab.available && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-[hsl(var(--border))] text-text-tertiary">
                       Soon
@@ -121,142 +267,40 @@ const SettingsModal = ({ isOpen, onClose }) => {
                 <div>
                   <h3 className="text-lg font-semibold text-text-primary mb-4">Appearance Settings</h3>
 
-                  {/* Color Theme Selector */}
+                  {/* Color Theme Selector — preview block + Randomize all */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      Color Theme
-                    </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                      {/* Default Theme */}
+                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                      <label className="block text-sm font-medium text-text-primary">
+                        Color Theme
+                        <span className="ml-2 text-xs text-text-tertiary font-normal">
+                          (each card shows a live preview)
+                        </span>
+                      </label>
                       <button
-                        onClick={() => handleChange('colorTheme', 'default')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'default'
-                            ? 'border-slate-700 bg-slate-50'
-                            : 'border-border hover:border-slate-400'
-                        }`}
+                        type="button"
+                        onClick={handleRandomize}
+                        title="Randomize ALL visual settings — theme, font, size, density, radius, view"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-primary to-primary-dark rounded-md hover:shadow-md hover:scale-105 transition-all active:scale-95"
                       >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-slate-700 to-slate-500 mb-1"></div>
-                        <div className="text-xs font-medium">Default</div>
-                      </button>
-
-                      {/* Emerald Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'emerald')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'emerald'
-                            ? 'border-[#10b981] bg-[#ecfdf5]'
-                            : 'border-border hover:border-[#6ee7b7]'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-[#10b981] to-[#34d399] mb-1"></div>
-                        <div className="text-xs font-medium">Emerald</div>
-                      </button>
-
-                      {/* Green Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'green')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'green'
-                            ? 'border-green-600 bg-green-50'
-                            : 'border-border hover:border-green-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-green-600 to-green-400 mb-1"></div>
-                        <div className="text-xs font-medium">Green</div>
-                      </button>
-
-                      {/* Blue Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'blue')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'blue'
-                            ? 'border-blue-600 bg-blue-50'
-                            : 'border-border hover:border-blue-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-blue-600 to-blue-400 mb-1"></div>
-                        <div className="text-xs font-medium">Blue</div>
-                      </button>
-
-                      {/* Purple Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'purple')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'purple'
-                            ? 'border-purple-600 bg-purple-50'
-                            : 'border-border hover:border-purple-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-purple-600 to-violet-400 mb-1"></div>
-                        <div className="text-xs font-medium">Purple</div>
-                      </button>
-
-                      {/* Orange Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'orange')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'orange'
-                            ? 'border-orange-500 bg-orange-50'
-                            : 'border-border hover:border-orange-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-orange-500 to-orange-400 mb-1"></div>
-                        <div className="text-xs font-medium">Orange</div>
-                      </button>
-
-                      {/* Red Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'red')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'red'
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-border hover:border-red-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-red-500 to-red-400 mb-1"></div>
-                        <div className="text-xs font-medium">Red</div>
-                      </button>
-
-                      {/* Rose Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'rose')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'rose'
-                            ? 'border-rose-400 bg-rose-50'
-                            : 'border-border hover:border-rose-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-rose-400 to-rose-300 mb-1"></div>
-                        <div className="text-xs font-medium">Rose</div>
-                      </button>
-
-                      {/* Yellow Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'yellow')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'yellow'
-                            ? 'border-yellow-500 bg-yellow-50'
-                            : 'border-border hover:border-yellow-300'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-yellow-500 to-yellow-400 mb-1"></div>
-                        <div className="text-xs font-medium">Yellow</div>
-                      </button>
-
-                      {/* Classic Theme */}
-                      <button
-                        onClick={() => handleChange('colorTheme', 'classic')}
-                        className={`p-2 rounded-md border-2 transition-all ${
-                          getValue('colorTheme') === 'classic'
-                            ? 'border-[#5B8DEF] bg-[#FCFCFD]'
-                            : 'border-border hover:border-[#9BB8F5]'
-                        }`}
-                      >
-                        <div className="w-full h-6 rounded bg-gradient-to-r from-[#5B8DEF] to-[#8AAEF2] mb-1"></div>
-                        <div className="text-xs font-medium">Classic</div>
+                        🎲 Surprise Me
                       </button>
                     </div>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                      {THEMES.map(theme => (
+                        <ThemePreviewCard
+                          key={theme.id}
+                          theme={theme}
+                          isActive={getValue('colorTheme') === theme.id}
+                          isHovered={hoveredTheme === theme.id}
+                          onClick={() => handleChange('colorTheme', theme.id)}
+                          onHover={() => setHoveredTheme(theme.id)}
+                          onLeave={() => setHoveredTheme(null)}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-text-tertiary mt-2">
+                      ✨ Visual settings apply instantly. Data settings (search, sessions) require <span className="font-semibold">Save &amp; Apply</span>.
+                    </p>
                   </div>
 
                   {/* Theme Mode (Light/Dark) */}

@@ -23,6 +23,7 @@ import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
+import { LoadingScreen, ListLoadingItems } from './ui/loading'
 import { H1, Muted, Small } from './ui/typography'
 import EmptyState from './layout/EmptyState'
 import { cn } from '@/lib/utils'
@@ -322,9 +323,13 @@ const SearchPage = () => {
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-6xl mx-auto">
           {isSearching && (
-            <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-              <Muted>Searching conversations...</Muted>
+            <div>
+              <LoadingScreen
+                label="Searching conversations..."
+                description="Running FTS5 query across your conversation history"
+                className="py-8"
+              />
+              <ListLoadingItems count={5} hasIcon={true} className="mt-2" />
             </div>
           )}
 
@@ -495,10 +500,7 @@ const SearchPage = () => {
 
             <CardContent className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
               {isLoadingMessage ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary mr-3" />
-                  <Muted>Loading full message...</Muted>
-                </div>
+                <LoadingScreen label="Loading full message..." className="py-8"/>
               ) : selectedMessage?.error ? (
                 <div className="text-center py-8">
                   <AlertCircle className="w-8 h-8 text-error mx-auto mb-2" />

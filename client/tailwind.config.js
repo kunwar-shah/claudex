@@ -127,6 +127,17 @@ export default {
         slow: '300ms',
         slower: '500ms',
       },
+      // Custom keyframes for loading animations
+      keyframes: {
+        loadingbar: {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(150%)' },
+          '100%': { transform: 'translateX(400%)' },
+        },
+      },
+      animation: {
+        loadingbar: 'loadingbar 1.4s ease-in-out infinite',
+      },
     },
   },
   plugins: [

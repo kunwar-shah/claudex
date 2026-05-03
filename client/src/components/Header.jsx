@@ -71,10 +71,11 @@ const Header = () => {
             variant="ghost"
             size="icon"
             title="Settings"
+            aria-label="Open settings"
             className="text-white hover:bg-[hsl(var(--surface))]/20 hover:text-white"
             onClick={() => setSettingsOpen(true)}
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-4 h-4" aria-hidden="true" />
           </Button>
         </nav>
 

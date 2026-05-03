@@ -45,9 +45,22 @@ export async function exportRoutes(fastify, options) {
         projectName: project.name
       };
 
-      // Set appropriate headers based on format
+      // Sanitize filename for HTTP Content-Disposition header.
+      // Session titles can contain em-dashes (—), emoji, quotes, etc.
+      // which Node rejects in HTTP headers (ERR_INVALID_CHAR).
+      // Strip to ASCII alphanumeric + dash + underscore only.
       const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `${project.name}-${session.title || sessionId}-${timestamp}`;
+      const safeProjectName = (project.name || 'project')
+        .replace(/[^a-zA-Z0-9-_]/g, '-')
+        .replace(/-+/g, '-')
+        .slice(0, 40)
+        .replace(/^-+|-+$/g, '');
+      const safeTitle = (session.title || sessionId)
+        .replace(/[^a-zA-Z0-9-_]/g, '-')
+        .replace(/-+/g, '-')
+        .slice(0, 40)
+        .replace(/^-+|-+$/g, '');
+      const filename = `${safeProjectName}-${safeTitle}-${timestamp}` || `claudex-export-${timestamp}`;
 
       switch (format.toLowerCase()) {
         case 'html':
