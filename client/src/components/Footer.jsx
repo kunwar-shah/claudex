@@ -5,9 +5,11 @@ import { Copy, ArrowUp, ArrowDown, Github, BookOpen, Activity } from 'lucide-rea
 import { projectsApi } from '../services/api'
 import ExportButton from './ExportButton'
 import { Button } from './ui/button'
+import { useToast } from '../contexts/ToastContext'
 
 const Footer = () => {
   const { projectId, sessionId } = useParams()
+  const toast = useToast()
   
   const { data: sessionData } = useQuery({
     queryKey: ['session', projectId, sessionId],
@@ -95,30 +97,16 @@ ${technicalMessages
 *Context extracted from Claude Conversations Viewer for AI continuity*`
 
       await navigator.clipboard.writeText(contextText)
-      
-      // Show success message
-      const toast = document.createElement('div')
-      toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in'
-      toast.textContent = 'Project context copied for Claude Code!'
-      document.body.appendChild(toast)
-      
-      setTimeout(() => {
-        document.body.removeChild(toast)
-      }, 3000)
-      
+      toast.success('Project context copied for Claude Code!', {
+        title: 'Copied',
+        duration: 3000,
+      })
       console.log('Project context copied to clipboard')
     } catch (error) {
       console.error('Failed to copy project context:', error)
-      
-      // Show error message
-      const toast = document.createElement('div')
-      toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg z-50'
-      toast.textContent = 'Failed to copy context: ' + error.message
-      document.body.appendChild(toast)
-      
-      setTimeout(() => {
-        document.body.removeChild(toast)
-      }, 3000)
+      toast.error(error.message || 'Could not copy context to clipboard', {
+        title: 'Copy failed',
+      })
     }
   }
 
@@ -166,7 +154,7 @@ ${technicalMessages
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-tertiary font-medium">
-              Claudex v1.2
+              Claudex v1.3.2
             </span>
 
             <a

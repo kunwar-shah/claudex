@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   Activity
 } from 'lucide-react'
-import { projectsApi } from '../services/api'
+import { projectsApi, statsApi } from '../services/api'
+import { Skeleton, SkeletonText, LoadingScreen } from './ui/loading'
 import {
   Card,
   Title,
@@ -31,6 +32,58 @@ import SessionMetadataControls from './SessionMetadataControls'
 import ProjectExportButton from './ProjectExportButton'
 import '../styles/tremor-dashboard.scss'
 
+// Custom polished horizontal bar chart — replaces Tremor's BarList for a nicer look.
+// Features: rank badges, name above bar (no overlap), value on right, gradient fill, hover lift.
+function CustomBarChart({ title, data, dotColor, barColorClass, badgeClass }) {
+  const total = data.reduce((sum, d) => sum + d.value, 0)
+  const max = Math.max(...data.map(d => d.value), 1)
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+          <Text className="font-semibold text-text-primary text-sm">{title}</Text>
+        </div>
+        <Badge size="xs" className={`${badgeClass} rounded font-medium`}>
+          Total: {total.toLocaleString()}
+        </Badge>
+      </div>
+      <div className="space-y-2.5">
+        {data.map((d, i) => {
+          const percentage = max > 0 ? (d.value / max) * 100 : 0
+          const shareOfTotal = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0'
+          return (
+            <div key={d.name} className="group">
+              <div className="flex items-center justify-between mb-1 gap-2">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-xs font-medium text-text-tertiary tabular-nums w-4 flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm font-medium text-text-primary truncate" title={d.name}>
+                    {d.name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-xs text-text-tertiary tabular-nums">{shareOfTotal}%</span>
+                  <span className="text-sm font-bold text-text-primary tabular-nums min-w-[60px] text-right">
+                    {d.value.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <div className="relative h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full bg-gradient-to-r ${barColorClass} rounded-full transition-all duration-700 ease-out group-hover:brightness-110`}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 const TremorProjectView = () => {
   const { projectId, sessionId } = useParams()
   const [searchParams] = useSearchParams()
@@ -46,9 +99,16 @@ const TremorProjectView = () => {
   }
 
   // Get all projects data for dashboard overview
-  const { data: projectsData } = useQuery({
+  const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getProjects().then(res => res.data)
+  })
+
+  // REAL message-role distribution from FTS5 (replaces fake 44/47/9 hardcoded percentages)
+  const { data: roleStats, isLoading: roleStatsLoading } = useQuery({
+    queryKey: ['stats', 'message-roles'],
+    queryFn: () => statsApi.getMessageRoles().then(res => res.data),
+    staleTime: 60_000, // refresh every minute
   })
 
   // Get sessions data
@@ -138,7 +198,11 @@ const TremorProjectView = () => {
                 <Flex alignItems="start" justifyContent="between">
                   <div>
                     <Text className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Total Projects</Text>
-                    <Metric className="tremor-metric-sm mt-2">{totalProjectsCount}</Metric>
+                    {projectsLoading ? (
+                      <Skeleton className="h-9 w-16 mt-2" />
+                    ) : (
+                      <Metric className="tremor-metric-sm mt-2">{totalProjectsCount.toLocaleString()}</Metric>
+                    )}
                   </div>
                   <div className="p-3 bg-primary/10 rounded-lg">
                     <Folder className="w-6 h-6 text-primary" />
@@ -155,7 +219,11 @@ const TremorProjectView = () => {
                 <Flex alignItems="start" justifyContent="between">
                   <div>
                     <Text className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Total Sessions</Text>
-                    <Metric className="tremor-metric-sm mt-2">{totalSessionsCount.toLocaleString()}</Metric>
+                    {projectsLoading ? (
+                      <Skeleton className="h-9 w-20 mt-2" />
+                    ) : (
+                      <Metric className="tremor-metric-sm mt-2">{totalSessionsCount.toLocaleString()}</Metric>
+                    )}
                   </div>
                   <div className="p-3 bg-success/10 rounded-lg">
                     <MessageSquare className="w-6 h-6 text-success" />
@@ -172,9 +240,13 @@ const TremorProjectView = () => {
                 <Flex alignItems="start" justifyContent="between">
                   <div>
                     <Text className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Total Messages</Text>
-                    <Metric className="tremor-metric-sm mt-2">
-                      {totalMessagesCount > 1000 ? `${(totalMessagesCount / 1000).toFixed(1)}K` : totalMessagesCount}
-                    </Metric>
+                    {projectsLoading ? (
+                      <Skeleton className="h-9 w-24 mt-2" />
+                    ) : (
+                      <Metric className="tremor-metric-sm mt-2">
+                        {totalMessagesCount > 1000 ? `${(totalMessagesCount / 1000).toFixed(1)}K` : totalMessagesCount.toLocaleString()}
+                      </Metric>
+                    )}
                   </div>
                   <div className="p-3 bg-accent/10 rounded-lg">
                     <MessageSquare className="w-6 h-6 text-accent" />
@@ -191,7 +263,11 @@ const TremorProjectView = () => {
                 <Flex alignItems="start" justifyContent="between">
                   <div>
                     <Text className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Active Today</Text>
-                    <Metric className="tremor-metric-sm mt-2">{activeTodayCount}</Metric>
+                    {projectsLoading ? (
+                      <Skeleton className="h-9 w-12 mt-2" />
+                    ) : (
+                      <Metric className="tremor-metric-sm mt-2">{activeTodayCount.toLocaleString()}</Metric>
+                    )}
                   </div>
                   <div className="p-3 bg-warning/10 rounded-lg">
                     <Zap className="w-6 h-6 text-warning" />
@@ -208,93 +284,130 @@ const TremorProjectView = () => {
             {/* Charts Section - Enterprise Design */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-4 flex items-start justify-between">
                   <div>
                     <Title className="text-lg font-bold">Message Distribution</Title>
-                    <Text className="text-sm">Breakdown by conversation role</Text>
+                    <Text className="text-sm text-text-secondary">Real role breakdown from your FTS5 index</Text>
                   </div>
-                  <Badge size="sm" className="bg-blue-500/10 text-blue-600 rounded">Live</Badge>
+                  <Badge size="sm" className="bg-success/10 text-success rounded font-medium" icon={Activity}>
+                    {roleStats?.total ? `${roleStats.total.toLocaleString()} indexed` : 'Live'}
+                  </Badge>
                 </div>
-                <div className="tremor-chart">
-                  <DonutChart
-                    data={[
-                      { name: 'User Messages', value: Math.floor(totalMessagesCount * 0.44) },
-                      { name: 'Assistant Messages', value: Math.floor(totalMessagesCount * 0.47) },
-                      { name: 'System Messages', value: Math.floor(totalMessagesCount * 0.09) }
-                    ]}
-                    category="value"
-                    index="name"
-                    colors={['blue', 'emerald', 'slate']}
-                    className="h-48"
-                    showLabel={true}
-                    showAnimation={true}
-                    variant="donut"
-                  />
+                <div className="tremor-chart relative">
+                  {roleStatsLoading ? (
+                    <div className="h-48 flex items-center justify-center">
+                      <Skeleton className="h-40 w-40 rounded-full" />
+                    </div>
+                  ) : (
+                    <>
+                      <DonutChart
+                        data={[
+                          { name: 'User', value: roleStats?.byRole?.user || 0 },
+                          { name: 'Assistant', value: roleStats?.byRole?.assistant || 0 },
+                          { name: 'System', value: roleStats?.byRole?.system || 0 },
+                          ...(roleStats?.byRole?.tool ? [{ name: 'Tool', value: roleStats.byRole.tool }] : []),
+                        ]}
+                        category="value"
+                        index="name"
+                        colors={['blue', 'emerald', 'slate', 'amber']}
+                        className="h-48"
+                        showLabel={false}
+                        showAnimation={true}
+                        variant="donut"
+                        valueFormatter={(v) => v.toLocaleString()}
+                      />
+                      {/* Custom centered total — replaces showLabel which was unformatted */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <Text className="text-xs text-text-secondary uppercase tracking-wider">Total</Text>
+                        <Metric className="text-2xl font-bold tracking-tight">
+                          {(roleStats?.total || 0).toLocaleString()}
+                        </Metric>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-border">
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#3b82f6'}}></div>
-                      <Text className="text-xs text-text-secondary">User</Text>
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                      <Text className="text-xs font-medium text-text-secondary uppercase tracking-wide">User</Text>
                     </div>
-                    <Metric className="text-lg text-primary">{Math.floor(totalMessagesCount * 0.44).toLocaleString()}</Metric>
+                    <Metric className="text-lg font-bold text-blue-600">
+                      {(roleStats?.byRole?.user || 0).toLocaleString()}
+                    </Metric>
+                    {roleStats?.percentages?.user != null && (
+                      <Text className="text-xs text-text-tertiary">{roleStats.percentages.user}%</Text>
+                    )}
                   </div>
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#10b981'}}></div>
-                      <Text className="text-xs text-text-secondary">Assistant</Text>
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      <Text className="text-xs font-medium text-text-secondary uppercase tracking-wide">Assistant</Text>
                     </div>
-                    <Metric className="text-lg text-success">{Math.floor(totalMessagesCount * 0.47).toLocaleString()}</Metric>
+                    <Metric className="text-lg font-bold text-emerald-600">
+                      {(roleStats?.byRole?.assistant || 0).toLocaleString()}
+                    </Metric>
+                    {roleStats?.percentages?.assistant != null && (
+                      <Text className="text-xs text-text-tertiary">{roleStats.percentages.assistant}%</Text>
+                    )}
                   </div>
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#64748b'}}></div>
-                      <Text className="text-xs text-text-secondary">System</Text>
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-500" />
+                      <Text className="text-xs font-medium text-text-secondary uppercase tracking-wide">System</Text>
                     </div>
-                    <Metric className="text-lg text-text-secondary">{Math.floor(totalMessagesCount * 0.09).toLocaleString()}</Metric>
+                    <Metric className="text-lg font-bold text-slate-600">
+                      {(roleStats?.byRole?.system || 0).toLocaleString()}
+                    </Metric>
+                    {roleStats?.percentages?.system != null && (
+                      <Text className="text-xs text-text-tertiary">{roleStats.percentages.system}%</Text>
+                    )}
                   </div>
                 </div>
               </Card>
 
               <Card className="tremor-card hover:shadow-xl transition-shadow duration-300">
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-4 flex items-start justify-between">
                   <div>
                     <Title className="text-lg font-bold">Project Activity</Title>
-                    <Text className="text-sm">Top 5 projects by engagement</Text>
+                    <Text className="text-sm text-text-secondary">Top 5 projects by sessions and messages</Text>
                   </div>
-                  <Badge size="sm" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Updated</Badge>
+                  <Badge size="sm" className="bg-primary/10 text-primary rounded font-medium">
+                    {allProjects.length} {allProjects.length === 1 ? 'project' : 'projects'}
+                  </Badge>
                 </div>
-                {projectActivityData.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Sessions Chart */}
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Sessions by Project</Text>
-                        <Badge size="xs" className="bg-blue-500/10 text-blue-600 rounded">Total: {projectActivityData.reduce((sum, p) => sum + p.sessions, 0)}</Badge>
-                      </div>
-                      <BarList
-                        data={projectActivityData.map(p => ({
-                          name: p.project,
-                          value: p.sessions
-                        }))}
-                        color="blue"
-                        showAnimation={true}
-                      />
+                {projectsLoading ? (
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      {[1,2,3,4,5].map(i => (
+                        <Skeleton key={`s-${i}`} className="h-9 w-full" />
+                      ))}
                     </div>
+                    <div className="pt-4 border-t border-border space-y-2">
+                      {[1,2,3,4,5].map(i => (
+                        <Skeleton key={`m-${i}`} className="h-9 w-full" />
+                      ))}
+                    </div>
+                  </div>
+                ) : projectActivityData.length > 0 ? (
+                  <div className="space-y-5">
+                    {/* Sessions Chart */}
+                    <CustomBarChart
+                      title="Sessions by Project"
+                      dotColor="bg-blue-500"
+                      barColorClass="from-blue-500 to-blue-600"
+                      badgeClass="bg-blue-500/10 text-blue-600"
+                      data={projectActivityData.map(p => ({ name: p.project, value: p.sessions }))}
+                    />
 
                     {/* Messages Chart */}
                     <div className="pt-4 border-t border-border">
-                      <div className="flex items-center justify-between mb-3">
-                        <Text className="font-semibold text-[hsl(var(--text-primary))]">Messages by Project</Text>
-                        <Badge size="xs" className="bg-[hsl(var(--primary-light))]0/10 text-[hsl(var(--primary))] rounded">Total: {projectActivityData.reduce((sum, p) => sum + p.messages, 0).toLocaleString()}</Badge>
-                      </div>
-                      <BarList
-                        data={projectActivityData.map(p => ({
-                          name: p.project,
-                          value: p.messages
-                        }))}
-                        color="emerald"
-                        showAnimation={true}
+                      <CustomBarChart
+                        title="Messages by Project"
+                        dotColor="bg-emerald-500"
+                        barColorClass="from-emerald-500 to-emerald-600"
+                        badgeClass="bg-emerald-500/10 text-emerald-600"
+                        data={projectActivityData.map(p => ({ name: p.project, value: p.messages }))}
                       />
                     </div>
                   </div>
@@ -316,15 +429,42 @@ const TremorProjectView = () => {
                   <Title className="text-xl font-bold">All Projects</Title>
                   <Text className="text-sm">Select a project to view detailed analytics</Text>
                 </div>
-                <Badge size="lg" className="bg-indigo-500/10 text-indigo-600 rounded">
-                  {allProjects.length} Total
-                </Badge>
+                {projectsLoading ? (
+                  <Skeleton className="h-7 w-20 rounded-md" />
+                ) : (
+                  <Badge size="lg" className="bg-indigo-500/10 text-indigo-600 rounded">
+                    {allProjects.length} Total
+                  </Badge>
+                )}
               </div>
-              {allProjects.length === 0 ? (
+              {projectsLoading ? (
+                <div className="space-y-2">
+                  {[1,2,3,4,5,6].map(i => (
+                    <div key={i} className="flex items-center gap-4 p-4 border border-border rounded-lg">
+                      <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <Skeleton className="h-4 w-2/5" />
+                        <Skeleton className="h-3 w-3/5" />
+                      </div>
+                      <Skeleton className="h-6 w-16 rounded-full flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              ) : allProjects.length === 0 ? (
                 <div className="text-center py-12 bg-surface rounded-lg">
                   <Folder className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                   <Title className="text-text-secondary mb-2">No Projects Found</Title>
-                  <Text className="text-text-secondary">Start using Claude Code to create conversation projects</Text>
+                  <Text className="text-text-secondary mb-4 max-w-md mx-auto">
+                    Claudex looks for conversations in <code className="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-xs font-mono">~/.claude/projects/</code>. Start a session in Claude Code to create your first project.
+                  </Text>
+                  <a
+                    href="https://docs.claude.com/en/docs/claude-code/quickstart"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary border border-primary/30 rounded-md hover:bg-primary/5 transition-colors"
+                  >
+                    📖 Claude Code Quickstart
+                  </a>
                 </div>
               ) : (
                 <>

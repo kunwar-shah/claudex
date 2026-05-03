@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { X, FileText, ChevronDown, Settings, Edit, MessageSquare } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
+import { ModalLoadingContent } from './ui/loading'
 
 /**
  * SessionSummaryModal - Modal dialog showing session summary
@@ -95,22 +96,18 @@ const SessionSummaryModal = ({ session, projectId, onClose }) => {
             </div>
             <button
               onClick={onClose}
-              className="ml-4 p-2 hover:bg-surface rounded-lg transition-colors"
+              aria-label="Close session summary"
+              title="Close"
+              className="ml-4 p-2 hover:bg-surface rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <X className="w-5 h-5 text-muted-foreground" />
+              <X className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
             </button>
           </div>
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
             {isLoading ? (
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-surface rounded w-3/4"></div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-surface rounded"></div>
-                  <div className="h-3 bg-surface rounded w-5/6"></div>
-                </div>
-              </div>
+              <ModalLoadingContent label="Loading session summary..." />
             ) : error ? (
               <div className="text-error text-sm">
                 Failed to load session summary

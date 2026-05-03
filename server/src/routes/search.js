@@ -177,6 +177,41 @@ export async function searchRoutes(fastify, options) {
     }
   });
 
+  // GET /api/stats/message-roles
+  // Returns real counts of messages by role from the FTS5 index
+  fastify.get('/stats/message-roles', async (request, reply) => {
+    try {
+      const db = searchIndexer.searchDb.db
+      // Single GROUP BY query — fast on FTS5 with role column
+      const rows = await db.all(
+        `SELECT role, COUNT(*) AS count FROM messages_fts GROUP BY role`
+      ) || []
+      const roleStats = { user: 0, assistant: 0, system: 0, tool: 0, other: 0 }
+      let total = 0
+      for (const row of rows) {
+        const role = (row.role || '').toLowerCase()
+        const n = Number(row.count) || 0
+        if (role in roleStats) roleStats[role] += n
+        else roleStats.other += n
+        total += n
+      }
+      return {
+        total,
+        byRole: roleStats,
+        percentages: total > 0
+          ? Object.fromEntries(Object.entries(roleStats).map(([k, v]) => [k, Number(((v / total) * 100).toFixed(1))]))
+          : roleStats,
+        source: 'real',
+        timestamp: new Date().toISOString()
+      }
+    } catch (error) {
+      reply.code(500).send({
+        error: 'stats_failed',
+        message: error.message
+      })
+    }
+  });
+
   // GET /api/health
   fastify.get('/health', async (request, reply) => {
     try {

@@ -58,6 +58,7 @@ const ProjectExportButton = ({ projectId, projectName, variant = 'default' }) =>
       disabled={isExporting}
       className={buttonClasses}
       title={`Export complete project: ${projectName || projectId}`}
+      aria-label={`Export project ${projectName || projectId} as JSON`}
     >
       {isExporting ? (
         <>

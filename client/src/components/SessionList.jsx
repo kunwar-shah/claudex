@@ -10,6 +10,7 @@ import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Muted, Small } from './ui/typography'
+import { ListLoadingItems } from './ui/loading'
 import { cn } from '@/lib/utils'
 
 const SessionList = ({ projectId, selectedSessionId }) => {
@@ -41,10 +42,8 @@ const SessionList = ({ projectId, selectedSessionId }) => {
 
   if (isLoading) {
     return (
-      <div className="p-4 space-y-3">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-20 bg-surface animate-pulse rounded-lg border border-border"></div>
-        ))}
+      <div className="p-4">
+        <ListLoadingItems count={6} hasIcon={true} />
       </div>
     )
   }

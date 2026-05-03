@@ -2,6 +2,45 @@
 
 All notable changes to Claudex.
 
+## [1.3.3] - 2026-05-01
+
+### Added
+- **Official MCP Registry submission** — Claudex is now publishable to `registry.modelcontextprotocol.io` (Anthropic's official MCP registry). MCP clients (Claude Code, Cursor, Codex, Windsurf) can discover Claudex via the registry.
+- **`mcpName: io.github.kunwar-shah/claudex`** in package.json — required by the registry verification.
+- **`server.json` manifest** at the repo root — describes the package, transport (stdio), and optional env vars.
+
+### UI/UX (large polish pass)
+- **Auto-apply visual settings** — theme, font, font size, density, border radius, animations now apply instantly on click. No more "Save & Apply" button for visual changes.
+- **Theme preview block** in Settings — each card shows a mini mockup with the theme's primary color, surface, button, and badge. No more global CSS swap on hover.
+- **🎲 Surprise Me button** — randomizes ALL visual settings at once (theme, font, size, density, radius, view).
+- **Mobile-responsive Settings modal** — full-height bottom sheet on mobile, dialog on desktop. Tabs scroll horizontally on narrow screens.
+
+### Infrastructure
+- **Unified `<ToastProvider>` context** — replaces three different toast patterns (Footer DOM hacks, App.jsx prop drilling, SearchPage local state). Stacking, dismissable, ARIA-correct (`role="alert"` for errors, `role="status"` for info).
+- **`<ErrorBoundary>` at root** — catches all JS errors with a recovery UI (Try Again / Reload / Go Home / Report Issue with pre-filled GitHub link). Replaces white screen of death.
+- **Keyboard shortcuts** — `?` opens help overlay, `/` focuses search, `Esc` closes modals, `g s|m|a` jumps to Search/Manage/Analytics, `Cmd/Ctrl+K` reserved for command palette, `Cmd/Ctrl+,` opens settings.
+- **Bundle code-splitting** — initial JS bundle 10× smaller (442 KB → 46 KB gzipped). Routes lazy-loaded. Tremor (1 MB) only loads on Analytics page.
+- **ARIA labels** added to icon-only buttons in Settings, Header, SessionSummary, Export, ProjectExport.
+
+### Real Data
+- **Real role distribution chart** — Analytics dashboard now uses actual SQL `GROUP BY role` from FTS5 index instead of hardcoded 44/47/9% percentages. New `/api/stats/message-roles` endpoint.
+- **Honest "X indexed" badge** — replaces misleading "Live" tag.
+- **Custom polished bar chart** — replaces Tremor BarList. Rank numbers, share-of-total %, gradient fills, hover lift, formatted numbers.
+
+### Loading States
+- **`<TopProgressBar>`** — global indeterminate progress bar at top of viewport. Activates on any TanStack Query fetch or mutation. 150ms delay to avoid flicker.
+- **Skeleton placeholders** for: Manage Sessions table, ConversationThread, SessionList sidebar, SearchPage results, Tremor stat cards, All Projects list, donut chart.
+- New shared `<LoadingScreen>`, `<TableLoadingRows>`, `<CardLoadingGrid>`, `<ListLoadingItems>`, `<ModalLoadingContent>` components.
+
+### Fixed
+- **Export button 500 error** — session titles with em-dashes (—), quotes, or emoji corrupted the `Content-Disposition` HTTP header. Filename now sanitized to ASCII alphanumeric + dash + underscore.
+- **Per-page dropdown value cut off** — wider select with proper right padding for the dropdown arrow.
+- **Tags input "Add" button overflowing card** — added `min-w-0` on flex children so input can shrink below browser default min-width.
+- **Footer version label** — was stuck at "Claudex v1.2", now shows current version.
+- **Copy Context popup behind header** — z-index `z-50` → `z-[10000]`, position moved to clear sticky header.
+
+---
+
 ## [1.3.2] - 2026-04-30
 
 ### Changed

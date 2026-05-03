@@ -162,7 +162,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
               value={customTitle}
               onChange={(e) => setCustomTitle(e.target.value)}
               placeholder={currentTitle}
-              className="flex-1 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
+              className="flex-1 min-w-0 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
               autoFocus
             />
             <button
@@ -250,7 +250,7 @@ const SessionMetadataControls = ({ projectId, sessionId, currentTitle, compact =
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             placeholder="Add tags (comma-separated)"
-            className="flex-1 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
+            className="flex-1 min-w-0 px-3 py-2 border border-[hsl(var(--border-hover))] rounded text-sm"
             onKeyPress={(e) => e.key === 'Enter' && handleAddTags()}
           />
           <button

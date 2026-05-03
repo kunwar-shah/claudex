@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { projectsApi, sessionMetadataApi } from '../services/api'
 import MessageBubble from './MessageBubble'
+import { LoadingScreen } from './ui/loading'
 import MessagingBubble from './MessagingBubble'
 import ExportButton from './ExportButton'
 import { Button } from './ui/button'
@@ -106,9 +107,10 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
 
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <LoadingScreen
+        label="Loading conversation..."
+        description="Fetching messages from the session log."
+      />
     )
   }
 
@@ -248,7 +250,7 @@ const ConversationThread = ({ projectId, sessionId, highlightMessageId }) => {
                   <select
                     value={pageSize}
                     onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                    className="h-7 rounded-md border border-border bg-background px-2 text-xs"
+                    className="h-8 rounded-md border border-border bg-background pl-2.5 pr-7 text-xs min-w-[68px] cursor-pointer hover:border-primary/50 transition-colors"
                   >
                     <option value={25}>25</option>
                     <option value={50}>50</option>
