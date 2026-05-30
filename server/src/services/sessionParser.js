@@ -111,6 +111,85 @@ export class SessionParser {
     }
   }
 
+  /**
+   * Parse only the portion of a session file starting at `startByte`, continuing
+   * line numbering from `startLineNumber`. Used by incremental indexing to read
+   * just the lines appended since the last pass.
+   *
+   * Reads the byte slice [startByte, EOF) and only consumes up to the LAST
+   * newline, so a partial final line (a record still being written) is deferred
+   * to the next pass rather than indexed half-formed. Returns the byte offset
+   * actually consumed so the caller can advance its watermark precisely.
+   *
+   * Line numbers and message ids are produced identically to parseSession() as
+   * long as `startLineNumber` is the last fully-indexed physical line, because
+   * MessageParser bakes the line number into each message id.
+   */
+  async parseSessionFrom(sessionFilePath, startByte = 0, startLineNumber = 0) {
+    // Detect template from the file head, same source parseSession uses.
+    const samples = await this.getSampleMessages(sessionFilePath);
+    const template = TemplateDetector.detectTemplate(samples);
+
+    const empty = {
+      messages: [],
+      template,
+      bytesConsumed: 0,
+      endByte: startByte,
+      lastLineNumber: startLineNumber,
+      skippedLines: 0,
+    };
+
+    const fh = await fs.promises.open(sessionFilePath, 'r');
+    try {
+      const { size } = await fh.stat();
+      if (startByte >= size) return empty;
+
+      const length = size - startByte;
+      const buffer = Buffer.allocUnsafe(length);
+      await fh.read(buffer, 0, length, startByte);
+
+      // Consume only through the last complete line (terminated by \n).
+      const lastNewline = buffer.lastIndexOf(0x0a);
+      if (lastNewline === -1) return empty; // no complete line available yet
+
+      const completeBytes = lastNewline + 1;
+      const text = buffer.toString('utf8', 0, completeBytes);
+
+      const messages = [];
+      let lineNumber = startLineNumber;
+      let skippedLines = 0;
+
+      const lines = text.split('\n');
+      lines.pop(); // drop the empty string after the trailing newline
+
+      for (const rawLine of lines) {
+        lineNumber++; // count every physical line (incl. blanks), like parseSession
+        const trimmedLine = rawLine.trim();
+        if (!trimmedLine) continue;
+
+        try {
+          const rawMessage = JSON.parse(trimmedLine);
+          const parsedMessage = this.messageParser.parseMessage(rawMessage, template, lineNumber);
+          parsedMessage.lineNumber = lineNumber;
+          messages.push(parsedMessage);
+        } catch (error) {
+          skippedLines++;
+        }
+      }
+
+      return {
+        messages,
+        template,
+        bytesConsumed: completeBytes,
+        endByte: startByte + completeBytes,
+        lastLineNumber: lineNumber,
+        skippedLines,
+      };
+    } finally {
+      await fh.close();
+    }
+  }
+
   async getSampleMessages(sessionFilePath, sampleSize = 10) {
     const samples = [];
     const fileStream = fs.createReadStream(sessionFilePath);

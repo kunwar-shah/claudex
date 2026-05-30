@@ -70,6 +70,41 @@ export class FileScanner {
     }
   }
 
+  // Lightweight session scan: stat only, no file reads. Used by incremental
+  // indexing to detect which session files changed (by size + mtime) before
+  // deciding whether to parse them at all.
+  async statSessions(projectPath) {
+    try {
+      const entries = await fs.readdir(projectPath, { withFileTypes: true });
+      const sessions = [];
+
+      for (const entry of entries) {
+        if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+          const filePath = path.join(projectPath, entry.name);
+          const stats = await fs.stat(filePath);
+          sessions.push({
+            sessionId: entry.name.replace('.jsonl', ''),
+            filePath,
+            size: stats.size,
+            mtimeMs: Math.floor(stats.mtimeMs)
+          });
+        }
+      }
+
+      return sessions;
+    } catch (error) {
+      console.error('Error stat-scanning sessions:', error);
+      throw new Error(`Failed to stat sessions in project: ${error.message}`);
+    }
+  }
+
+  // Compute the display title for a session from its first raw messages,
+  // matching the title used by the full-index path.
+  async getSessionTitle(filePath, sessionId) {
+    const firstMessages = await this.getSessionFirstMessages(filePath, 3);
+    return extractTitleFromRawMessages(firstMessages, sessionId);
+  }
+
   cleanProjectName(rawName) {
     // Convert "-mnt-c-laragon-www-simple-migration" to "simple-migration"
     // Convert "-home-boss-claude-chats" to "claude-chats"

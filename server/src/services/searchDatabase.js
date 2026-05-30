@@ -116,6 +116,30 @@ export class SearchDatabase {
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_deleted ON session_metadata(is_deleted)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_tags ON session_metadata(tags)')
     await this.db.run('CREATE INDEX IF NOT EXISTS idx_session_metadata_favorited ON session_metadata(is_favorited)')
+
+    // Per-file watermark table powering incremental indexing.
+    // One row per (project_id, session_id) recording how far into the JSONL
+    // file we have indexed, so subsequent passes only parse appended lines.
+    const indexedFilesTableSQL = `
+      CREATE TABLE IF NOT EXISTS indexed_files (
+        project_id TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        project_name TEXT,
+        session_title TEXT,
+        template TEXT,
+        file_path TEXT NOT NULL,
+        mtime_ms INTEGER NOT NULL,
+        size_bytes INTEGER NOT NULL,
+        bytes_indexed INTEGER NOT NULL,
+        last_line_number INTEGER NOT NULL DEFAULT 0,
+        prefix_sha TEXT,
+        message_count INTEGER NOT NULL DEFAULT 0,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (project_id, session_id)
+      )
+    `
+    await this.db.run(indexedFilesTableSQL)
+    await this.db.run('CREATE INDEX IF NOT EXISTS idx_indexed_files_project ON indexed_files(project_id)')
   }
 
   async indexMessage({
@@ -326,6 +350,72 @@ export class SearchDatabase {
 
     // For complex queries, just escape quotes and return as-is
     return escaped;
+  }
+
+  // ---- Incremental indexing: per-file watermark tracking ----
+
+  async getIndexedFile(projectId, sessionId) {
+    return await this.db.get(
+      'SELECT * FROM indexed_files WHERE project_id = ? AND session_id = ?',
+      [projectId, sessionId]
+    )
+  }
+
+  async getIndexedFilesForProject(projectId) {
+    return (await this.db.all(
+      'SELECT * FROM indexed_files WHERE project_id = ?',
+      [projectId]
+    )) || []
+  }
+
+  async getAllIndexedFiles() {
+    return (await this.db.all('SELECT * FROM indexed_files')) || []
+  }
+
+  async upsertIndexedFile(record) {
+    await this.db.run(`
+      INSERT OR REPLACE INTO indexed_files (
+        project_id, session_id, project_name, session_title, template,
+        file_path, mtime_ms, size_bytes, bytes_indexed, last_line_number,
+        prefix_sha, message_count, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `, [
+      record.projectId, record.sessionId, record.projectName, record.sessionTitle,
+      record.template, record.filePath, record.mtimeMs, record.sizeBytes,
+      record.bytesIndexed, record.lastLineNumber, record.prefixSha, record.messageCount
+    ])
+  }
+
+  async deleteIndexedFile(projectId, sessionId) {
+    await this.db.run(
+      'DELETE FROM indexed_files WHERE project_id = ? AND session_id = ?',
+      [projectId, sessionId]
+    )
+  }
+
+  async clearIndexedFiles() {
+    await this.db.run('DELETE FROM indexed_files')
+  }
+
+  // Delete all FTS rows for a session (used by the full-reindex fallback).
+  async deleteSessionRows(projectId, sessionId) {
+    await this.db.run(
+      'DELETE FROM messages_fts WHERE project_id = ? AND session_id = ?',
+      [projectId, sessionId]
+    )
+  }
+
+  // Preserve a session's currently-indexed rows by re-keying them to an
+  // archived session_id, instead of deleting them. Used when a file shrinks
+  // or is rewritten (compaction corruption, manual edit) so previously
+  // indexed conversation content remains searchable.
+  async archiveSessionRows(projectId, sessionId, archiveSuffix, titleSuffix = ' (archived)') {
+    await this.db.run(`
+      UPDATE messages_fts
+         SET session_id = session_id || ?,
+             session_title = session_title || ?
+       WHERE project_id = ? AND session_id = ?
+    `, [archiveSuffix, titleSuffix, projectId, sessionId])
   }
 
   async close() {

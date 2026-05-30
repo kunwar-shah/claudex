@@ -89,7 +89,12 @@ export async function searchRoutes(fastify, options) {
         result: null
       };
 
-      console.log('🔧 Starting async search index build...');
+      // Incremental by default; pass ?full=true (or { full: true }) to force a
+      // full rebuild from scratch.
+      const full = request.query?.full === 'true' || request.query?.full === true
+        || request.body?.full === true;
+
+      console.log(`🔧 Starting async search index ${full ? 'full rebuild' : 'incremental update'}...`);
 
       // Progress callback to update status in real-time
       const progressCallback = (progressData) => {
@@ -100,7 +105,11 @@ export async function searchRoutes(fastify, options) {
       };
 
       // Start indexing in background (don't await)
-      searchIndexer.buildFullIndex(progressCallback)
+      const indexBuild = full
+        ? searchIndexer.buildFullIndex(progressCallback)
+        : searchIndexer.buildIncrementalIndex(progressCallback);
+
+      indexBuild
         .then(result => {
           rebuildStatus.isBuilding = false;
           rebuildStatus.progress = 100;
@@ -116,7 +125,8 @@ export async function searchRoutes(fastify, options) {
       // Return immediately
       return {
         success: true,
-        message: 'Index rebuild started in background',
+        mode: full ? 'full' : 'incremental',
+        message: `Index ${full ? 'full rebuild' : 'incremental update'} started in background`,
         status: rebuildStatus
       };
 
