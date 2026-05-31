@@ -17,6 +17,50 @@ export async function searchRoutes(fastify, options) {
     result: null
   };
 
+  // Shared build plumbing, used by both the manual endpoint and the optional
+  // periodic re-index timer, so they can't run concurrently and report status
+  // the same way.
+  const progressCallback = (progressData) => {
+    rebuildStatus.progress = progressData.progress;
+    rebuildStatus.totalMessages = progressData.totalMessages;
+    rebuildStatus.currentSession = progressData.currentSession;
+    rebuildStatus.totalSessions = progressData.totalSessions;
+  };
+
+  function beginRebuildStatus() {
+    rebuildStatus = {
+      isBuilding: true,
+      progress: 0,
+      totalMessages: 0,
+      currentSession: 0,
+      totalSessions: 0,
+      error: null,
+      startTime: Date.now(),
+      result: null
+    };
+  }
+
+  // Kick off a build and keep rebuildStatus in sync. Returns the promise so
+  // callers can await it (periodic timer) or fire-and-forget (HTTP endpoint).
+  function launchBuild(full) {
+    const build = full
+      ? searchIndexer.buildFullIndex(progressCallback)
+      : searchIndexer.buildIncrementalIndex(progressCallback);
+
+    return build
+      .then(result => {
+        rebuildStatus.isBuilding = false;
+        rebuildStatus.progress = 100;
+        rebuildStatus.result = result;
+        console.log('✅ Search index build completed successfully');
+      })
+      .catch(error => {
+        rebuildStatus.isBuilding = false;
+        rebuildStatus.error = error.message;
+        console.error('❌ Search index build failed:', error);
+      });
+  }
+
   // POST /api/search  
   fastify.post('/search', async (request, reply) => {
     try {
@@ -77,18 +121,6 @@ export async function searchRoutes(fastify, options) {
         });
       }
 
-      // Reset status
-      rebuildStatus = {
-        isBuilding: true,
-        progress: 0,
-        totalMessages: 0,
-        currentSession: 0,
-        totalSessions: 0,
-        error: null,
-        startTime: Date.now(),
-        result: null
-      };
-
       // Incremental by default; pass ?full=true (or { full: true }) to force a
       // full rebuild from scratch.
       const full = request.query?.full === 'true' || request.query?.full === true
@@ -96,31 +128,8 @@ export async function searchRoutes(fastify, options) {
 
       console.log(`🔧 Starting async search index ${full ? 'full rebuild' : 'incremental update'}...`);
 
-      // Progress callback to update status in real-time
-      const progressCallback = (progressData) => {
-        rebuildStatus.progress = progressData.progress;
-        rebuildStatus.totalMessages = progressData.totalMessages;
-        rebuildStatus.currentSession = progressData.currentSession;
-        rebuildStatus.totalSessions = progressData.totalSessions;
-      };
-
-      // Start indexing in background (don't await)
-      const indexBuild = full
-        ? searchIndexer.buildFullIndex(progressCallback)
-        : searchIndexer.buildIncrementalIndex(progressCallback);
-
-      indexBuild
-        .then(result => {
-          rebuildStatus.isBuilding = false;
-          rebuildStatus.progress = 100;
-          rebuildStatus.result = result;
-          console.log('✅ Search index build completed successfully');
-        })
-        .catch(error => {
-          rebuildStatus.isBuilding = false;
-          rebuildStatus.error = error.message;
-          console.error('❌ Search index build failed:', error);
-        });
+      beginRebuildStatus();
+      launchBuild(full); // fire-and-forget; status tracked via rebuildStatus
 
       // Return immediately
       return {
@@ -240,4 +249,39 @@ export async function searchRoutes(fastify, options) {
       });
     }
   });
+
+  // ---- Optional periodic incremental re-index ----
+  // Set CLAUDEX_REINDEX_INTERVAL to a number of seconds to keep the index fresh
+  // automatically (e.g. 60). Unset or <= 0 disables it (default). Each tick runs
+  // an incremental pass, skipped if a manual build is already in progress, so it
+  // never overlaps. The first pass runs shortly after startup, which also
+  // bootstraps an empty index without needing a manual rebuild.
+  const reindexSeconds = parseInt(process.env.CLAUDEX_REINDEX_INTERVAL || '0', 10);
+  if (Number.isFinite(reindexSeconds) && reindexSeconds > 0) {
+    const intervalMs = Math.max(reindexSeconds, 5) * 1000; // floor at 5s
+
+    const tick = async () => {
+      if (rebuildStatus.isBuilding) return; // a manual or prior build is running
+      beginRebuildStatus();
+      try {
+        await launchBuild(false); // incremental
+      } catch (error) {
+        console.error('❌ Periodic re-index failed:', error);
+      }
+    };
+
+    // Initial pass a moment after boot, then on the interval.
+    const initialTimer = setTimeout(tick, 1000);
+    const reindexTimer = setInterval(tick, intervalMs);
+    // Don't let these timers keep the process alive on their own.
+    if (initialTimer.unref) initialTimer.unref();
+    if (reindexTimer.unref) reindexTimer.unref();
+
+    fastify.addHook('onClose', async () => {
+      clearTimeout(initialTimer);
+      clearInterval(reindexTimer);
+    });
+
+    console.log(`🕒 Periodic incremental re-index enabled: every ${Math.max(reindexSeconds, 5)}s`);
+  }
 }
