@@ -151,16 +151,19 @@ function showHelp() {
   console.log('  --version, -v           Show version')
   console.log('  --port, -p <port>       Server port (default: 3400)')
   console.log('  --project-root <path>   Path to Claude projects directory')
+  console.log('  --reindex-interval <s>  Auto incremental re-index every <s> seconds (default: off)')
   console.log('')
   console.log(chalk.white('Environment Variables:'))
-  console.log('  PROJECT_ROOT   Path to Claude projects directory (default: ~/.claude/projects)')
-  console.log('  PORT           Server port (default: 3400)')
+  console.log('  PROJECT_ROOT              Path to Claude projects directory (default: ~/.claude/projects)')
+  console.log('  PORT                      Server port (default: 3400)')
+  console.log('  CLAUDEX_REINDEX_INTERVAL  Auto incremental re-index interval in seconds (default: off)')
   console.log('')
   console.log(chalk.white('Examples:'))
   console.log('  claudex                              Start on default port (3400)')
   console.log('  claudex --port 3500                  Start on custom port')
   console.log('  claudex -p 8080                      Short form')
   console.log('  claudex --project-root ~/my-chats    Custom projects directory')
+  console.log('  claudex --reindex-interval 60        Auto re-index every 60s')
   console.log('  PORT=3500 claudex                    Using environment variable')
   console.log('')
   console.log(chalk.white('MCP (Claude Code Integration):'))
@@ -212,12 +215,29 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
+// Parse periodic re-index interval flag (seconds)
+let reindexInterval = null
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--reindex-interval') {
+    reindexInterval = args[i + 1]
+    if (!reindexInterval || isNaN(parseInt(reindexInterval))) {
+      console.log(chalk.red('❌ Invalid re-index interval (seconds)'))
+      console.log(chalk.yellow('Usage: claudex --reindex-interval 60'))
+      process.exit(1)
+    }
+    break
+  }
+}
+
 // Set environment variables from CLI flags
 if (customPort) {
   process.env.PORT = customPort
 }
 if (customProjectRoot) {
   process.env.PROJECT_ROOT = customProjectRoot
+}
+if (reindexInterval) {
+  process.env.CLAUDEX_REINDEX_INTERVAL = reindexInterval
 }
 
 if (args.includes('--help') || args.includes('-h')) {
