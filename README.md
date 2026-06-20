@@ -1,5 +1,3 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/kunwar-shah-claudex-badge.png)](https://mseep.ai/app/kunwar-shah-claudex)
-
 <div align="center">
   <img src="docs/logo-sm.png" alt="Claudex Logo" width="180">
 
