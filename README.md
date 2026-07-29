@@ -3,6 +3,8 @@
 
   # Claudex
 
+[![MCP Toplist](https://mcptoplist.com/badge/io.github.kunwar-shah%2Fclaudex.svg)](https://mcptoplist.com/server/io.github.kunwar-shah%2Fclaudex)
+
   **Professional conversation viewer and analysis tool for Claude Code**
 
   > **Category**: Development Tools · Conversation Analysis · Usage Monitoring
